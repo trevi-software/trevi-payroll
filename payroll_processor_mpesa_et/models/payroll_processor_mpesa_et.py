@@ -127,13 +127,23 @@ class PayrollProcessorMpesaEt(models.Model):
 
         if response.status_code == codes.ok:
             _logger.info(
-                "Payment request successful. Response: {response.text}"
+                "Payment request for {party_b} was successful. Response: {response.text}"
             )
             return loads(response.json())
         else:
             response.raise_for_status()
 
     def translate_payment_response(self, response: Dict[str, str]) -> Dict[str, str]:
+
+       return {
+           "ok_conversation": response["ConversationId"],
+           "ok_originator_conversation": response["OriginatorConversationID"],
+           "ok_response_code": response["ResponseCode"],
+           "ok_response_desc": response["ResponseDescription"],
+           "raw": response.__str__
+       }
+
+    def translate_payment_result(self, response: Dict[str, str]) -> Dict[str, str]:
 
        return {
            "ok_conversation": response["ConversationId"],
