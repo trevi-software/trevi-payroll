@@ -16,6 +16,8 @@ class ResultController(Controller):
         recepient_is_registered_customer = kwargs.get('recepient_is_registered_customer')
 
         self.env["payslip.mpesa_et.result"].create({
+            "result_ok": True,
+            "result_error": False,
             "result_type": type,
             "result_code": code,
             "result_desc": desc,

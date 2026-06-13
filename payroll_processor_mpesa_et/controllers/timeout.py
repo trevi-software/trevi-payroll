@@ -9,6 +9,8 @@ class TimeoutController(Controller):
         result_desc = kwargs.get('result_desc')
 
         self.env["payslip.mpesa_et.result"].create({
+            "result_error": True,
+            "result_ok": False,
             "conversation": conversation,
             "originator_conversation": originator_conversation,
             "result_code": result_code,

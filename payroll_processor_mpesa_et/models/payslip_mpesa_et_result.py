@@ -7,6 +7,10 @@ class PayslipMpesaEtResult(models.Model):
     _description = "Safaricom Ethiopia M-PESA Payslip Integration Result"
     _order = "tx_completed_at desc"
 
+    result_ok = fields.Boolean(string="Result OK", readonly=True)
+
+    result_error = fields.Boolean(string="Result Error", readonly=True)
+
     result_type = fields.Integer(readonly=True)
 
     result_code = fields.Integer(readonly=True)
