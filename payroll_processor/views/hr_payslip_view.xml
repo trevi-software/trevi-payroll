@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+
+    <record id="hr_payslip_view_tree_inherit" model="ir.ui.view">
+        <field name="name">hr.payslip.tree.inherit.payroll_processor</field>
+        <field name="model">hr.payslip</field>
+        <field name="inherit_id" ref="payroll.hr_payslip_view_tree" />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='date_to']" position="after">
+                <field name="payroll_payment_processor" />
+            </xpath>
+        </field>
+    </record>
+
+    <record id="hr_payslip_view_form_inherit" model="ir.ui.view">
+        <field name="name">hr.payslip.form.inherit.payroll_processor</field>
+        <field name="model">hr.payslip</field>
+        <field name="inherit_id" ref="payroll.hr_payslip_view_form" />
+        <field name="arch" type="xml">
+            <data>
+                <xpath expr="//button[@name='action_payslip_done']" position="replace">
+                    <button
+                        string="Confirm"
+                        name="action_payslip_confirm"
+                        type="object"
+                        states="verify"
+                        class="oe_highlight"
+                    />
+                    <button
+                        string="Pay"
+                        name="action_payslip_payment"
+                        type="object"
+                        states="payment"
+                        class="oe_highlight"
+                    />
+                    <button
+                        string="Done"
+                        name="action_payslip_done"
+                        type="object"
+                        states="payment"
+                        class="oe_highlight"
+                    />
+                </xpath>
+                <xpath expr="//field[@name='contract_id']" position="before">
+                    <field name="payroll_payment_processor" />
+                </xpath>
+            </data>
+        </field>
+    </record>
+
+</odoo>

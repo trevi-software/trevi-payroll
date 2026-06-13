@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+
+    <record id="hr_payslip_view_form_mpesa" model="ir.ui.view">
+        <field name="name">hr.payslip.form.inherit.payroll_processor_mpesa_et</field>
+        <field name="model">hr.payslip</field>
+        <field name="inherit_id" ref="payroll.hr_payslip_view_form" />
+        <field name="arch" type="xml">
+            <field name="paid" position="after">
+                <field name="paid_mpesa" />
+            </field>
+            <page name="accounting" position="after">
+                <page name="mpesa_et" string="M-PESA (ET)">
+                    <group name="response" string="API Response">
+                        <field name="mpesa_et_payment_response"/>
+                    </group>
+                    <group name="result" string="Transaction Result">
+                        <field name="mpesa_et_payment_result"/>
+                    </group>
+                </page>
+            </page>
+        </field>
+    </record>
+
+</odoo>

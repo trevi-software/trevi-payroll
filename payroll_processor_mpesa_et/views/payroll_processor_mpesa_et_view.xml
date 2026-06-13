@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+
+    <record id="payroll_processor_mpesa_et_form" model="ir.ui.view">
+        <field name="name">payroll.processor.mpesa_et.form</field>
+        <field name="model">payroll.processor.mpesa_et</field>
+        <field name="arch" type="xml">
+            <form string="M-PESA (ET) Payroll Processor">
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only" />
+                        <h1>
+                            <field name="name" placeholder="Processor Name" />
+                        </h1>
+                    </div>
+                    <group name="auth" string="Authentication">
+                        <field name="consumer_key" />
+                        <field name="consumer_secret" />
+                        <field name="initiator_name" />
+                        <field name="security_credential" />
+                        <field name="party_a" />
+                        <field name="grant_type" />
+                    </group>
+                    <group name="endpoints" string="End Points">
+                        <field name="auth_endpoint" />
+                        <field name="payout_endpoint" />
+                        <field name="timeout_url" />
+                        <field name="result_url" />
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="payroll_processor_mpesa_et_action" model="ir.actions.act_window">
+        <field name="name">M-PESA (ET)</field>
+        <field name="res_model">payroll.processor.mpesa_et</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem
+        id="payroll_processor_mpesa_et"
+        action="payroll_processor_mpesa_et_action"
+        parent="payroll_processor.payroll_menu_processors"
+        sequence="10"
+    />
+
+</odoo>
