@@ -11,7 +11,9 @@ class PayslipMpesaEtResponse(models.Model):
 
     ok_conversation = fields.Char(string="Conversation ID", readonly=True)
 
-    ok_originator_conversation = fields.Char(string="Originator Conversation ID", readonly=True)
+    ok_originator_conversation = fields.Char(
+        string="Originator Conversation ID", readonly=True
+    )
 
     ok_response_code = fields.Char(string="Payment Response Code", readonly=True)
 

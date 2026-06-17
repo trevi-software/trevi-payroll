@@ -17,7 +17,9 @@ class PayslipMpesaEtResult(models.Model):
 
     result_desc = fields.Text(readonly=True)
 
-    originator_conversation = fields.Text(string="OriginatorConversationID", readonly=True)
+    originator_conversation = fields.Text(
+        string="OriginatorConversationID", readonly=True
+    )
 
     conversation = fields.Text(string="ConversationID", readonly=True)
 
@@ -30,7 +32,7 @@ class PayslipMpesaEtResult(models.Model):
     tx_completed_at = fields.Datetime(string="Transaction Completed At", readonly=True)
 
     recepient_public_name = fields.Char(readonly=True)
-    
+
     recepient_is_registered_customer = fields.Boolean(readonly=True)
 
     raw = fields.Text("Raw Response", readonly=True)

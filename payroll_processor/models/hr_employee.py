@@ -1,4 +1,4 @@
-from odoo import api, fields, models, _
+from odoo import _, api, fields, models
 
 
 class HrEmployee(models.Model):
@@ -7,18 +7,19 @@ class HrEmployee(models.Model):
 
     @api.model
     def _get_payroll_payment_processor(self):
-        """ Return the default payment method chosen by the company. """
+        """Return the default payment method chosen by the company."""
         return self.env.company.payroll_payment_processor
-    
+
     # should be in-sync with field in res.company -> payroll_payment_processor
     payroll_payment_processor = fields.Selection(
         selection=[
-                ('none', _("None")),
-                ('manual', _("Manual")),
+            ("none", _("None")),
+            ("manual", _("Manual")),
         ],
         default=_get_payroll_payment_processor,
         string="Payroll Payment Processor",
-        help="The payment processor to use when processing the employee's payslips for payment.",
+        help="The payment processor to use when processing "
+        "the employee's payslips for payment.",
         index=True,
         tracking=True,
     )

@@ -9,12 +9,9 @@ _logger = logging.getLogger(__name__)
 class HrPayslip(models.Model):
 
     _inherit = "hr.payslip"
-    
+
     state = fields.Selection(
-        selection_add=[
-            ("payment", "Payment"),
-            ("done",)
-        ],
+        selection_add=[("payment", "Payment"), ("done",)],
         help="""* When the payslip is created the status is \'Draft\'
         \n* If the payslip is under verification, the status is \'Waiting\'.
         \n* If the payslip is in the process of being paid, the status is \'Payment\'.
@@ -24,24 +21,27 @@ class HrPayslip(models.Model):
 
     @api.model
     def _get_payroll_payment_processor(self):
-        """ Return the default payment method chosen by the company. """
+        """Return the default payment method chosen by the company."""
         return self.env.company.payroll_payment_processor
 
-     # should be in-sync with field in res.company and hr.employee -> payroll_payment_processor
+    # should be in-sync with field in res.company and hr.employee -> payroll_payment_processor
     payroll_payment_processor = fields.Selection(
         selection=[
-                ('none', _("None")),
-                ('manual', _("Manual")),
+            ("none", _("None")),
+            ("manual", _("Manual")),
         ],
         default=_get_payroll_payment_processor,
         help="The payment processor to use when processing the payslip for payment.",
         index=True,
         tracking=True,
     )
-    
+
     @api.onchange("employee_id")
     def onchange_employee_id(self):
-        self.payroll_payment_processor = self.employee_id.payroll_payment_processor or self.env.company.payroll_payment_processor
+        self.payroll_payment_processor = (
+            self.employee_id.payroll_payment_processor
+            or self.env.company.payroll_payment_processor
+        )
 
     def action_payslip_confirm(self):
         if (
@@ -57,14 +57,13 @@ class HrPayslip(models.Model):
                 _logger.warning(
                     "Payslip %s (%s) is already 'Paid'. Discontinuing any further processing.",
                     slip.name,
-                    slip.number
+                    slip.number,
                 )
                 continue
-            if slip.payroll_payment_processor == 'manual':
+            if slip.payroll_payment_processor == "manual":
                 continue
-            elif slip.payroll_payment_processor == 'none':
+            elif slip.payroll_payment_processor == "none":
                 slip.action_payslip_done()
-
 
     def action_payslip_done(self):
         return self.write({"state": "done"})
