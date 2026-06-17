@@ -16,16 +16,9 @@
                     <group name="auth" string="Authentication">
                         <field name="consumer_key" />
                         <field name="consumer_secret" />
-                        <field name="initiator_name" />
-                        <field name="security_credential" />
+                        <field name="api_user" />
+                        <field name="api_password" />
                         <field name="party_a" />
-                        <field name="grant_type" />
-                    </group>
-                    <group name="endpoints" string="End Points">
-                        <field name="auth_endpoint" />
-                        <field name="payout_endpoint" />
-                        <field name="timeout_url" />
-                        <field name="result_url" />
                     </group>
                 </sheet>
             </form>
