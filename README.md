@@ -2,9 +2,9 @@
 
 # TREVI Payroll
 <!-- /!\ Non OCA Context : Set here the badge of your runbot / runboat instance. -->
-[![Pre-commit Status](https://github.com/trevi-software/trevi-payroll/actions/workflows/pre-commit.yml/badge.svg?branch=14.0)](https://github.com/trevi-software/trevi-payroll/actions/workflows/pre-commit.yml?query=branch%3A14.0)
-[![Build Status](https://github.com/trevi-software/trevi-payroll/actions/workflows/test.yml/badge.svg?branch=14.0)](https://github.com/trevi-software/trevi-payroll/actions/workflows/test.yml?query=branch%3A14.0)
-[![codecov](https://codecov.io/gh/trevi-software/trevi-payroll/branch/14.0/graph/badge.svg)](https://codecov.io/gh/trevi-software/trevi-payroll)
+[![Pre-commit Status](https://github.com/trevi-software/trevi-payroll/actions/workflows/pre-commit.yml/badge.svg?branch=15.0)](https://github.com/trevi-software/trevi-payroll/actions/workflows/pre-commit.yml?query=branch%3A15.0)
+[![Build Status](https://github.com/trevi-software/trevi-payroll/actions/workflows/test.yml/badge.svg?branch=15.0)](https://github.com/trevi-software/trevi-payroll/actions/workflows/test.yml?query=branch%3A15.0)
+[![codecov](https://codecov.io/gh/trevi-software/trevi-payroll/branch/15.0/graph/badge.svg)](https://codecov.io/gh/trevi-software/trevi-payroll)
 <!-- /!\ Non OCA Context : Set here the badge of your translation instance. -->
 
 <!-- /!\ do not modify above this line -->
