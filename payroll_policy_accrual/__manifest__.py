@@ -10,7 +10,7 @@
     "author": "TREVI Software, Michael Telahun Makonnen",
     "license": "AGPL-3",
     "images": ["static/src/img/main_screenshot.png"],
-    "website": "https://github.com/trevi-software/trevi-hr",
+    "website": "https://github.com/trevi-software/trevi-payroll",
     "depends": [
         "hr_accrual_bank",
         "hr_contract_status",
