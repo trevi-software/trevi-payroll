@@ -7,7 +7,7 @@
     "category": "Payroll",
     "version": "16.0.1.0.0",
     "author": "TREVI Software",
-    "website": "https://github.com/trevi-software/trevi-hr",
+    "website": "https://github.com/trevi-software/trevi-payroll",
     "images": ["static/src/img/main_screenshot.png"],
     "license": "AGPL-3",
     "depends": [
