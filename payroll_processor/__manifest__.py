@@ -1,7 +1,7 @@
 {
     "name": "Default Payroll Processor",
     "summary": "Make salary payments through a payment processor",
-    "version": "14.0.1.0.0",
+    "version": "16.0.1.0.0",
     "author": "TREVI Software",
     "category": "Payroll",
     "license": "AGPL-3",
