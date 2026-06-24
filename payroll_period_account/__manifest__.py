@@ -10,7 +10,7 @@
     "images": ["static/src/img/main_screenshot.png"],
     "author": "TREVI Software, Michael Telahun Makonnen",
     "license": "AGPL-3",
-    "website": "https://github.com/trevi-software/trevi-hr",
+    "website": "https://github.com/trevi-software/trevi-payroll",
     "depends": [
         "payroll_account",
         "payroll_periods",
