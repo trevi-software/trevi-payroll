@@ -9,7 +9,7 @@
     "images": ["static/src/img/main_screenshot.png"],
     "license": "AGPL-3",
     "author": "TREVI Software",
-    "website": "https://github.com/trevi-software/trevi-hr",
+    "website": "https://github.com/trevi-software/trevi-payroll",
     "depends": [
         "payroll_payslip_amendment",
         "payroll_periods",

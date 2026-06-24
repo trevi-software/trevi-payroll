@@ -34,7 +34,10 @@
                     <group>
                         <group>
                             <field name="type" />
-                            <field name="active_after" attrs="{'required': [('type', '=', 'weekly')]}" />
+                            <field
+                                name="active_after"
+                                attrs="{'required': [('type', '=', 'weekly')]}"
+                            />
                             <field name="duration" />
                             <field name="rate" />
                         </group>

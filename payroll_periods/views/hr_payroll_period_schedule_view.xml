@@ -33,8 +33,14 @@
                     </group>
                     <group>
                         <field name="type" />
-                        <field name="mo_firstday" attrs="{'invisible': [('type', '!=', 'monthly')]}" />
-                        <field name="mo_paydate" attrs="{'invisible': [('type', '!=', 'monthly')]}" />
+                        <field
+                            name="mo_firstday"
+                            attrs="{'invisible': [('type', '!=', 'monthly')]}"
+                        />
+                        <field
+                            name="mo_paydate"
+                            attrs="{'invisible': [('type', '!=', 'monthly')]}"
+                        />
                         <newline />
                         <field
                             name="initial_period_date"
