@@ -8,7 +8,7 @@
     "category": "Payroll",
     "license": "AGPL-3",
     "author": "TREVI Software, Michael Telahun Makonnen",
-    "website": "https://github.com/trevi-software/trevi-hr",
+    "website": "https://github.com/trevi-software/trevi-payroll",
     "images": ["static/src/img/main_screenshot.png"],
     "depends": [
         "res_currency_denomination",
