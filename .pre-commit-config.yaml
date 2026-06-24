@@ -21,8 +21,8 @@ exclude: |
   # You don't usually want a bot to modify your legal texts
   (LICENSE.*|COPYING.*)
 default_language_version:
-  python: python3
-  node: "14.13.0"
+  python: python3.11
+  node: "16.17.0"
 repos:
   - repo: local
     hooks:
@@ -53,13 +53,13 @@ repos:
       - id: oca-gen-addon-readme
         args:
           - --addons-dir=.
-          - --branch=14.0
+          - --branch=16.0
           - --org-name=trevi-software
           - --repo-name=trevi-payroll
           - --if-source-changed
           - --keep-source-digest
   - repo: https://github.com/OCA/odoo-pre-commit-hooks
-    rev: v0.2.23
+    rev: v0.2.24
     hooks:
       - id: oca-checks-odoo-module
       - id: oca-checks-po
@@ -93,8 +93,8 @@ repos:
         files: \.(css|htm|html|js|json|jsx|less|md|scss|toml|ts|xml|yaml|yml)$
         language: node
         additional_dependencies:
-          - "prettier@2.1.2"
-          - "@prettier/plugin-xml@0.12.0"
+          - "prettier@2.7.1"
+          - "@prettier/plugin-xml@2.2.0"
   - repo: local
     hooks:
       - id: eslint
@@ -107,7 +107,7 @@ repos:
         types: [javascript]
         language: node
         additional_dependencies:
-          - "eslint@7.8.1"
+          - "eslint@8.24.0"
           - "eslint-plugin-jsdoc@"
           - "globals@"
   - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -160,9 +160,9 @@ repos:
     hooks:
       - id: flake8
         name: flake8
-        additional_dependencies: ["flake8-bugbear==20.1.4"]
+        additional_dependencies: ["flake8-bugbear==21.9.2"]
   - repo: https://github.com/OCA/pylint-odoo
-    rev: v10.0.2
+    rev: v10.0.4
     hooks:
       - id: pylint_odoo
         name: pylint with optional checks
