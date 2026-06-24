@@ -38,7 +38,10 @@
                                 name="weekly_working_days"
                                 attrs="{'invisible': [('type', '!=', 'weekly')]}"
                             />
-                            <field name="active_after" attrs="{'required': [('type', '=', 'weekly')]}" />
+                            <field
+                                name="active_after"
+                                attrs="{'required': [('type', '=', 'weekly')]}"
+                            />
                             <field name="rate" />
                         </group>
                         <group>
@@ -46,7 +49,10 @@
                                 name="active_start_time"
                                 attrs="{'invisible': [('type', '!=', 'daily')]}"
                             />
-                            <field name="active_end_time" attrs="{'invisible': [('type', '!=', 'daily')]}" />
+                            <field
+                                name="active_end_time"
+                                attrs="{'invisible': [('type', '!=', 'daily')]}"
+                            />
                             <field
                                 name="tz"
                                 attrs="{
