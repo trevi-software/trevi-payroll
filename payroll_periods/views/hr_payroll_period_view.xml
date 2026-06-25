@@ -102,12 +102,14 @@
                                         <field name="ignore" />
                                         <button
                                             name="button_ignore"
+					    title="Ignore"
                                             type="object"
                                             icon="fa-check"
                                             invisible="severity != 'critical' or (severity == 'critical' and ignore == True)"
                                         />
                                         <button
                                             name="button_unignore"
+					    title="Unignore"
                                             type="object"
                                             icon="fa-close"
                                             invisible="severity != 'critical' or (severity == 'critical' and ignore == False)"
