@@ -261,9 +261,7 @@ class HrPayperiodSchedule(models.Model):
                 dtEnd = utcEnd.replace(tzinfo=None)
 
                 data = {
-                    "name": _("{}/{} {}").format(
-                        str(year_number), str(month_number), str(month_name)
-                    ),
+                    "name": _("{year_number}/{month_number} {month_name}"),
                     "period_name": _("{year_number}/{month_number} {month_name}"),
                     "schedule_id": self.id,
                     "date_start": dtStart,
