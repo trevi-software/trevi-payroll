@@ -12,12 +12,12 @@
             <xpath expr="//div[@data-key='payroll']" position="inside">
                 <h2>Default Values</h2>
                 <div
-                    class="row mt16 o_settings_container"
                     name="working_days_calculation_setting_container"
+                    class="row mt16 o_settings_container"
                 >
                     <div
-                        class="col-12 col-lg-6 o_setting_box"
                         id="working_days_calculation"
+                        class="col-12 col-lg-6 o_setting_box"
                     >
                         <div class="o_setting_left_pane" />
                         <div class="o_setting_right_pane">
@@ -30,12 +30,12 @@
                     </div>
                 </div>
                 <div
-                    class="row mt16 o_settings_container"
                     name="weekly_max_regular_hours_dictionary_setting_container"
+                    class="row mt16 o_settings_container"
                 >
                     <div
-                        class="col-12 col-lg-6 o_setting_box"
                         id="weekly_max_regular_hours"
+                        class="col-12 col-lg-6 o_setting_box"
                     >
                         <div class="o_setting_left_pane" />
                         <div class="o_setting_right_pane">
@@ -48,12 +48,12 @@
                     </div>
                 </div>
                 <div
-                    class="row mt16 o_settings_container"
                     name="max_working_days_dictionary_setting_container"
+                    class="row mt16 o_settings_container"
                 >
                     <div
-                        class="col-12 col-lg-6 o_setting_box"
                         id="monthly_max_working_days"
+                        class="col-12 col-lg-6 o_setting_box"
                     >
                         <div class="o_setting_left_pane" />
                         <div class="o_setting_right_pane">
@@ -67,10 +67,10 @@
                 </div>
                 <h2>Worked Days Codes</h2>
                 <div
-                    class="row mt16 o_settings_container"
                     name="max_dictionary_setting_container"
+                    class="row mt16 o_settings_container"
                 >
-                    <div class="col-12 col-lg-6 o_setting_box" id="work_days_code_max">
+                    <div id="work_days_code_max" class="col-12 col-lg-6 o_setting_box">
                         <div class="o_setting_left_pane" />
                         <div class="o_setting_right_pane">
                             <label for="work_days_code_max" />
