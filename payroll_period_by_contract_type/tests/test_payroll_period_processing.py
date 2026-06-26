@@ -169,7 +169,7 @@ class TestPayrollProcessing(common.SavepointCase):
         # Start payroll wizard
         wiz = (
             self.Wizard.with_user(self.userPM)
-            .with_context({"active_id": self.period.id})
+            .with_context(active_id=self.period.id)
             .create({})
         )
 
@@ -236,7 +236,7 @@ class TestPayrollProcessing(common.SavepointCase):
         # Start payroll wizard
         wiz = (
             self.Wizard.with_user(self.userPM)
-            .with_context({"active_id": self.period.id})
+            .with_context(active_id=self.period.id)
             .create({})
         )
 
