@@ -102,17 +102,25 @@
                                         <field name="ignore" />
                                         <button
                                             name="button_ignore"
-					    title="Ignore"
+                                            title="Ignore"
                                             type="object"
                                             icon="fa-check"
-                                            invisible="severity != 'critical' or (severity == 'critical' and ignore == True)"
+                                            attrs="{
+                                                'invisible': [
+                                                    severity != 'critical' or (severity == 'critical' and ignore == True)
+                                                ]
+                                            }"
                                         />
                                         <button
                                             name="button_unignore"
-					    title="Unignore"
+                                            title="Unignore"
                                             type="object"
                                             icon="fa-close"
-                                            invisible="severity != 'critical' or (severity == 'critical' and ignore == False)"
+                                            attrs="{
+                                                'invisible': [
+                                                    severity != 'critical' or (severity == 'critical' and ignore == False)
+                                                ]
+                                            }"
                                         />
                                     </tree>
                                 </field>
