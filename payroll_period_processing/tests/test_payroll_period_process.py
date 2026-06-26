@@ -167,7 +167,7 @@ class TestProcessing(common.SavepointCase):
         self.setUpCommon()
         wiz = (
             self.Wizard.with_user(self.payrollOfficer)
-            .with_context({"active_id": self.period.id})
+            .with_context(active_id=self.period.id)
             .create({})
         )
         wiz.state_holidays()
@@ -179,7 +179,7 @@ class TestProcessing(common.SavepointCase):
         self.setUpCommon()
         wiz = (
             self.Wizard.with_user(self.payrollOfficer)
-            .with_context({"active_id": self.period.id})
+            .with_context(active_id=self.period.id)
             .create({})
         )
         wiz.state_leaves()
@@ -194,7 +194,7 @@ class TestProcessing(common.SavepointCase):
         cc = self.create_contract(self.employee_emp.id, "draft", "done", start)
         wiz = (
             self.Wizard.with_user(self.payrollOfficer)
-            .with_context({"active_id": self.period.id})
+            .with_context(active_id=self.period.id)
             .create({})
         )
 
@@ -216,7 +216,7 @@ class TestProcessing(common.SavepointCase):
         cc.signal_confirm()
         wiz = (
             self.Wizard.with_user(self.payrollOfficer)
-            .with_context({"active_id": self.period.id})
+            .with_context(active_id=self.period.id)
             .create({})
         )
         wiz.create_payroll_register()
@@ -258,7 +258,7 @@ class TestProcessing(common.SavepointCase):
         cc.signal_confirm()
         wiz = (
             self.Wizard.with_user(self.payrollOfficer)
-            .with_context({"active_id": self.period.id})
+            .with_context(active_id=self.period.id)
             .create({})
         )
         wiz.create_payroll_register()
