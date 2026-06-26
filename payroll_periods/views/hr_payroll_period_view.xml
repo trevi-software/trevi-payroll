@@ -120,7 +120,7 @@
                                             icon="fa-close"
                                             attrs="{
                                                 'invisible': [
-                                                    '|', ('severity', '!=', 'critical')
+                                                    '|', ('severity', '!=', 'critical'),
                                                     '&amp;', ('severity', '=', 'critical'),
                                                          ('ignore', '=', False)
                                                 ]
