@@ -12,6 +12,5 @@ class ResCompany(models.Model):
             ("manual", _("Manual")),
         ],
         default="none",
-        string="Payroll Payment Processor",
         help="The payment processor to use when processing a payslip for payment.",
     )

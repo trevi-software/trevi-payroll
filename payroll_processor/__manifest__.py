@@ -1,6 +1,6 @@
 {
     "name": "Default Payroll Processor",
-    "summary": "Make salary payments through a payment processor",
+    "summary": "Base module for implementing salary payment processors",
     "version": "16.0.1.0.0",
     "author": "TREVI Software",
     "category": "Payroll",
