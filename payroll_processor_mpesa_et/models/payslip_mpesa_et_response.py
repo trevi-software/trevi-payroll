@@ -7,7 +7,7 @@ class PayslipMpesaEtResponse(models.Model):
     _description = "Safaricom Ethiopia M-PESA Payslip Integration Response"
     _order = "ok_conversation error_request"
 
-    payslip_id = fields.Many2one("hr.payslip", string="Payslip", required=True)
+    payslip_id = fields.Many2one("hr.payslip", required=True)
 
     ok_conversation = fields.Char(string="Conversation ID", readonly=True)
 

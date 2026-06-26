@@ -15,7 +15,7 @@
                     class="row mt16 o_settings_container"
                     name="payroll_payslip_report_setting_container"
                 >
-                    <div class="col-12 col-lg-6 o_setting_box" id="inc_category_codes">
+                    <div id="inc_category_codes" class="col-12 col-lg-6 o_setting_box">
                         <div class="o_setting_left_pane" />
                         <div class="o_setting_right_pane">
                             <label for="include_category_codes" />

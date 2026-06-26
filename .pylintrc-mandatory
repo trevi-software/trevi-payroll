@@ -9,11 +9,7 @@ manifest-required-authors=TREVI Software
 manifest-required-keys=license
 manifest-deprecated-keys=description,active
 license-allowed=AGPL-3,GPL-2,GPL-2 or any later version,GPL-3,GPL-3 or any later version,LGPL-3
-<<<<<<< before updating
-valid-odoo-versions=14.0
-=======
 valid-odoo-versions=16.0
->>>>>>> after updating
 
 [MESSAGES CONTROL]
 disable=all
