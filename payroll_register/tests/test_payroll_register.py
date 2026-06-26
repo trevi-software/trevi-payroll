@@ -82,7 +82,7 @@ class TestPayrollRegister(common.SavepointCase):
                 "date_end": self.end,
             }
         )
-        wiz = self.Wizard.with_context({"active_id": reg.id}).create({})
+        wiz = self.Wizard.with_context(active_id=reg.id).create({})
         with self.assertRaises(UserError):
             wiz.create_payslip_runs()
 
@@ -99,7 +99,7 @@ class TestPayrollRegister(common.SavepointCase):
                 "date_end": self.end,
             }
         )
-        wiz = self.Wizard.with_context({"active_id": reg.id}).create(
+        wiz = self.Wizard.with_context(active_id=reg.id).create(
             {"department_ids": [(6, 0, [self.dept1.id])]}
         )
         wiz.create_payslip_runs()
@@ -118,7 +118,7 @@ class TestPayrollRegister(common.SavepointCase):
                 "currency_id": self.env.ref("base.USD").id,
             }
         )
-        wiz = self.Wizard.with_context({"active_id": reg.id}).create(
+        wiz = self.Wizard.with_context(active_id=reg.id).create(
             {"department_ids": [(6, 0, [self.dept1.id])]}
         )
         wiz.create_payslip_runs()
