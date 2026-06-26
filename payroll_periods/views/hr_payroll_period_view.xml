@@ -107,7 +107,9 @@
                                             icon="fa-check"
                                             attrs="{
                                                 'invisible': [
-                                                    severity != 'critical' or (severity == 'critical' and ignore == True)
+                                                    '|', ('severity', '!=', 'critical'),
+                                                    '&amp;', ('severity', '=', 'critical'),
+                                                         ('ignore', '=', True)
                                                 ]
                                             }"
                                         />
@@ -118,7 +120,9 @@
                                             icon="fa-close"
                                             attrs="{
                                                 'invisible': [
-                                                    severity != 'critical' or (severity == 'critical' and ignore == False)
+                                                    '|', ('severity', '!=', 'critical')
+                                                    '&amp;', ('severity', '=', 'critical'),
+                                                         ('ignore', '=', False)
                                                 ]
                                             }"
                                         />
