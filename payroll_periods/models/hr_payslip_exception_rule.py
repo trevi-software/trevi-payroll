@@ -76,7 +76,7 @@ result = categories.GROSS.amount > categories.NET.amount"""
             try:
                 safe_eval(self.condition_python, localdict, mode="exec", nocopy=True)
                 return "result" in localdict and localdict["result"] or False
-            except Exception:
+            except Exception as exc:
                 raise exceptions.UserError(
                     _("Error!")
                     + "\n"
@@ -85,4 +85,4 @@ result = categories.GROSS.amount > categories.NET.amount"""
                         " rule %(name)s (%(code)s)."
                     )
                     % {"name": self.name, "code": self.code}
-                )
+                ) from exc
