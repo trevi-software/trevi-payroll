@@ -12,10 +12,10 @@
             <xpath expr="//div[@data-key='payroll']" position="inside">
                 <h2>Payroll Codes</h2>
                 <div
-                    class="row mt16 o_settings_container"
                     name="salary_codes_container"
+                    class="row mt16 o_settings_container"
                 >
-                    <div class="col-12 col-lg-6 o_setting_box" id="categ_info">
+                    <div id="categ_info" class="col-12 col-lg-6 o_setting_box">
                         <div class="o_setting_left_pane" />
                         <div class="o_setting_right_pane">
                             <label for="categ_info" />
@@ -28,8 +28,8 @@
                         </div>
                     </div>
                     <div
-                        class="col-12 col-lg-6 o_setting_box"
                         id="categ_ee_contribution"
+                        class="col-12 col-lg-6 o_setting_box"
                     >
                         <div class="o_setting_left_pane" />
                         <div class="o_setting_right_pane">
@@ -43,8 +43,8 @@
                         </div>
                     </div>
                     <div
-                        class="col-12 col-lg-6 o_setting_box"
                         id="categ_er_contribution"
+                        class="col-12 col-lg-6 o_setting_box"
                     >
                         <div class="o_setting_left_pane" />
                         <div class="o_setting_right_pane">
@@ -57,7 +57,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-12 col-lg-6 o_setting_box" id="categ_basic">
+                    <div id="categ_basic" class="col-12 col-lg-6 o_setting_box">
                         <div class="o_setting_left_pane" />
                         <div class="o_setting_right_pane">
                             <label for="categ_basic" />
@@ -68,7 +68,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-12 col-lg-6 o_setting_box" id="categ_ot">
+                    <div id="categ_ot" class="col-12 col-lg-6 o_setting_box">
                         <div class="o_setting_left_pane" />
                         <div class="o_setting_right_pane">
                             <label for="categ_ot" />
@@ -79,7 +79,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-12 col-lg-6 o_setting_box" id="categ_allowance">
+                    <div id="categ_allowance" class="col-12 col-lg-6 o_setting_box">
                         <div class="o_setting_left_pane" />
                         <div class="o_setting_right_pane">
                             <label for="categ_allowance" />
@@ -91,7 +91,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-12 col-lg-6 o_setting_box" id="categ_deduction">
+                    <div id="categ_deduction" class="col-12 col-lg-6 o_setting_box">
                         <div class="o_setting_left_pane" />
                         <div class="o_setting_right_pane">
                             <label for="categ_deduction" />
@@ -102,7 +102,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-12 col-lg-6 o_setting_box" id="categ_taxexempt">
+                    <div id="categ_taxexempt" class="col-12 col-lg-6 o_setting_box">
                         <div class="o_setting_left_pane" />
                         <div class="o_setting_right_pane">
                             <label for="categ_taxexempt" />
@@ -113,7 +113,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-12 col-lg-6 o_setting_box" id="categ_taxable">
+                    <div id="categ_taxable" class="col-12 col-lg-6 o_setting_box">
                         <div class="o_setting_left_pane" />
                         <div class="o_setting_right_pane">
                             <label for="categ_taxable" />
@@ -125,7 +125,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-12 col-lg-6 o_setting_box" id="categ_gross">
+                    <div id="categ_gross" class="col-12 col-lg-6 o_setting_box">
                         <div class="o_setting_left_pane" />
                         <div class="o_setting_right_pane">
                             <label for="categ_gross" />
@@ -137,7 +137,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-12 col-lg-6 o_setting_box" id="categ_net">
+                    <div id="categ_net" class="col-12 col-lg-6 o_setting_box">
                         <div class="o_setting_left_pane" />
                         <div class="o_setting_right_pane">
                             <label for="categ_net" />
@@ -149,8 +149,8 @@
                         </div>
                     </div>
                     <div
-                        class="col-12 col-lg-6 o_setting_box"
                         id="categ_payroll_tax_ee"
+                        class="col-12 col-lg-6 o_setting_box"
                     >
                         <div class="o_setting_left_pane" />
                         <div class="o_setting_right_pane">
@@ -163,8 +163,8 @@
                         </div>
                     </div>
                     <div
-                        class="col-12 col-lg-6 o_setting_box"
                         id="categ_payroll_tax_er"
+                        class="col-12 col-lg-6 o_setting_box"
                     >
                         <div class="o_setting_left_pane" />
                         <div class="o_setting_right_pane">
@@ -176,7 +176,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-12 col-lg-6 o_setting_box" id="categ_income_tax">
+                    <div id="categ_income_tax" class="col-12 col-lg-6 o_setting_box">
                         <div class="o_setting_left_pane" />
                         <div class="o_setting_right_pane">
                             <label for="categ_income_tax" />
@@ -187,7 +187,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-12 col-lg-6 o_setting_box" id="rule_gross">
+                    <div id="rule_gross" class="col-12 col-lg-6 o_setting_box">
                         <div class="o_setting_left_pane" />
                         <div class="o_setting_right_pane">
                             <label for="rule_gross" />
@@ -201,7 +201,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-12 col-lg-6 o_setting_box" id="rule_net">
+                    <div id="rule_net" class="col-12 col-lg-6 o_setting_box">
                         <div class="o_setting_left_pane" />
                         <div class="o_setting_right_pane">
                             <label for="rule_net" />
