@@ -69,7 +69,7 @@ class PayrollProcessorMpesaEt(models.Model):
             ),
         )
         headers = {"Authorization": authorization}
-        response = request("GET", endpoint, headers=headers)
+        response = request("GET", endpoint, headers=headers, timeout=30)
 
         if response.status_code == codes.ok:
             return loads(response.json())
@@ -152,7 +152,7 @@ class PayrollProcessorMpesaEt(models.Model):
             endpoint,
             payload,
         )
-        response = request("POST", endpoint, headers=headers, data=payload)
+        response = request("POST", endpoint, headers=headers, data=payload, timeout=30)
 
         if response.status_code == codes.ok:
             _logger.info(

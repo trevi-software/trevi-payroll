@@ -17,7 +17,6 @@ class HrEmployee(models.Model):
             ("manual", _("Manual")),
         ],
         default=_get_payroll_payment_processor,
-        string="Payroll Payment Processor",
         help="The payment processor to use when processing "
         "the employee's payslips for payment.",
         index=True,
