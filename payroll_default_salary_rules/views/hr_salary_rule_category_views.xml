@@ -30,7 +30,7 @@
                     name="web_ribbon"
                     title="Archived"
                     bg_color="bg-danger"
-                    attrs="{'invisible': 'active == True'}"
+                    attrs="{'invisible': [('active', '=', True)]}"
                 />
             </xpath>
             <xpath expr="//field[@name='parent_id']" position="after">
