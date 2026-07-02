@@ -122,7 +122,7 @@ class HrAttendance(models.Model):
 
         return res
 
-    @api.model
+    @api.model_create_multi
     def create(self, vals_list):
 
         cooked_list = []
