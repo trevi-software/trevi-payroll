@@ -1,3 +1,3 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_payroll_processor_manager,access_payroll_processor_manager,model_payroll_processor,base.group_payroll_manager,1,1,1,1
-access_payroll_processor,access_payroll_processor,model_payroll_processor,base.group_payroll_user,1,0,0,0
+access_payroll_processor_manager,access_payroll_processor_manager,model_payroll_processor,payroll.group_payroll_manager,1,1,1,1
+access_payroll_processor,access_payroll_processor,model_payroll_processor,payroll.group_payroll_user,1,0,0,0
