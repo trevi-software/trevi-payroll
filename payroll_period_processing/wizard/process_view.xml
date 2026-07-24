@@ -10,14 +10,14 @@
                     <button
                         name="state_back"
                         type="object"
-                        states="apprvlv,holidays"
+                        invisible="state not in ['apprvlv', 'holidays']"
                         class="oe_highlight"
                         string="Back"
                     />
                     <button
                         name="state_next"
                         type="object"
-                        states="apprvcn,apprvlv"
+                        invisible="state not in ['apprvcn', 'apprvlv']"
                         class="oe_highlight"
                         string="Next"
                     />
@@ -30,12 +30,20 @@
                     <field name="state" widget="statusbar" />
                 </header>
                 <notebook>
-                    <page name="state_apprvcn" string="Contracts" states="apprvcn">
+                    <page
+                        name="state_apprvcn"
+                        string="Contracts"
+                        invisible="state != 'apprvcn'"
+                    >
                         <group string="Contracts to Approve">
                             <field name="contract_ids" nolabel="1" />
                         </group>
                     </page>
-                    <page name="state_apprvlv" string="Leaves" states="apprvlv">
+                    <page
+                        name="state_apprvlv"
+                        string="Leaves"
+                        invisible="state != 'apprvlv'"
+                    >
                         <group string="Leaves to Approve">
                             <field name="leave_ids" nolabel="1" />
                         </group>
@@ -43,7 +51,7 @@
                     <page
                         name="state_holidays"
                         string="Public Holidays"
-                        states="holidays"
+                        invisible="state != 'holidays'"
                     >
                         <group string="Public Holidays in Payroll Period">
                             <field name="public_holiday_ids" nolabel="1" />
