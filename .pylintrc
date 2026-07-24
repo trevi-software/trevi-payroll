@@ -3,13 +3,16 @@
 load-plugins=pylint_odoo
 score=n
 
+[IMPORTS]
+deprecated-modules=pdb,pudb,ipdb,bs4
+
 [ODOOLINT]
 readme-template-url="https://github.com/OCA/maintainer-tools/blob/master/template/module/README.rst"
 manifest-required-authors=TREVI Software
 manifest-required-keys=license
 manifest-deprecated-keys=description,active
 license-allowed=AGPL-3,GPL-2,GPL-2 or any later version,GPL-3,GPL-3 or any later version,LGPL-3
-valid-odoo-versions=16.0
+valid-odoo-versions=17.0
 
 [MESSAGES CONTROL]
 disable=all
@@ -40,6 +43,7 @@ enable=anomalous-backslash-in-string,
     assignment-from-none,
     attribute-deprecated,
     dangerous-default-value,
+    deprecated-module,
     development-status-allowed,
     duplicate-key,
     eval-used,
@@ -99,7 +103,7 @@ enable=anomalous-backslash-in-string,
     website-manifest-key-not-valid-uri,
     external-request-timeout,
     missing-manifest-dependency,
-    too-complex,,
+    too-complex,
     create-user-wo-reset-password,
     dangerous-filter-wo-user,
     file-not-used,
