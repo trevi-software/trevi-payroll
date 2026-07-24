@@ -13,7 +13,7 @@
         <field name="priority" eval="99" />
         <field name="arch" type="xml">
             <xpath expr="//field[@name='date']" position="replace">
-                <field name="period_id" />
+                <field name="period_id" readonly="state != 'draft'" />
             </xpath>
         </field>
     </record>
