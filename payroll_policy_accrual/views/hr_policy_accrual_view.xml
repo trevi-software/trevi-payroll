@@ -45,91 +45,75 @@
                                     <field name="balance_on_payslip" />
                                     <field
                                         name="calculation_frequency"
-                                        attrs="{
-                                            'invisible': [('type', '!=', 'calendar')],
-                                            'required': [('type', '=', 'calendar')]
-                                        }"
+                                        invisible="type != 'calendar'"
+                                        required="type == 'calendar'"
                                     />
                                     <field
                                         name="frequency_on_hire_date"
-                                        attrs="{
-                                            'invisible': [('type', '!=', 'calendar')],
-                                            'required': [('type', '=', 'calendar')]
-                                        }"
+                                        invisible="type != 'calendar'"
+                                        required="type == 'calendar'"
                                     />
                                 </group>
                                 <group>
                                     <field name="minimum_employed_days" />
                                     <field
                                         name="accrual_rate"
-                                        attrs="{
-                                            'invisible': [('type', '!=', 'calendar')],
-                                            'required': [('type', '=', 'calendar')]
-                                        }"
+                                        invisible="type != 'calendar'"
+                                        required="type == 'calendar'"
                                     />
                                     <field
                                         name="accrual_rate_hour"
-                                        attrs="{
-                                            'invisible': [('type', '!=', 'hour')],
-                                            'required': [('type', '=', 'hour')]
-                                        }"
+                                        invisible="type != 'hour'"
+                                        required="type == 'hour'"
                                     />
                                     <field
                                         name="accrual_rate_premium_minimum"
-                                        attrs="{'invisible': [('type', '!=', 'calendar')]}"
+                                        invisible="type != 'calendar'"
                                     />
                                     <field
                                         name="accrual_rate_premium"
-                                        attrs="{'invisible': [('type', '!=', 'calendar')]}"
+                                        invisible="type != 'calendar'"
                                     />
                                     <field
                                         name="accrual_rate_premium_milestone"
-                                        attrs="{'invisible': [('type', '!=', 'calendar')]}"
+                                        invisible="type != 'calendar'"
                                     />
                                     <field name="accrual_rate_max" />
                                 </group>
                             </group>
                             <group
                                 string="Weekly Frequency"
-                                attrs="{'invisible': ['|', ('calculation_frequency', '!=', 'weekly'), ('frequency_on_hire_date', '=', True)]}"
+                                invisible="calculation_frequency != 'weekly' or frequency_on_hire_date"
                             >
                                 <field
                                     name="frequency_week_day"
-                                    attrs="{
-                                        'invisible': [('calculation_frequency', '!=', 'weekly')],
-                                        'required': [('calculation_frequency', '=', 'weekly')]
-                                    }"
+                                    invisible="calculation_frequency != 'weekly'"
+                                    required="calculation_frequency == 'weekly'"
                                 />
                             </group>
                             <group
                                 string="Monthly Frequency"
-                                attrs="{'invisible': ['|', ('calculation_frequency', '!=', 'monthly'), ('frequency_on_hire_date', '=', True)]}"
+                                invisible="calculation_frequency != 'monthly' or frequency_on_hire_date"
                             >
                                 <field
                                     name="frequency_month_day"
-                                    attrs="{
-                                        'invisible': [('calculation_frequency', '!=', 'monthly')],
-                                        'required': [('calculation_frequency', '=', 'monthly'), ('frequency_on_hire_date', '=', False)]
-                                    }"
+                                    invisible="calculation_frequency != 'monthly'"
+                                    required="calculation_frequency == 'monthly' and not frequency_on_hire_date"
                                 />
                             </group>
                             <group
                                 string="Annual Frequency"
-                                attrs="{'invisible': ['|', ('calculation_frequency', '!=', 'annual'), ('frequency_on_hire_date', '=', True)]}"
+                                invisible="calculation_frequency != 'annual' or frequency_on_hire_date"
                             >
                                 <field
                                     name="frequency_annual_month"
-                                    attrs="{
-                                        'invisible': [('calculation_frequency', '!=', 'annual')],
-                                        'required': [('calculation_frequency', '=', 'annual')]
-                                    }"
+                                    invisible="calculation_frequency != 'annual'"
+                                    required="calculation_frequency == 'annual' and not frequency_on_hire_date"
                                 />
                                 <field
                                     name="frequency_annual_day"
-                                    attrs="{
-                                        'invisible': [('calculation_frequency', '!=', 'annual')],
-                                        'required': [('calculation_frequency', '=', 'annual')]
-                                    }"
+                                    invisible="calculation_frequency != 'annual'"
+                                    required="calculation_frequency == 'annual' and not frequency_on_hire_date"
                                 />
                             </group>
                         </page>
