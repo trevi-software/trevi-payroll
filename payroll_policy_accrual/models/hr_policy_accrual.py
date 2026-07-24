@@ -34,11 +34,11 @@ class HrPolicy(models.Model):
 
         res = None
         for policy in policy_group.accr_policy_ids:
-            dPolicy = fields.Date.from_string(policy.date)
+            dPolicy = fields.Date.to_date(policy.date)
             if dPolicy <= dToday:
                 if res is None:
                     res = policy
-                elif dPolicy > fields.Date.from_string(res.date):
+                elif dPolicy > fields.Date.to_date(res.date):
                     res = policy
 
         return res
@@ -49,7 +49,7 @@ class HrPolicy(models.Model):
         PolicyGroup = self.env["hr.policy.group"]
         AccrualJob = self.env["hr.policy.line.accrual.job"]
 
-        dToday = fields.Date.from_string(fields.Date.today())
+        dToday = fields.Date.to_date(fields.Date.today())
 
         for pg in PolicyGroup.search([]):
             accrual_policy = self.get_latest_policy(pg, dToday)
