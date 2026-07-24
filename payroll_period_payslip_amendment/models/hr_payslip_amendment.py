@@ -11,8 +11,6 @@ class PayslipAmendment(models.Model):
         string="Payroll Period",
         comodel_name="hr.payroll.period",
         required=False,
-        readonly=True,
-        states={"draft": [("readonly", False)]},
     )
 
     @api.onchange("period_id")

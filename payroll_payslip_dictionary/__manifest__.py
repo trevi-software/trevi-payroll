@@ -5,7 +5,7 @@
 {
     "name": "Payslip Dictionary",
     "summary": "Dictionary of values that can be used in payslip calculations",
-    "version": "16.0.1.0.0",
+    "version": "17.0.1.0.0",
     "category": "Payroll",
     "images": ["static/src/img/main_screenshot.png"],
     "author": "TREVI Software, Michael Telahun Makonnen",

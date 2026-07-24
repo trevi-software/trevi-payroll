@@ -36,29 +36,21 @@
                             <field name="type" />
                             <field
                                 name="weekly_working_days"
-                                attrs="{'invisible': [('type', '!=', 'weekly')]}"
+                                invisible="type != 'weekly'"
                             />
-                            <field
-                                name="active_after"
-                                attrs="{'required': [('type', '=', 'weekly')]}"
-                            />
+                            <field name="active_after" required="type == 'weekly'" />
                             <field name="rate" />
                         </group>
                         <group>
                             <field
                                 name="active_start_time"
-                                attrs="{'invisible': [('type', '!=', 'daily')]}"
+                                invisible="type != 'daily'"
                             />
-                            <field
-                                name="active_end_time"
-                                attrs="{'invisible': [('type', '!=', 'daily')]}"
-                            />
+                            <field name="active_end_time" invisible="type != 'daily'" />
                             <field
                                 name="tz"
-                                attrs="{
-                                    'invisible': [('type', '!=', 'daily')],
-                                    'required': [('type', '=', 'daily')]
-                                }"
+                                invisible="type != 'daily'"
+                                required="type == 'daily'"
                             />
                             <field name="policy_id" />
                         </group>

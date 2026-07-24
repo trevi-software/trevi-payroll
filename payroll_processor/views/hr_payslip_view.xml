@@ -24,21 +24,21 @@
                         string="Confirm"
                         name="action_payslip_confirm"
                         type="object"
-                        states="verify"
+                        invisible="state != 'verify'"
                         class="oe_highlight"
                     />
                     <button
                         string="Pay"
                         name="action_payslip_payment"
                         type="object"
-                        states="payment"
+                        invisible="state != 'payment'"
                         class="oe_highlight"
                     />
                     <button
                         string="Done"
                         name="action_payslip_done"
                         type="object"
-                        states="payment"
+                        invisible="state != 'payment'"
                         class="oe_highlight"
                     />
                 </xpath>
