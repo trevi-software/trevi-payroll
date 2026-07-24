@@ -54,25 +54,19 @@ class HrPayrollRegister(models.Model):
         selection=[("draft", "Draft"), ("close", "Close")],
         index=True,
         default="draft",
-        readonly=True,
     )
     date_start = fields.Datetime(
         string="Date From",
         required=True,
-        readonly=True,
-        states={"draft": [("readonly", False)]},
     )
     date_end = fields.Datetime(
         string="Date To",
         required=True,
-        readonly=True,
-        states={"draft": [("readonly", False)]},
     )
     run_ids = fields.One2many(
+        string="Payslip Runs",
         comodel_name="hr.payslip.run",
         inverse_name="register_id",
-        readonly=True,
-        states={"draft": [("readonly", False)]},
     )
     company_id = fields.Many2one(
         comodel_name="res.company",
@@ -82,7 +76,6 @@ class HrPayrollRegister(models.Model):
         string="Denomination Quantitiess",
         comodel_name="hr.payroll.register.denominations",
         inverse_name="register_id",
-        readonly=True,
     )
     exact_change = fields.Monetary(
         string="Net Amount", compute="_compute_change", readonly=True
