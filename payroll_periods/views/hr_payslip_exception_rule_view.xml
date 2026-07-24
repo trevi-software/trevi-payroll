@@ -45,10 +45,8 @@
                         name="condition_python"
                         nolabel="1"
                         colspan="4"
-                        attrs="{
-                            'invisible': [('condition_select', '!=', 'python')],
-                            'required': [('condition_select', '=', 'python')]
-                        }"
+                        invisible="condition_select != 'python'"
+                        required="condition_select == 'python'"
                     />
                 </group>
                 <group string="Note" colspan="4">

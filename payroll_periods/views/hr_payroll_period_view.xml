@@ -54,7 +54,7 @@
                             type="object"
                             string="Start Payment"
                             class="oe_highlight"
-                            states="ended,locked,generate"
+                            invisible="state not in ['ended', 'locked', 'generate']"
                             confirm="Are you sure? Once you start payment you cannot make any more modifications to the pay slip."
                         />
                         <field name="state" widget="statusbar" />
@@ -105,26 +105,14 @@
                                             title="Ignore"
                                             type="object"
                                             icon="fa-check"
-                                            attrs="{
-                                                'invisible': [
-                                                    '|', ('severity', '!=', 'critical'),
-                                                    '&amp;', ('severity', '=', 'critical'),
-                                                         ('ignore', '=', True)
-                                                ]
-                                            }"
+                                            invisible="severity != 'critical' or (severity == 'critical' and ignore)"
                                         />
                                         <button
                                             name="button_unignore"
                                             title="Unignore"
                                             type="object"
                                             icon="fa-close"
-                                            attrs="{
-                                                'invisible': [
-                                                    '|', ('severity', '!=', 'critical'),
-                                                    '&amp;', ('severity', '=', 'critical'),
-                                                         ('ignore', '=', False)
-                                                ]
-                                            }"
+                                            invisible="severity != 'critical' or (severity == 'critical' and not ignore)"
                                         />
                                     </tree>
                                 </field>
