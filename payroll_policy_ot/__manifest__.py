@@ -5,7 +5,7 @@
 {
     "name": "Overtime Policy",
     "summary": "Assign over-time policies to a policy group",
-    "version": "16.0.1.0.0",
+    "version": "17.0.1.0.0",
     "category": "Generic Modules/Human Resources",
     "author": "TREVI Software, Michael Telahun Makonnen",
     "license": "AGPL-3",
