@@ -26,21 +26,21 @@
                     <button
                         name="do_validate"
                         type="object"
-                        states="draft"
+                        invisible="state != 'draft'"
                         class="oe_highlight"
                         string="Confirm"
                     />
                     <button
                         name="do_cancel"
                         type="object"
-                        states="draft,validate"
+                        invisible="state not in ['draft', 'validate']"
                         class="oe_highlight"
                         string="Cancel"
                     />
                     <button
                         name="do_reset"
                         type="object"
-                        states="cancel"
+                        invisible="state != 'cancel'"
                         class="oe_highlight"
                         string="Set to Draft"
                     />

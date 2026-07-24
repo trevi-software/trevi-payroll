@@ -82,7 +82,7 @@ class HrAttendance(models.Model):
         contract = False
         if res.get("clock_in", False) and not res.get("check_in", False):
             rp = None
-            dt = fields.Datetime.from_string(res["clock_in"])
+            dt = fields.Datetime.to_datetime(res["clock_in"])
             res.update({"check_in": res["clock_in"]})
             contract = self.get_contract_by_date(employee_id, dt.date())
             if contract:
@@ -103,7 +103,7 @@ class HrAttendance(models.Model):
 
         if res.get("clock_out", False) and not res.get("check_out", False):
             rp = None
-            dt = fields.Datetime.from_string(res["clock_out"])
+            dt = fields.Datetime.to_datetime(res["clock_out"])
             res.update({"check_out": res["clock_out"]})
             contract = self.get_contract_by_date(employee_id, dt.date())
             if contract:

@@ -11,7 +11,7 @@
                     <button
                         name="%(action_payroll_period_process)d"
                         type="action"
-                        states="open,ended,locked,generate"
+                        invisible="state not in ['open', 'ended', 'locked', 'generate']"
                         class="oe_highlight"
                         string="Process Payroll"
                     />
