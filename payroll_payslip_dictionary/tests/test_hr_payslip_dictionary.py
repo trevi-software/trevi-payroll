@@ -287,7 +287,7 @@ class TestHrPayslip(test_common.TestHrPayslip):
 
         line = alice_payslip.line_ids.filtered(lambda line: line.code == "TEST")
         self.assertEqual(len(line), 1, "I found the Test line")
-        res = fields.Float.compare(20.83, line[0].amount, precision_digits=2)
+        res = fields.Float.compare(20.83, line[0].amount, precision_rounding=2)
         self.assertEqual(
             res,
             0,
@@ -314,7 +314,7 @@ class TestHrPayslip(test_common.TestHrPayslip):
 
         line = alice_payslip.line_ids.filtered(lambda line: line.code == "TEST")
         self.assertEqual(len(line), 1, "I found the Test line")
-        res = fields.Float.compare(166.67, line[0].amount, precision_digits=2)
+        res = fields.Float.compare(166.67, line[0].amount, precision_rounding=2)
         self.assertEqual(
             res,
             0,
