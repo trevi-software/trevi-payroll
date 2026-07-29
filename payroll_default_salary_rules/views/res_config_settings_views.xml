@@ -9,20 +9,20 @@
         <field name="priority" eval="80" />
         <field name="inherit_id" ref="payroll.res_config_settings_view_form" />
         <field name="arch" type="xml">
-            <xpath expr="//div[@data-key='payroll']" position="inside">
+            <xpath expr="//app[@name='payroll']" position="inside">
                 <block title="Payroll Codes">
                     <setting
                         help="Informational payslip lines that may be
-                                    indirectly used in other lines, but don't
-                                    have a direct effect on the payslip."
+                                indirectly used in other lines, but don't
+                                have a direct effect on the payslip."
                     >
                         <label for="categ_info" />
                         <field name="categ_info" />
                     </setting>
                     <setting
                         help="Payslip lines deducted from the employee for
-                                    the purposes of a current or future benefit.
-                                    Does not include payroll taxes."
+                                the purposes of a current or future benefit.
+                                Does not include payroll taxes."
                     >
                         <label for="categ_ee_contribution" />
                         <field name="categ_ee_contribution" />
@@ -81,15 +81,15 @@
                     </setting>
                     <setting
                         help="Gross earnings. Payslip lines that calculate the
-                                    employee's total earnings, including tax-exempt
-                                    lines."
+                                employee's total earnings, including tax-exempt
+                                lines."
                     >
                         <label for="categ_gross" />
                         <field name="categ_gross" />
                     </setting>
                     <setting
                         help="Net earnings. Payslip lines calculating the,
-                                    total take-home pay of the payslip."
+                                total take-home pay of the payslip."
                     >
                         <label for="categ_net" />
                         <field name="categ_net" />
@@ -127,10 +127,10 @@
                     </setting>
                     <setting
                         help="Net earnings payslip line. Useful in cases where
-                                    the employee's net earnings are calculated on a
-                                    single payslip line. It is always better to use
-                                    the sum of the Net Earnings category for
-                                    calculations."
+                                the employee's net earnings are calculated on a
+                                single payslip line. It is always better to use
+                                the sum of the Net Earnings category for
+                                calculations."
                     >
                         <label for="categ_net" />
                         <field name="categ_net" />
