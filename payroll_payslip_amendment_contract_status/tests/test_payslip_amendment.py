@@ -107,13 +107,13 @@ class TestPayslipAmendment(common.SavepointCase):
             len(input_lines), 2, "There must be TWO payslip input lines for SALECOM"
         )
 
-        _res1 = fields.Float.compare(input_lines[0].amount, 25.0, precision_digits=2)
-        _res2 = fields.Float.compare(input_lines[1].amount, 25.0, precision_digits=2)
+        _res1 = fields.Float.compare(input_lines[0].amount, 25.0, precision_rounding=2)
+        _res2 = fields.Float.compare(input_lines[1].amount, 25.0, precision_rounding=2)
         self.assertEqual(
             _res1, 0, "The Input amount should be equal to HALF the payslip amendment"
         )
         self.assertEqual(
-            fields.Float.compare(_res1, _res2, precision_digits=2),
+            fields.Float.compare(_res1, _res2, precision_rounding=2),
             0,
             "The Input amounts should be equal to each other",
         )
