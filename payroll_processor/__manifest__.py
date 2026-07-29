@@ -14,6 +14,6 @@
         "views/hr_payslip_view.xml",
         "views/res_config_settings_view.xml",
     ],
-    "post_init_hook": "post_init_hook",
+    "post_init_hook": "disable_payroll_prevent_compute_on_confirm",
     "installable": True,
 }
