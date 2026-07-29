@@ -155,7 +155,7 @@ class TestAccrualPolicy(common.SavepointCase):
         self.assertEqual(date.today(), aa.line_ids[0].date)
         self.assertEqual(ee, aa.line_ids[0].employee_id)
         self.assertEqual(
-            0, fields.Float.compare(aa.line_ids[0].amount, 2.0, precision_digits=2)
+            0, fields.Float.compare(aa.line_ids[0].amount, 2.0, precision_rounding=2)
         )
         lva = self.LeaveAlloction.search(
             [("employee_id", "=", ee.id), ("from_accrual", "=", True)]
@@ -164,7 +164,7 @@ class TestAccrualPolicy(common.SavepointCase):
         self.assertEqual(
             0,
             fields.Float.compare(
-                aa.line_ids[0].amount, lva[0].number_of_days, precision_digits=2
+                aa.line_ids[0].amount, lva[0].number_of_days, precision_rounding=2
             ),
         )
         job = pl.job_ids.filtered(lambda j: j.name == start + relativedelta(months=1))
