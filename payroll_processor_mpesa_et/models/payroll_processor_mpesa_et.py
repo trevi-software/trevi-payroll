@@ -13,8 +13,6 @@ API_ENDPOINT_PAYOUT = "/mpesa/b2c/v2/paymentrequest"
 MY_TIMEOUT_ENDPOINT = "payroll_processor_mpesa_et/timeout"
 MY_RESULT_ENDPOINT = "payroll_processor_mpesa_et/result"
 
-IS_ENABLED = "enabled == true"
-
 _logger = logging.getLogger(__name__)
 
 
@@ -29,17 +27,17 @@ class PayrollProcessorMpesaEt(models.Model):
         \n* If the processor should NOT process payslips the status should be \'Disabled\'.""",
     )
 
-    name = fields.Char(readonly=IS_ENABLED)
+    name = fields.Char()
 
-    consumer_key = fields.Char(string="API Key", readonly=IS_ENABLED, copy=False)
+    consumer_key = fields.Char(string="API Key", copy=False)
 
-    consumer_secret = fields.Char(string="API Secret", readonly=IS_ENABLED, copy=False)
+    consumer_secret = fields.Char(string="API Secret", copy=False)
 
-    party_a = fields.Char(name="Business Shortcode", readonly=IS_ENABLED)
+    party_a = fields.Char(name="Business Shortcode")
 
-    api_user = fields.Char(string="User Name", readonly=IS_ENABLED)
+    api_user = fields.Char(string="User Name")
 
-    api_password = fields.Char(string="Password", readonly=IS_ENABLED, copy=False)
+    api_password = fields.Char(string="Password", copy=False)
 
     def authenticate(self) -> Dict[str, str]:
         """
