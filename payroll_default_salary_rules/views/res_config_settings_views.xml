@@ -9,213 +9,133 @@
         <field name="priority" eval="80" />
         <field name="inherit_id" ref="payroll.res_config_settings_view_form" />
         <field name="arch" type="xml">
-            <xpath expr="//div[@data-key='payroll']" position="inside">
-                <h2>Payroll Codes</h2>
-                <div
-                    name="salary_codes_container"
-                    class="row mt16 o_settings_container"
-                >
-                    <div id="categ_info" class="col-12 col-lg-6 o_setting_box">
-                        <div class="o_setting_left_pane" />
-                        <div class="o_setting_right_pane">
-                            <label for="categ_info" />
-                            <field name="categ_info" />
-                            <div class="text-muted">
-                                    Informational payslip lines that may be
-                                    indirectly used in other lines, but don't
-                                    have a direct effect on the payslip.
-                            </div>
-                        </div>
-                    </div>
-                    <div
-                        id="categ_ee_contribution"
-                        class="col-12 col-lg-6 o_setting_box"
+            <xpath expr="//app[@name='payroll']" position="inside">
+                <block title="Payroll Codes">
+                    <setting
+                        help="Informational payslip lines that may be
+                                indirectly used in other lines, but don't
+                                have a direct effect on the payslip."
                     >
-                        <div class="o_setting_left_pane" />
-                        <div class="o_setting_right_pane">
-                            <label for="categ_ee_contribution" />
-                            <field name="categ_ee_contribution" />
-                            <div class="text-muted">
-                                    Payslip lines deducted from the employee for
-                                    the purposes of a current or future benefit.
-                                    Does not include payroll taxes.
-                            </div>
-                        </div>
-                    </div>
-                    <div
-                        id="categ_er_contribution"
-                        class="col-12 col-lg-6 o_setting_box"
+                        <label for="categ_info" />
+                        <field name="categ_info" />
+                    </setting>
+                    <setting
+                        help="Payslip lines deducted from the employee for
+                                the purposes of a current or future benefit.
+                                Does not include payroll taxes."
                     >
-                        <div class="o_setting_left_pane" />
-                        <div class="o_setting_right_pane">
-                            <label for="categ_er_contribution" />
-                            <field name="categ_er_contribution" />
-                            <div class="text-muted">
-                                    Payslip lines deducted from the employer for
+                        <label for="categ_ee_contribution" />
+                        <field name="categ_ee_contribution" />
+                    </setting>
+                    <setting
+                        help="Payslip lines deducted from the employer for
                                     the purposes of a current or future benefit to
-                                    the employee. Does not include payroll taxes.
-                            </div>
-                        </div>
-                    </div>
-                    <div id="categ_basic" class="col-12 col-lg-6 o_setting_box">
-                        <div class="o_setting_left_pane" />
-                        <div class="o_setting_right_pane">
-                            <label for="categ_basic" />
-                            <field name="categ_basic" />
-                            <div class="text-muted">
-                                    Payslip lines used to build the employee's
-                                    basic salary.
-                            </div>
-                        </div>
-                    </div>
-                    <div id="categ_ot" class="col-12 col-lg-6 o_setting_box">
-                        <div class="o_setting_left_pane" />
-                        <div class="o_setting_right_pane">
-                            <label for="categ_ot" />
-                            <field name="categ_ot" />
-                            <div class="text-muted">
-                                    Payslip lines used to build the employee's
-                                    overtime payment.
-                            </div>
-                        </div>
-                    </div>
-                    <div id="categ_allowance" class="col-12 col-lg-6 o_setting_box">
-                        <div class="o_setting_left_pane" />
-                        <div class="o_setting_right_pane">
-                            <label for="categ_allowance" />
-                            <field name="categ_allowance" />
-                            <div class="text-muted">
-                                    Payslip lines used for extra payments to
+                                    the employee. Does not include payroll taxes."
+                    >
+                        <label for="categ_er_contribution" />
+                        <field name="categ_er_contribution" />
+                    </setting>
+                    <setting
+                        help="Payslip lines used to build the employee's
+                                    basic salary."
+                    >
+                        <label for="categ_basic" />
+                        <field name="categ_basic" />
+                    </setting>
+                    <setting
+                        help="Payslip lines used to build the employee's
+                                    overtime payment."
+                    >
+                        <label for="categ_ot" />
+                        <field name="categ_ot" />
+                    </setting>
+                    <setting
+                        help="Payslip lines used for extra payments to
                                     the employee, other than basic salary and
-                                    overtime.
-                            </div>
-                        </div>
-                    </div>
-                    <div id="categ_deduction" class="col-12 col-lg-6 o_setting_box">
-                        <div class="o_setting_left_pane" />
-                        <div class="o_setting_right_pane">
-                            <label for="categ_deduction" />
-                            <field name="categ_deduction" />
-                            <div class="text-muted">
-                                    Payslip lines deducted from the employee after
-                                    taxes and not including employee contributions.
-                            </div>
-                        </div>
-                    </div>
-                    <div id="categ_taxexempt" class="col-12 col-lg-6 o_setting_box">
-                        <div class="o_setting_left_pane" />
-                        <div class="o_setting_right_pane">
-                            <label for="categ_taxexempt" />
-                            <field name="categ_taxexempt" />
-                            <div class="text-muted">
-                                    Payslip lines calculating the portion of
-                                    the employees earnings that are not taxable.
-                            </div>
-                        </div>
-                    </div>
-                    <div id="categ_taxable" class="col-12 col-lg-6 o_setting_box">
-                        <div class="o_setting_left_pane" />
-                        <div class="o_setting_right_pane">
+                                    overtime."
+                    >
+                        <label for="categ_allowance" />
+                        <field name="categ_allowance" />
+                    </setting>
+                    <setting
+                        help="Payslip lines deducted from the employee after
+                                    taxes and not including employee contributions."
+                    >
+                        <label for="categ_deduction" />
+                        <field name="categ_deduction" />
+                    </setting>
+                    <setting
+                        help="Payslip lines calculating the portion of
+                                    the employees earnings that are not taxable."
+                    >
+                        <label for="categ_taxexempt" />
+                        <field name="categ_taxexempt" />
+                    </setting>
+                    <setting
+                        help="Gross taxable. Payslip lines calculating the
+                                    portion of the employee's earnings that are
+                                    taxable."
+                    >
                             <label for="categ_taxable" />
                             <field name="categ_taxable" />
-                            <div class="text-muted">
-                                    Gross taxable. Payslip lines calculating the
-                                    portion of the employee's earnings that are
-                                    taxable.
-                            </div>
-                        </div>
-                    </div>
-                    <div id="categ_gross" class="col-12 col-lg-6 o_setting_box">
-                        <div class="o_setting_left_pane" />
-                        <div class="o_setting_right_pane">
-                            <label for="categ_gross" />
-                            <field name="categ_gross" />
-                            <div class="text-muted">
-                                    Gross earnings. Payslip lines that calculate the
-                                    employee's total earnings, including tax-exempt
-                                    lines.
-                            </div>
-                        </div>
-                    </div>
-                    <div id="categ_net" class="col-12 col-lg-6 o_setting_box">
-                        <div class="o_setting_left_pane" />
-                        <div class="o_setting_right_pane">
-                            <label for="categ_net" />
-                            <field name="categ_net" />
-                            <div class="text-muted">
-                                    Net earnings. Payslip lines calculating the,
-                                    total take-home pay of the payslip.
-                            </div>
-                        </div>
-                    </div>
-                    <div
-                        id="categ_payroll_tax_ee"
-                        class="col-12 col-lg-6 o_setting_box"
+                    </setting>
+                    <setting
+                        help="Gross earnings. Payslip lines that calculate the
+                                employee's total earnings, including tax-exempt
+                                lines."
                     >
-                        <div class="o_setting_left_pane" />
-                        <div class="o_setting_right_pane">
-                            <label for="categ_payroll_tax_ee" />
-                            <field name="categ_payroll_tax_ee" />
-                            <div class="text-muted">
-                                    Payroll tax deductions. Deducted from the
-                                    employee and usually used to fund social programs.
-                            </div>
-                        </div>
-                    </div>
-                    <div
-                        id="categ_payroll_tax_er"
-                        class="col-12 col-lg-6 o_setting_box"
+                        <label for="categ_gross" />
+                        <field name="categ_gross" />
+                    </setting>
+                    <setting
+                        help="Net earnings. Payslip lines calculating the,
+                                total take-home pay of the payslip."
                     >
-                        <div class="o_setting_left_pane" />
-                        <div class="o_setting_right_pane">
-                            <label for="categ_payroll_tax_er" />
-                            <field name="categ_payroll_tax_er" />
-                            <div class="text-muted">
-                                    Payroll tax contributions from the employer. Does
-                                    not necessarily have an employEE counterpart.
-                            </div>
-                        </div>
-                    </div>
-                    <div id="categ_income_tax" class="col-12 col-lg-6 o_setting_box">
-                        <div class="o_setting_left_pane" />
-                        <div class="o_setting_right_pane">
-                            <label for="categ_income_tax" />
-                            <field name="categ_income_tax" />
-                            <div class="text-muted">
-                                    Income tax deductions. Deducted from the employee
-                                    and used to fund the general government.
-                            </div>
-                        </div>
-                    </div>
-                    <div id="rule_gross" class="col-12 col-lg-6 o_setting_box">
-                        <div class="o_setting_left_pane" />
-                        <div class="o_setting_right_pane">
-                            <label for="rule_gross" />
-                            <field name="rule_gross" />
-                            <div class="text-muted">
-                                    Gross earnings payslip line. For use in cases
+                        <label for="categ_net" />
+                        <field name="categ_net" />
+                    </setting>
+                    <setting
+                        help="Payroll tax deductions. Deducted from the
+                                    employee and usually used to fund social programs."
+                    >
+                        <label for="categ_payroll_tax_ee" />
+                        <field name="categ_payroll_tax_ee" />
+                    </setting>
+                    <setting
+                        help="Payroll tax contributions from the employer. Does
+                                    not necessarily have an employEE counterpart."
+                    >
+                        <label for="categ_payroll_tax_er" />
+                        <field name="categ_payroll_tax_er" />
+                    </setting>
+                    <setting
+                        help="Income tax deductions. Deducted from the employee
+                                    and used to fund the general government."
+                    >
+                        <label for="categ_income_tax" />
+                        <field name="categ_income_tax" />
+                    </setting>
+                    <setting
+                        help="Gross earnings payslip line. For use in cases
                                     where the employee's gross earnings are
                                     calculated on a single payslip line. It is always
                                     better to use the sum of the Gross Earnings
-                                    category for calculations.
-                            </div>
-                        </div>
-                    </div>
-                    <div id="rule_net" class="col-12 col-lg-6 o_setting_box">
-                        <div class="o_setting_left_pane" />
-                        <div class="o_setting_right_pane">
-                            <label for="rule_net" />
-                            <field name="rule_net" />
-                            <div class="text-muted">
-                                    Net earnings payslip line. Useful in cases where
-                                    the employee's net earnings are calculated on a
-                                    single payslip line. It is always better to use
-                                    the sum of the Net Earnings category for
-                                    calculations.
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                                    category for calculations."
+                    >
+                        <label for="categ_gross" />
+                        <field name="categ_gross" />
+                    </setting>
+                    <setting
+                        help="Net earnings payslip line. Useful in cases where
+                                the employee's net earnings are calculated on a
+                                single payslip line. It is always better to use
+                                the sum of the Net Earnings category for
+                                calculations."
+                    >
+                        <label for="categ_net" />
+                        <field name="categ_net" />
+                    </setting>
+                </block>
             </xpath>
         </field>
     </record>

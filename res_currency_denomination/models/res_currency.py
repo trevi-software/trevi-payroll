@@ -45,7 +45,7 @@ class ResCurrency(models.Model):
         # Arrange in order from largest value to smallest.
         #
         for denom in self.denomination_ids:
-            if float_compare(denom.ratio, 1.00, precision_digits=2) == 0:
+            if float_compare(denom.ratio, 1.00, precision_rounding=2) == 0:
                 smallest_note = denom.value
 
             if len(denominations) == 0:
@@ -75,7 +75,7 @@ class ResCurrency(models.Model):
 
         for currency in self:
             for denom in currency.denomination_ids:
-                if float_compare(denom.ratio, 1.00, precision_digits=2) == 0:
+                if float_compare(denom.ratio, 1.00, precision_rounding=2) == 0:
                     smallest_note = denom.value
 
                 if len(denominations) == 0:
