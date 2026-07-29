@@ -338,7 +338,7 @@ class HrPayslip(models.Model):
                     line.tz,
                     punches_list=self.attendance_dict_list(working_hours_dict),
                 )
-                if fields.Float.compare(partial_hr, 0.0, precision_digits=2) == 1:
+                if fields.Float.compare(partial_hr, 0.0, precision_rounding=2) > 0:
                     attendances[line.code]["number_of_hours"] += partial_hr
                     attendances[line.code]["number_of_days"] += 1.0
                     hours_after_ot -= partial_hr
@@ -353,8 +353,10 @@ class HrPayslip(models.Model):
                             line.accrual_max,
                         )
                         if (
-                            fields.Float.compare(accrued_hours, 0.0, precision_digits=2)
-                            == 1
+                            fields.Float.compare(
+                                accrued_hours, 0.0, precision_rounding=2
+                            )
+                            > 0
                         ):
                             self._add_accrued_hours(line, attendances, accrued_hours)
 
@@ -379,7 +381,7 @@ class HrPayslip(models.Model):
                         line.accrual_max,
                     )
                     if (
-                        fields.Float.compare(accrued_hours, 0.0, precision_digits=2)
+                        fields.Float.compare(accrued_hours, 0.0, precision_rounding=2)
                         == 1
                     ):
                         self._add_accrued_hours(line, attendances, accrued_hours)
@@ -413,8 +415,8 @@ class HrPayslip(models.Model):
                         line.accrual_max,
                     )
                     if (
-                        fields.Float.compare(accrued_hours, 0.0, precision_digits=2)
-                        == 1
+                        fields.Float.compare(accrued_hours, 0.0, precision_rounding=2)
+                        > 0
                     ):
                         self._add_accrued_hours(line, attendances, accrued_hours)
 
@@ -822,12 +824,12 @@ class HrPayslip(models.Model):
         acc_precision = 2
         accrued = worked_hours
         if (
-            not fields.Float.is_zero(pol_acc_min, precision_digits=acc_precision)
+            not fields.Float.is_zero(pol_acc_min, precision_rounding=acc_precision)
             and accrued < pol_acc_min
         ):
             accrued = pol_acc_min
         elif (
-            not fields.Float.is_zero(pol_acc_max, precision_digits=acc_precision)
+            not fields.Float.is_zero(pol_acc_max, precision_rounding=acc_precision)
             and accrued > pol_acc_max
         ):
             accrued = pol_acc_max
@@ -844,7 +846,7 @@ class HrPayslip(models.Model):
         """Returns worked time in hours according to pol_active_after and pol_duration."""
 
         applied_min = (worked_hours * 60) - pol_active_after
-        if fields.Float.compare(applied_min, 0.0, precision_digits=0) == 1:
+        if fields.Float.compare(applied_min, 0.0, precision_rounding=0) > 0:
             applied_min = (
                 (pol_duration is not False and applied_min > pol_duration)
                 and pol_duration
@@ -892,8 +894,8 @@ class HrPayslip(models.Model):
                         line.accrual_max,
                     )
                     if (
-                        fields.Float.compare(accrued_hours, 0.0, precision_digits=2)
-                        == 1
+                        fields.Float.compare(accrued_hours, 0.0, precision_rounding=2)
+                        > 0
                     ):
                         self._add_accrued_hours(line, attendances, accrued_hours)
 
@@ -916,8 +918,8 @@ class HrPayslip(models.Model):
                         line.accrual_max,
                     )
                     if (
-                        fields.Float.compare(accrued_hours, 0.0, precision_digits=2)
-                        == 1
+                        fields.Float.compare(accrued_hours, 0.0, precision_rounding=2)
+                        > 0
                     ):
                         self._add_accrued_hours(line, attendances, accrued_hours)
 
@@ -966,8 +968,8 @@ class HrPayslip(models.Model):
                         line.accrual_max,
                     )
                     if (
-                        fields.Float.compare(accrued_hours, 0.0, precision_digits=2)
-                        == 1
+                        fields.Float.compare(accrued_hours, 0.0, precision_rounding=2)
+                        > 0
                     ):
                         self._add_accrued_hours(line, attendances, accrued_hours)
 
@@ -990,8 +992,8 @@ class HrPayslip(models.Model):
                         line.accrual_max,
                     )
                     if (
-                        fields.Float.compare(accrued_hours, 0.0, precision_digits=2)
-                        == 1
+                        fields.Float.compare(accrued_hours, 0.0, precision_rounding=2)
+                        > 0
                     ):
                         self._add_accrued_hours(line, attendances, accrued_hours)
 
