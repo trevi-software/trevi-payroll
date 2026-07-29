@@ -16,23 +16,19 @@ class HrPayslipAmendment(models.Model):
     date = fields.Date(
         default=lambda s: date.today(),
         required=True,
-        readonly=True,
     )
     input_id = fields.Many2one(
         string="Salary Rule Input",
         comodel_name="hr.rule.input",
         required=True,
-        readonly=True,
     )
     employee_id = fields.Many2one(
         comodel_name="hr.employee",
         required=True,
-        readonly=True,
     )
     amount = fields.Float(
         digits="Payroll",
         required=True,
-        readonly=True,
         help="The meaning of this field is dependent on the salary rule that uses it.",
     )
     state = fields.Selection(
