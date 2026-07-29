@@ -12,4 +12,4 @@ class PayrollProcessor(models.Model):
         \n* If the processor should NOT process payslips the status should be \'Disabled\'.""",
     )
 
-    name = fields.Char(readonly="enabled == True")
+    name = fields.Char()
