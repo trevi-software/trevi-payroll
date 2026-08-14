@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <odoo noupdate="1">
-
     <!-- Allow users to access own (and subordinates) Pay Slips -->
     <record id="property_rule_payslip_own" model="ir.rule">
         <field name="name">Own and Subordinates: Pay Slips</field>
@@ -23,5 +22,4 @@
         <field name="perm_write" eval="False" />
         <field name="perm_unlink" eval="False" />
     </record>
-
 </odoo>

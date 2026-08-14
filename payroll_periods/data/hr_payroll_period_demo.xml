@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <odoo>
-
     <record id="schedule1" model="hr.payroll.period.schedule">
         <field name="name">Calendar Month Schedule</field>
         <field name="tz">GMT</field>
@@ -50,5 +49,4 @@
     <record id="hr_contract.hr_contract_vad" model="hr.contract">
         <field name="pps_id" ref="schedule1" />
     </record>
-
 </odoo>

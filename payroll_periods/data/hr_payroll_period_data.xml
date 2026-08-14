@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <odoo noupdate="1">
-
     <!-- Messaging / Chatter -->
 
     <record id="mt_state_open" model="mail.message.subtype">
@@ -70,5 +69,4 @@
         <field name="sequence" eval="20" />
         <field name="severity">critical</field>
     </record>
-
 </odoo>

@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <odoo>
-
     <!-- Employment Contracts -->
     <record id="view_hr_contract_form_inherit" model="ir.ui.view">
         <field name="name">hr.contract.form.inherit.payrollperiod</field>
@@ -16,5 +15,4 @@
             </data>
         </field>
     </record>
-
 </odoo>
