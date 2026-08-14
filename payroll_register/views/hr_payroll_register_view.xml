@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <odoo>
-
     <record id="hr_payroll_register_filter" model="ir.ui.view">
         <field name="name">Payroll Registers Search View</field>
         <field name="model">hr.payroll.register</field>
@@ -19,8 +18,8 @@
                     />
                 </group>
             </search>
-            </field>
-        </record>
+        </field>
+    </record>
 
     <record id="hr_payroll_register_tree" model="ir.ui.view">
         <field name="name">hr.payroll.register.tree</field>
@@ -65,7 +64,7 @@
                         <group>
                             <field name="period_name" />
                         </group>
-                        </group>
+                    </group>
                     <group>
                         <group string="Payslip Batches">
                             <field
@@ -131,5 +130,4 @@
         parent="payroll.payroll_menu_root"
         sequence="30"
     />
-
 </odoo>
