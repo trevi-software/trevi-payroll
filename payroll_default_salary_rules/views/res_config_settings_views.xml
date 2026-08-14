@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <odoo>
-
     <record id="res_config_settings_view_form" model="ir.ui.view">
         <field
             name="name"
@@ -76,8 +75,8 @@
                                     portion of the employee's earnings that are
                                     taxable."
                     >
-                            <label for="categ_taxable" />
-                            <field name="categ_taxable" />
+                        <label for="categ_taxable" />
+                        <field name="categ_taxable" />
                     </setting>
                     <setting
                         help="Gross earnings. Payslip lines that calculate the
@@ -139,5 +138,4 @@
             </xpath>
         </field>
     </record>
-
 </odoo>
