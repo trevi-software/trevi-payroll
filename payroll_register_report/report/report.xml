@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <odoo>
-
     <record id="paperformat_payroll_register" model="report.paperformat">
         <field name="name">Custom Paperformat for the Payroll Register</field>
         <field name="default" eval="False" />
@@ -35,5 +34,4 @@
         <field name="binding_type">report</field>
         <field name="paperformat_id" ref="paperformat_payroll_register" />
     </record>
-
 </odoo>

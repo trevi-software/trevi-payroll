@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <odoo>
-
     <template id="report_payroll_register">
         <t t-call="web.html_container">
             <t t-foreach="docs" t-as="o">
@@ -37,7 +36,9 @@
                                     <th scope="col">Gross</th>
                                     <th scope="col">Taxable Gross</th>
                                     <th scope="col">Federal Income Tax</th>
-                            <th scope="col"><t t-out="payroll_tax_heading" /></th>
+                                    <th scope="col">
+                                        <t t-out="payroll_tax_heading" />
+                                    </th>
                                     <th scope="col">Deductions</th>
                                     <th scope="col">Net</th>
                                 </tr>
@@ -110,7 +111,9 @@
     </template>
 
     <template id="payroll_register_batch">
-        <h2><span t-field="batch.name" /></h2>
+        <h2>
+            <span t-field="batch.name" />
+        </h2>
         <table class="table table-sm table-striped table-bordered text-right">
             <thead class="text-center">
                 <tr>
@@ -121,7 +124,9 @@
                     <th scope="col">Gross</th>
                     <th scope="col">Taxable Gross</th>
                     <th scope="col">Federal Income Tax</th>
-                    <th scope="col"><t t-out="payroll_tax_heading" /></th>
+                    <th scope="col">
+                        <t t-out="payroll_tax_heading" />
+                    </th>
                     <th scope="col">Deductions</th>
                     <th scope="col">Net</th>
                 </tr>
@@ -243,15 +248,32 @@
         <td class="w-25" style="text-align: left;">
             <span t-field="slip.employee_id.name" />
         </td>
-        <td><t t-out="salary" t-options="{'widget': 'float', 'precision': 2}" /></td>
-        <td><t t-out="ot" t-options="{'widget': 'float', 'precision': 2}" /></td>
-        <td><t t-out="allow" t-options="{'widget': 'float', 'precision': 2}" /></td>
-        <td><t t-out="gross" t-options="{'widget': 'float', 'precision': 2}" /></td>
-        <td><t t-out="grosstxbl" t-options="{'widget': 'float', 'precision': 2}" /></td>
-        <td><t t-out="fit" t-options="{'widget': 'float', 'precision': 2}" /></td>
-        <td><t t-out="prltax" t-options="{'widget': 'float', 'precision': 2}" /></td>
-        <td><t t-out="deduct" t-options="{'widget': 'float', 'precision': 2}" /></td>
-        <td><t t-out="net" t-options="{'widget': 'float', 'precision': 2}" /></td>
+        <td>
+            <t t-out="salary" t-options="{'widget': 'float', 'precision': 2}" />
+        </td>
+        <td>
+            <t t-out="ot" t-options="{'widget': 'float', 'precision': 2}" />
+        </td>
+        <td>
+            <t t-out="allow" t-options="{'widget': 'float', 'precision': 2}" />
+        </td>
+        <td>
+            <t t-out="gross" t-options="{'widget': 'float', 'precision': 2}" />
+        </td>
+        <td>
+            <t t-out="grosstxbl" t-options="{'widget': 'float', 'precision': 2}" />
+        </td>
+        <td>
+            <t t-out="fit" t-options="{'widget': 'float', 'precision': 2}" />
+        </td>
+        <td>
+            <t t-out="prltax" t-options="{'widget': 'float', 'precision': 2}" />
+        </td>
+        <td>
+            <t t-out="deduct" t-options="{'widget': 'float', 'precision': 2}" />
+        </td>
+        <td>
+            <t t-out="net" t-options="{'widget': 'float', 'precision': 2}" />
+        </td>
     </template>
-
 </odoo>
