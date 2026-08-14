@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <odoo>
     <data noupdate="1">
-
         <!-- Rule Codes -->
         <function
             model="ir.config_parameter"
@@ -85,11 +84,9 @@
             name="set_param"
             eval="('payroll_default_salary_rules.categ_er_contribution', 'ERCONT')"
         />
-
     </data>
 
     <data noupdate="1">
-
         <!-- Salary Rule Categories -->
         <record id="INFO" model="hr.salary.rule.category">
             <field name="name">Informational</field>
@@ -193,6 +190,5 @@ result = categories.BASIC + categories.OVERTM + categories.ALLWNC + categories.T
 result = categories.GROSS - categories.PRLTAX - categories.INCTAX - categories.EECONT - categories.DEDUCT
             </field>
         </record>
-
     </data>
 </odoo>

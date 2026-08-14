@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <odoo>
-
     <record id="hr_salary_rule_category_view_search" model="ir.ui.view">
         <field
             name="name"
@@ -51,5 +50,4 @@
             </xpath>
         </field>
     </record>
-
 </odoo>
