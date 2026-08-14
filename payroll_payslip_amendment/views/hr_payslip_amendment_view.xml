@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <odoo>
-
     <!-- Pay Slip Amendment -->
 
     <record id="view_payslip_amendment_tree" model="ir.ui.view">
@@ -81,5 +80,4 @@
         groups="payroll.group_payroll_user"
         sequence="50"
     />
-
 </odoo>
