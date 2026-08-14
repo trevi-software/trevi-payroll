@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <odoo>
-
     <record id="policygroup_demo" model="hr.policy.group">
         <field name="name">Demo group for all employees</field>
     </record>
@@ -46,5 +45,4 @@
     <record id="hr_contract.hr_contract_vad" model="hr.contract">
         <field name="policy_group_id" ref="policygroup_demo" />
     </record>
-
 </odoo>
