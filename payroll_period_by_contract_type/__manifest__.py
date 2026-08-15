@@ -4,7 +4,7 @@
 {
     "name": "Payroll Period Batch by contract type",
     "summary": "Generate separate payslip batches for each contract type.",
-    "version": "17.0.1.0.0",
+    "version": "18.0.1.0.0",
     "category": "Payroll",
     "images": ["static/src/img/main_screenshot.png"],
     "author": "TREVI Software",
