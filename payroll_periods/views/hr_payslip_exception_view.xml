@@ -5,7 +5,7 @@
         <field name="name">hr.payslip.exception.tree</field>
         <field name="model">hr.payslip.exception</field>
         <field name="arch" type="xml">
-            <tree
+            <list
                 decoration-danger="severity == 'critical'"
                 decoration-warning="severity == 'medium'"
             >
@@ -13,7 +13,7 @@
                 <field name="slip_id" />
                 <field name="severity" />
                 <field name="ignore" />
-            </tree>
+            </list>
         </field>
     </record>
     <record id="view_payroll_exception_form" model="ir.ui.view">
@@ -43,7 +43,7 @@
     <record id="open_payroll_exception_view" model="ir.actions.act_window">
         <field name="name">Exceptions</field>
         <field name="res_model">hr.payslip.exception</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
     </record>
     <menuitem
         id="menu_payroll_exception_view"

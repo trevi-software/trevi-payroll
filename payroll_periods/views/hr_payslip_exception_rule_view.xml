@@ -5,12 +5,12 @@
         <field name="name">hr.payslip.exception.rule.tree</field>
         <field name="model">hr.payslip.exception.rule</field>
         <field name="arch" type="xml">
-            <tree>
+            <list>
                 <field name="name" />
                 <field name="code" />
                 <field name="severity" />
                 <field name="sequence" />
-            </tree>
+            </list>
         </field>
     </record>
     <record id="view_exception_rule_form" model="ir.ui.view">
@@ -57,7 +57,7 @@
     <record id="open_payroll_exception_rule_view" model="ir.actions.act_window">
         <field name="name">Payroll Exception Rules</field>
         <field name="res_model">hr.payslip.exception.rule</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
     </record>
     <menuitem
         id="menu_payroll_exception_rule_view"
