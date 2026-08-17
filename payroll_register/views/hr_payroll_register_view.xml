@@ -25,9 +25,9 @@
         <field name="name">hr.payroll.register.tree</field>
         <field name="model">hr.payroll.register</field>
         <field name="arch" type="xml">
-            <tree>
+            <list>
                 <field name="display_name" />
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -73,12 +73,12 @@
                                 colspan="4"
                                 nolabel="1"
                             >
-                                <tree>
+                                <list>
                                     <field name="name" />
                                     <field name="date_start" />
                                     <field name="date_end" />
                                     <field name="state" />
-                                </tree>
+                                </list>
                             </field>
                         </group>
                         <group name="denominations" string="Denominations">
@@ -89,10 +89,10 @@
                                     nolabel="1"
                                     colspan="2"
                                 >
-                                    <tree default_order="denomination">
+                                    <list default_order="denomination">
                                         <field name="denomination" />
                                         <field name="denomination_qty" />
-                                    </tree>
+                                    </list>
                                 </field>
                                 <newline />
                                 <div name="exact_change">
@@ -121,7 +121,7 @@
     <record id="open_payroll_registers" model="ir.actions.act_window">
         <field name="name">Registers</field>
         <field name="res_model">hr.payroll.register</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
         <field name="view_id" ref="hr_payroll_register_tree" />
     </record>
     <menuitem
