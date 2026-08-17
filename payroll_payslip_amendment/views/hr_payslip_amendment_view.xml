@@ -6,13 +6,13 @@
         <field name="name">hr.payslip.amendment.tree</field>
         <field name="model">hr.payslip.amendment</field>
         <field name="arch" type="xml">
-            <tree>
+            <list>
                 <field name="employee_id" />
                 <field name="input_id" />
                 <field name="date" />
                 <field name="amount" />
                 <field name="state" />
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -71,7 +71,7 @@
     <record id="action_payslip_amendment" model="ir.actions.act_window">
         <field name="name">Pay Slip Amendments</field>
         <field name="res_model">hr.payslip.amendment</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
     </record>
     <menuitem
         id="menu_payslip_amendment"
