@@ -10,13 +10,13 @@
                 <page name="exceptions" string="Exceptions">
                     <group name="exceptions" string="Payroll Exceptions">
                         <field name="exception_ids" nolabel="1">
-                            <tree
+                            <list
                                 decoration-danger="severity == 'critical'"
                                 decoration-warning="severity == 'medium'"
                             >
                                 <field name="name" />
                                 <field name="severity" />
-                            </tree>
+                            </list>
                         </field>
                     </group>
                 </page>

@@ -5,7 +5,7 @@
         <field name="name">hr.payroll.period.schedule.tree</field>
         <field name="model">hr.payroll.period.schedule</field>
         <field name="arch" type="xml">
-            <tree>
+            <list>
                 <field name="name" />
                 <field name="type" />
                 <field name="tz" />
@@ -13,7 +13,7 @@
                 <field name="ot_max_rollover_hours" />
                 <field name="ot_max_rollover_gap" />
                 <field name="active" />
-            </tree>
+            </list>
         </field>
     </record>
     <record id="view_payperiod_schedule_form" model="ir.ui.view">
@@ -58,7 +58,7 @@
     <record id="open_payroll_period_schedule_view" model="ir.actions.act_window">
         <field name="name">Payroll Period Schedules</field>
         <field name="res_model">hr.payroll.period.schedule</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
     </record>
     <menuitem
         id="menu_payroll_period_schedule_view"
