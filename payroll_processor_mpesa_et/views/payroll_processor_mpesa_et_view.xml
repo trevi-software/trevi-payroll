@@ -26,7 +26,7 @@
     <record id="payroll_processor_mpesa_et_action" model="ir.actions.act_window">
         <field name="name">M-PESA (ET)</field>
         <field name="res_model">payroll.processor.mpesa_et</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
     </record>
 
     <menuitem
