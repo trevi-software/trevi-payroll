@@ -6,14 +6,14 @@
         <field name="name">hr.policy.line.presence.tree</field>
         <field name="model">hr.policy.line.presence</field>
         <field name="arch" type="xml">
-            <tree>
+            <list>
                 <field name="name" />
                 <field name="code" />
                 <field name="type" />
                 <field name="rate" />
                 <field name="active_after" />
                 <field name="duration" />
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -57,12 +57,12 @@
         <field name="name">hr.policy.presence.tree</field>
         <field name="model">hr.policy.presence</field>
         <field name="arch" type="xml">
-            <tree>
+            <list>
                 <field name="name" />
                 <field name="date" />
                 <field name="work_hours_per_week" />
                 <field name="work_days_per_week" />
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -96,7 +96,7 @@
     <record id="open_presence_policy" model="ir.actions.act_window">
         <field name="name">Presence Policies</field>
         <field name="res_model">hr.policy.presence</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
     </record>
     <menuitem
         id="menu_hr_presence_policy"
