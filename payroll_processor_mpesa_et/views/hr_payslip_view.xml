@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <odoo>
-
     <record id="hr_payslip_view_form_mpesa" model="ir.ui.view">
         <field name="name">hr.payslip.form.inherit.payroll_processor_mpesa_et</field>
         <field name="model">hr.payslip</field>
@@ -22,5 +21,4 @@
             </page>
         </field>
     </record>
-
 </odoo>

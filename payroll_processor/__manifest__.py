@@ -1,7 +1,7 @@
 {
     "name": "Default Payroll Processor",
-    "summary": "Make salary payments through a payment processor",
-    "version": "14.0.1.0.0",
+    "summary": "Base module for implementing salary payment processors",
+    "version": "18.0.1.0.0",
     "author": "TREVI Software",
     "category": "Payroll",
     "license": "AGPL-3",
@@ -14,6 +14,6 @@
         "views/hr_payslip_view.xml",
         "views/res_config_settings_view.xml",
     ],
-    "post_init_hook": "post_init_hook",
+    "post_init_hook": "disable_payroll_prevent_compute_on_confirm",
     "installable": True,
 }
