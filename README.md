@@ -17,7 +17,36 @@ Additional payroll modules for Odoo.
 
 [//]: # (addons)
 
-This part will be replaced when running the oca-gen-addons-table script from OCA/maintainer-tools.
+Available addons
+----------------
+addon | version | maintainers | summary
+--- | --- | --- | ---
+[payroll_default_salary_rules](payroll_default_salary_rules/) | 18.0.1.0.0 |  | Default set of salary rules and categories.
+[payroll_payslip_amendment](payroll_payslip_amendment/) | 18.0.1.0.0 |  | Add amendments to current and future pay slips
+[payroll_payslip_amendment_contract_status](payroll_payslip_amendment_contract_status/) | 18.0.1.0.0 |  | Link payslip amendments with the employee contract state.
+[payroll_payslip_dictionary](payroll_payslip_dictionary/) | 18.0.1.0.0 |  | Dictionary of values that can be used in payslip calculations
+[payroll_payslip_hr_leave_type](payroll_payslip_hr_leave_type/) | 18.0.1.0.0 |  | Use time-off codes (instead of names) in payslip rules
+[payroll_payslip_patch](payroll_payslip_patch/) | 18.0.1.0.0 |  | Miscellaneous source code patches to payslip handling
+[payroll_payslip_report](payroll_payslip_report/) | 18.0.1.0.0 |  | Comprehensive payslip report by department.
+[payroll_period_account](payroll_period_account/) | 18.0.1.0.0 |  | Links payroll periods to accounting
+[payroll_period_base_lock](payroll_period_base_lock/) | 18.0.1.0.0 |  | Adds a base lock field to a payroll period.
+[payroll_period_by_contract_type](payroll_period_by_contract_type/) | 18.0.1.0.0 |  | Generate separate payslip batches for each contract type.
+[payroll_period_contract_values](payroll_period_contract_values/) | 18.0.1.0.0 |  | Links payroll period schedules with employee contracts.
+[payroll_period_payslip_amendment](payroll_period_payslip_amendment/) | 18.0.1.0.0 |  | Link payslip amendments with a payroll period.
+[payroll_period_processing](payroll_period_processing/) | 18.0.1.0.0 |  | Payroll period processing wizard
+[payroll_periods](payroll_periods/) | 18.0.1.0.0 |  | Configurable payroll schedules.
+[payroll_policy_absence](payroll_policy_absence/) | 18.0.1.0.0 |  | Define properties of an employee absense policy for payroll.
+[payroll_policy_accrual](payroll_policy_accrual/) | 18.0.1.0.0 |  | Automatically or manually accrue to time banks to be withdrawn later
+[payroll_policy_group](payroll_policy_group/) | 18.0.1.0.0 |  | Group payroll policies and assign them to contracts
+[payroll_policy_ot](payroll_policy_ot/) | 18.0.1.0.0 |  | Assign over-time policies to a policy group
+[payroll_policy_payslip](payroll_policy_payslip/) | 18.0.1.0.0 |  | Apply payroll policies duing payslip processing
+[payroll_policy_presence](payroll_policy_presence/) | 18.0.1.0.0 |  | Define properties of an employee presence policy
+[payroll_policy_rounding](payroll_policy_rounding/) | 18.0.1.0.0 |  | Define attendance check-in and check-out rounding policies
+[payroll_processor](payroll_processor/) | 18.0.1.0.0 |  | Base module for implementing salary payment processors
+[payroll_processor_mpesa_et](payroll_processor_mpesa_et/) | 18.0.1.0.0 |  | Make salary payments through Safaricom Ethiopia
+[payroll_register](payroll_register/) | 18.0.1.0.0 |  | Payroll Register
+[payroll_register_report](payroll_register_report/) | 18.0.1.0.0 |  | List payslips with salary categories by batch.
+[res_currency_denomination](res_currency_denomination/) | 18.0.1.0.0 |  | Currency Denominations
 
 [//]: # (end addons)
 
