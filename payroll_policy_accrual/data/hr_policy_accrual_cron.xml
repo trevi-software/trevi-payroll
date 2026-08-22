@@ -4,7 +4,6 @@
         <field name="name">Accrual Policies: Update</field>
         <field name="model_id" ref="model_hr_policy_accrual" />
         <field name="type">ir.actions.server</field>
-        <field name="doall" eval="True" />
         <field name="state">code</field>
         <field name="code">model.try_calculate_accruals()</field>
         <field
@@ -13,6 +12,5 @@
         />
         <field name="interval_number" eval="1" />
         <field name="interval_type">days</field>
-        <field name="numbercall" eval="-1" />
     </record>
 </odoo>
