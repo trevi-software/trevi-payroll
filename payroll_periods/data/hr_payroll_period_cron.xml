@@ -12,7 +12,6 @@
         />
         <field name="interval_number" eval="1" />
         <field name="interval_type">hours</field>
-        <field name="numbercall" eval="-1" />
     </record>
 
     <record id="hr_payroll_period_create_cron" model="ir.cron">
@@ -27,6 +26,5 @@
         />
         <field name="interval_number" eval="1" />
         <field name="interval_type">hours</field>
-        <field name="numbercall" eval="-1" />
     </record>
 </odoo>
