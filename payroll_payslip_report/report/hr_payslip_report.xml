@@ -72,12 +72,7 @@
                     string="My Department"
                     domain="[('department_id.member_ids.user_id', '=', uid)]"
                 />
-                <filter
-                    string="Date From"
-                    name="filter_datefrom"
-                    date="date_from"
-                    default_period="this_year"
-                />
+                <filter string="Date From" name="filter_datefrom" date="date_from" />
                 <filter name="Done" string="Done" domain="[('state','=', 'done')]" />
                 <filter name="Draft" string="Draft" domain="[('state','=','draft')]" />
                 <separator />
