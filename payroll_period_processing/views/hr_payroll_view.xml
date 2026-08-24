@@ -18,10 +18,7 @@
                 <xpath expr="//field[@name='name']" position="before">
                     <field name="register_id" />
                 </xpath>
-                <xpath
-                    expr="//form/sheet/notebook/page/group/field/tree/button[@name='button_ignore']"
-                    position="before"
-                >
+                <xpath expr="//button[@name='button_ignore']" position="before">
                     <button
                         name="button_recalculate"
                         type="object"
