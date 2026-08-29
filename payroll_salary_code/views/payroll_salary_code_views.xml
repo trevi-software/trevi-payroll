@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="payroll_salary_code_view_search" model="ir.ui.view">
+        <field name="name">payroll.salary.code.search</field>
+        <field name="model">payroll.salary.code</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="code" />
+                <field name="description" />
+            </search>
+        </field>
+    </record>
+
+    <record id="payroll_salary_code_view_list" model="ir.ui.view">
+        <field name="name">payroll.salary.code.list</field>
+        <field name="model">payroll.salary.code</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="code" />
+                <field name="description" />
+            </list>
+        </field>
+    </record>
+
+    <record id="payroll_salary_code_view_form" model="ir.ui.view">
+        <field name="name">payroll.salary.code.form</field>
+        <field name="model">payroll.salary.code</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="code" />
+                            <field name="description" />
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="open_payroll_salary_codes" model="ir.actions.act_window">
+        <field name="name">Salary Codes</field>
+        <field name="res_model">payroll.salary.code</field>
+        <field name="view_mode">list,form</field>
+    </record>
+    <menuitem
+        id="menu_payroll_salary_code"
+        action="open_payroll_salary_codes"
+        parent="payroll.payroll_menu_configuration"
+        sequence="60"
+    />
+</odoo>
