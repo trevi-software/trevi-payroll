@@ -5,7 +5,7 @@
 from odoo.tests import common
 
 
-class TestAccrualPolicy(common.SavepointCase):
+class TestAccrualPolicy(common.TransactionCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()

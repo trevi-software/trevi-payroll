@@ -6,13 +6,12 @@ from odoo import _, exceptions, fields, models
 
 
 class HrAttendance(models.Model):
-
     _inherit = "hr.employee"
 
     # Completely over-ride base module method to implement rounding.
     # Base module: hr_attendance/models/hr_employee.py
     #
-    def _attendance_action_change(self):
+    def _attendance_action_change(self, geo_information=None):
         """Check In/Check Out action
         Check In: create a new attendance record
         Check Out: modify check_out field of appropriate attendance record
@@ -25,12 +24,21 @@ class HrAttendance(models.Model):
                 "employee_id": self.id,
                 "clock_in": action_date,
             }
+            if geo_information:
+                vals.update(
+                    {f"in_{key}": value for key, value in geo_information.items()}
+                )
             return self.env["hr.attendance"].create(vals)
         attendance = self.env["hr.attendance"].search(
             [("employee_id", "=", self.id), ("check_out", "=", False)], limit=1
         )
         if attendance:
-            attendance.clock_out = action_date
+            vals = {"clock_out": action_date}
+            if geo_information:
+                vals.update(
+                    {f"out_{key}": value for key, value in geo_information.items()}
+                )
+            attendance.write(vals)
         else:
             raise exceptions.UserError(
                 _(

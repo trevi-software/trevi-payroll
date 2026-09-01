@@ -8,7 +8,7 @@ from odoo.exceptions import UserError, ValidationError
 from odoo.tests import common, new_test_user
 
 
-class TestPayrollRegister(common.SavepointCase):
+class TestPayrollRegister(common.TransactionCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()

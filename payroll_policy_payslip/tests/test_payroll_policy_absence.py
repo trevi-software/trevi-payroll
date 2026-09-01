@@ -1,7 +1,7 @@
 # Copyright (C) 2022 TREVI Software
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from datetime import date, datetime
+from datetime import date
 
 from . import common
 
@@ -54,7 +54,7 @@ class TestAbsencePolicy(common.TestHrPayslip):
             {
                 "name": "Sick Leave",
                 "code": "SICK50",
-                "allocation_type": "no",
+                "requires_allocation": "no",
                 "leave_validation_type": "hr",
             }
         )
@@ -62,7 +62,7 @@ class TestAbsencePolicy(common.TestHrPayslip):
             {
                 "name": "Hourly Leave",
                 "code": "HOURLY",
-                "allocation_type": "no",
+                "requires_allocation": "no",
                 "leave_validation_type": "hr",
                 "request_unit": "hour",
             }
@@ -108,7 +108,6 @@ class TestAbsencePolicy(common.TestHrPayslip):
         cls.default_policy_group.absence_policy_ids = [(4, cls.absence_policy.id)]
 
     def test_no_hours(self):
-
         # I set the test rule to detect the number of regular worked hours
         self.test_rule.amount_python_compute = (
             "result_rate = worked_days.PL1.rate * 100 \n"
@@ -157,7 +156,6 @@ class TestAbsencePolicy(common.TestHrPayslip):
         )
 
     def test_public_holiday_absence(self):
-
         # Create a public holiday
         self.public_holiday = self.PublicHoliday.create(
             {
@@ -221,7 +219,6 @@ class TestAbsencePolicy(common.TestHrPayslip):
         )
 
     def test_leave_dock(self):
-
         # Set system parameter
         self.env["ir.config_parameter"].sudo().set_param(
             "payroll.leaves_positive", True
@@ -233,9 +230,8 @@ class TestAbsencePolicy(common.TestHrPayslip):
                 "name": "Richard Sick Leave",
                 "employee_id": self.richard_emp.id,
                 "holiday_status_id": self.sick_leave_type.id,
-                "date_from": datetime(2022, 4, 4),
-                "date_to": datetime(2022, 4, 5, 23, 59, 59),
-                # 'number_of_days': 2,
+                "request_date_from": date(2022, 4, 4),
+                "request_date_to": date(2022, 4, 5),
             }
         )
         lv.action_approve()
@@ -303,7 +299,6 @@ class TestAbsencePolicy(common.TestHrPayslip):
         )
 
     def test_leave_partial_awol(self):
-
         # Set system parameter
         self.env["ir.config_parameter"].sudo().set_param(
             "payroll.leaves_positive", True

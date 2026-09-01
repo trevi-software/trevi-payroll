@@ -9,7 +9,7 @@ from odoo.exceptions import UserError
 from odoo.tests import common
 
 
-class TestPayslipAmendment(common.SavepointCase):
+class TestPayslipAmendment(common.TransactionCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -233,7 +233,7 @@ class TestPayslipAmendment(common.SavepointCase):
             len(input_lines), 1, "There must be a payslip input line for SALECOM"
         )
 
-        _res = fields.Float.compare(input_lines[0].amount, 100.00, precision_rounding=2)
+        _res = fields.Float.compare(input_lines[0].amount, 100.00, precision_digits=2)
         self.assertEqual(
             _res, 0, "The Input amount should be equal to the payslip amendment"
         )
@@ -273,7 +273,7 @@ class TestPayslipAmendment(common.SavepointCase):
             len(input_lines), 1, "There must be a payslip input line for SALECOM"
         )
 
-        _res = fields.Float.compare(input_lines[0].amount, 0.00, precision_rounding=2)
+        _res = fields.Float.compare(input_lines[0].amount, 0.00, precision_digits=2)
         self.assertEqual(_res, 0, "The Input amount should 0")
         self.assertEqual(
             psa.state, "validate", "The payslip amendment must be in 'validate' state"
@@ -317,7 +317,7 @@ class TestPayslipAmendment(common.SavepointCase):
         slip.onchange_employee()
 
         input_lines = slip.input_line_ids.filtered(lambda self: self.code == "SALECOM")
-        _res = fields.Float.compare(input_lines[0].amount, 200.00, precision_rounding=2)
+        _res = fields.Float.compare(input_lines[0].amount, 200.00, precision_digits=2)
         self.assertEqual(
             _res,
             0,

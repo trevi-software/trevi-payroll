@@ -10,7 +10,6 @@ from odoo.tools.safe_eval import safe_eval
 # I ommitted the parts I don't use.
 #
 class HrPayslipExceptionRule(models.Model):
-
     _name = "hr.payslip.exception.rule"
     _description = "Rules describing pay slips in an abnormal state"
     _order = "sequence, code"
@@ -54,7 +53,7 @@ result = categories.GROSS.amount > categories.NET.amount"""
         string="Python Condition",
         readonly=False,
         help="The condition that triggers the exception.",
-        default=lambda self: self._generate_condition_str,
+        default=lambda self: self._generate_condition_str(),
     )
     severity = fields.Selection(
         selection=[("low", "Low"), ("medium", "Medium"), ("critical", "Critical")],

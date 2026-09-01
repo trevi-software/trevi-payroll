@@ -86,12 +86,7 @@ class HrPayslip(models.Model):
         contracts = self.employee_id._get_contracts(
             date_from=self.date_from, date_to=self.date_to
         )
-        structure_ids = contracts.get_all_structures()
-        tupleList = (
-            self.env["hr.payroll.structure"].browse(structure_ids).get_all_rules()
-        )
-        rule_ids = [i for i, _s in tupleList]
-        rules = self.env["hr.salary.rule"].browse(rule_ids).sorted("sequence")
+        rules = contracts.get_all_structures().get_all_rules().sorted("sequence")
 
         # Setup categories dict with all possible categories
         #
@@ -110,7 +105,7 @@ class HrPayslip(models.Model):
         for line in self.line_ids:
             idCateg = line.salary_rule_id.category_id.code
             prev_amount = 0
-            if not fields.Float.is_zero(categories[idCateg], precision_rounding=2):
+            if not fields.Float.is_zero(categories[idCateg], precision_digits=2):
                 prev_amount = categories[idCateg]
             categories = _sum_salary_rule_category(
                 categories, line.salary_rule_id.category_id, line.total - prev_amount
@@ -119,7 +114,6 @@ class HrPayslip(models.Model):
         return categories
 
     def compute_sheet(self):
-
         res = super().compute_sheet()
 
         sorted_rules = (
@@ -127,7 +121,6 @@ class HrPayslip(models.Model):
         )
 
         for payslip in self:
-
             baselocaldict = payslip._get_baselocaldict_hook()
             employee = payslip.employee_id
             contract = employee.contract_id

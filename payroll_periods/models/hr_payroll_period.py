@@ -13,7 +13,6 @@ from .hr_payroll_period_schedule import get_period_year
 
 
 class HrPayrollPeriod(models.Model):
-
     _name = "hr.payroll.period"
     _description = "Payroll Periods"
     _inherit = ["mail.thread", "mail.activity.mixin"]
@@ -58,7 +57,6 @@ class HrPayrollPeriod(models.Model):
     )
 
     def _get_pex(self, severity):
-
         self.ensure_one()
         PayslipException = self.env["hr.payslip.exception"]
 
@@ -72,7 +70,6 @@ class HrPayrollPeriod(models.Model):
 
     @api.depends("run_ids.slip_ids")
     def _compute_pex_all(self):
-
         for period in self:
             res = period._get_pex("critical")
             res += period._get_pex("medium")
@@ -100,7 +97,6 @@ class HrPayrollPeriod(models.Model):
 
     @api.model
     def is_ended(self):
-
         #
         # XXX - Someone who cares about DST should update this code to handle it.
         #
@@ -138,7 +134,6 @@ class HrPayrollPeriod(models.Model):
 
     @api.model
     def get_utc_times(self, period):
-
         #
         # XXX - Someone who cares about DST should update this code to handle it.
         #
@@ -150,29 +145,27 @@ class HrPayrollPeriod(models.Model):
         return (utcDtStart, utcDtEnd)
 
     def set_state_ended(self):
-
         self.write({"state": "ended"})
 
     def set_state_payment(self):
-
         for period in self:
             for ex in period.exception_ids:
                 if ex.severity == "critical" and not ex.ignore:
                     raise exceptions.ValidationError(
                         _("Validation Error")
                         + "\n"
-                        + _("Critical exceptions remain in %(period)s. If you wish to \
-                            proceed you must resolve or ignore them.")
+                        + _(
+                            "Critical exceptions remain in %(period)s. If you wish to \
+                            proceed you must resolve or ignore them."
+                        )
                         % {"period": period.name}
                     )
         self.write({"state": "payment"})
 
     def set_state_generate(self):
-
         self.write({"state": "generate"})
 
     def set_state_closed(self):
-
         # When we close a pay period, also de-activate related attendances
         Attendance = self.env["hr.attendance"]
 
@@ -211,7 +204,6 @@ class HrPayrollPeriod(models.Model):
         dLastContractEnd = False
         open_contract = False
         for contract in ee.contract_ids:
-
             # Does employee have a contract in this pay period?
             #
             dContractStart = contract.date_start
@@ -245,7 +237,6 @@ class HrPayrollPeriod(models.Model):
         return dictCreate
 
     def create_payslip(self, employee_id, run_id=False):
-
         self.ensure_one()
         local_tz = timezone(self.schedule_id.tz)
         utc_pstart, utc_pend = self.get_utc_times(self)
@@ -293,7 +284,9 @@ class HrPayrollPeriod(models.Model):
                 if term.name >= temp_date_start and term.name < temp_date_end:
                     temp_date_end = term.name
 
-        month_name, _, year_no = get_period_year(dPeriodStart, annual_pay_periods)
+        month_name, _month_no, year_no = get_period_year(
+            dPeriodStart, annual_pay_periods
+        )
         slip_name = _("Pay Slip for %(employee)s for %(year)s/%(month)s") % {
             "employee": ee.name,
             "year": year_no,
@@ -314,7 +307,6 @@ class HrPayrollPeriod(models.Model):
         return slip
 
     def print_contribution_registers(self):
-
         data = (
             self.env["hr.payroll.period"]
             .browse(self.ids[0])
@@ -335,7 +327,6 @@ class HrPayrollPeriod(models.Model):
         }
 
     def rerun_payslip(self, slip):
-
         self.ensure_one()
         run = slip.payslip_run_id
         ee = slip.employee_id
