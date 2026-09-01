@@ -6,15 +6,13 @@ from odoo import api, fields, models
 
 
 class HrContract(models.Model):
-
     _inherit = "hr.contract"
 
     @api.model
     def _get_pay_sched(self):
-
         iv = self.get_latest_initial_values()
         if iv is not None and iv.pay_sched_id:
             return iv.pay_sched_id.id
         return False
 
-    pps_id = fields.Many2one(default=lambda self: self._get_pay_sched)
+    pps_id = fields.Many2one(default=lambda self: self._get_pay_sched())
