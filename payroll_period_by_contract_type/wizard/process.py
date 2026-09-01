@@ -53,9 +53,9 @@ class ProcessPayroll(models.TransientModel):
 
         for ctype in ctypes:
             ees = employees.filtered(
-                lambda e: contracts.filtered(lambda c: c.employee_id == e)[
-                    0
-                ].contract_type_id
+                lambda e, ctype=ctype: contracts.filtered(
+                    lambda c, e=e: c.employee_id == e
+                )[0].contract_type_id
                 == ctype
             )
             if len(ees) == 0:
