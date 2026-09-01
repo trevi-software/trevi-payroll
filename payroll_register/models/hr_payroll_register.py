@@ -9,7 +9,6 @@ from odoo.tools.translate import _
 
 
 class HrPayrollRun(models.Model):
-
     _name = "hr.payslip.run"
     _inherit = "hr.payslip.run"
 
@@ -23,7 +22,6 @@ class HrPayrollRun(models.Model):
 
 
 class HrPayrollRegister(models.Model):
-
     _name = "hr.payroll.register"
     _description = "Payroll Register"
     _sql_constraints = [
@@ -36,7 +34,6 @@ class HrPayrollRegister(models.Model):
 
     @api.model
     def _get_default_name(self):
-
         month_name = datetime.now().strftime("%B")
         year = datetime.now().year
         name = _("Payroll for the Month of %(month)s %(year)s") % {
@@ -46,7 +43,9 @@ class HrPayrollRegister(models.Model):
         return name
 
     name = fields.Char(
-        string="Description", required=True, default=lambda self: self._get_default_name
+        string="Description",
+        required=True,
+        default=lambda self: self._get_default_name(),
     )
     period_name = fields.Char()
     state = fields.Selection(
@@ -87,7 +86,6 @@ class HrPayrollRegister(models.Model):
     )
 
     def _compute_change(self):
-
         res = 0
         for reg in self:
             for den in reg.denomination_ids:
@@ -104,7 +102,6 @@ class HrPayrollRegister(models.Model):
         return res
 
     def action_delete_runs(self):
-
         PayslipRun = self.env["hr.payslip.run"]
         payslip_run_ids = PayslipRun.search([("register_id", "in", self.ids)])
         payslip_run_ids.unlink()
@@ -112,7 +109,6 @@ class HrPayrollRegister(models.Model):
 
     @api.model
     def get_net_payslip_lines_domain(self, run_ids):
-
         return [
             ("slip_id.payslip_run_id", "in", run_ids.ids),
             ("salary_rule_id.code", "=", "NET"),
@@ -120,7 +116,6 @@ class HrPayrollRegister(models.Model):
 
     @api.model
     def get_net_payslip_lines(self, run_ids):
-
         net_lines = []
         PayslipLine = self.env["hr.payslip.line"]
         slip_line_ids = PayslipLine.search(self.get_net_payslip_lines_domain(run_ids))
@@ -130,7 +125,6 @@ class HrPayrollRegister(models.Model):
         return net_lines
 
     def set_denominations(self):
-
         Denominations = self.env["hr.payroll.register.denominations"]
         for register in self:
             if len(register.run_ids) == 0:
@@ -169,7 +163,6 @@ class HrPayrollRegister(models.Model):
 
 
 class HrPayrollRegisterDenominations(models.Model):
-
     _name = "hr.payroll.register.denominations"
     _description = "Exact denomination amounts for entire payroll register"
     _order = "denomination"
