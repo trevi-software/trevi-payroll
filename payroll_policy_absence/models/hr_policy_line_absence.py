@@ -6,7 +6,6 @@ from odoo import api, fields, models
 
 
 class PolicyLineAbsence(models.Model):
-
     _name = "hr.policy.line.absence"
     _description = "Absence payroll policy line"
 
@@ -25,12 +24,12 @@ class PolicyLineAbsence(models.Model):
     rate = fields.Float(required=True, default=1.0, help="Multiplier of employee wage.")
     use_awol = fields.Boolean(
         string="Absent Without Leave",
-        help="Use this policy to record employee time absence not covered by other leaves.",
+        help="Use this policy to record employee time absence not covered by "
+        "other leaves.",
     )
 
     @api.onchange("holiday_status_id")
     def onchange_holiday(self):
-
         if self.holiday_status_id:
             self.name = self.holiday_status_id.name
             self.code = self.holiday_status_id.code
