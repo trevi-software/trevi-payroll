@@ -10,7 +10,7 @@ from odoo.exceptions import ValidationError
 from odoo.tests import common, new_test_user
 
 
-class TestSchedule(common.SavepointCase):
+class TestSchedule(common.TransactionCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
