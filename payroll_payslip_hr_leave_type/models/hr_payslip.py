@@ -25,7 +25,9 @@ class HrPayslip(models.Model):
         for r in res:
             if r["code"] == "WORK100":
                 continue
-            leave_type = leave_types.filtered(lambda lvt: lvt.name == r["name"])[:1]
+            leave_type = leave_types.filtered(lambda lvt, r=r: lvt.name == r["name"])[
+                :1
+            ]
             if leave_type.code:
                 r["code"] = leave_type.code
 
