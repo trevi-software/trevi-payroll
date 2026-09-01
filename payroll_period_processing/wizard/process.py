@@ -171,7 +171,8 @@ class ProcessingWizard(models.TransientModel):
         if self.payroll_period_id.state in ["payment", "closed"]:
             raise exceptions.UserError(
                 _(
-                    "You cannot modify a payroll register once it has been marked for payment"
+                    "You cannot modify a payroll register once it has been "
+                    "marked for payment"
                 )
             )
 
@@ -180,9 +181,7 @@ class ProcessingWizard(models.TransientModel):
 
         # Create the payroll register
         register_values = {
-            "name": _(
-                "%(month)s Payroll Sheet" % {"month": self.payroll_period_id.name}
-            ),
+            "name": _("%(month)s Payroll Sheet", month=self.payroll_period_id.name),
             "period_name": self.payroll_period_id.period_name,
             "date_start": self.payroll_period_id.date_start,
             "date_end": self.payroll_period_id.date_end,
@@ -276,8 +275,8 @@ class ProcessingWizard(models.TransientModel):
         this pay period's schedule.
         """
 
-        # DateTime in db is stored as naive UTC. Convert it to explicit UTC and then convert
-        # that into the time zone of the pay period schedule.
+        # DateTime in db is stored as naive UTC. Convert it to explicit UTC
+        # and then convert that into the time zone of the pay period schedule.
         #
         period = self.payroll_period_id
         local_tz = timezone(period.schedule_id.tz)
