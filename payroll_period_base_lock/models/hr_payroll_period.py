@@ -23,7 +23,6 @@ class PayrollPeriod(models.Model):
 
     @api.model
     def lock_period(self, periods, employee_ids):
-
         PayrollLock = self.env["base.lock"]
         for period in periods:
             utcDtStart, utcDtEnd = self.get_utc_times(period)
@@ -41,7 +40,6 @@ class PayrollPeriod(models.Model):
 
     @api.model
     def unlock_period(self, periods, employee_ids):
-
         for period in periods:
             if period.lock_id:
                 period.lock_id.unlink()
@@ -49,7 +47,6 @@ class PayrollPeriod(models.Model):
         return
 
     def set_state_locked(self):
-
         for period in self:
             self.lock_period([period])
             period.state = "locked"
@@ -58,7 +55,6 @@ class PayrollPeriod(models.Model):
 
     @api.model
     def is_payroll_locked(self, utcdt_str):
-
         PayrollLock = self.env["base.lock"]
         is_locked = PayrollLock.is_locked_datetime_utc(utcdt_str)
 
