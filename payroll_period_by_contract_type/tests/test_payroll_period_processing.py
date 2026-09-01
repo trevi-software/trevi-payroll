@@ -8,7 +8,7 @@ from pytz import timezone, utc
 from odoo.tests import common, new_test_user
 
 
-class TestPayrollProcessing(common.SavepointCase):
+class TestPayrollProcessing(common.TransactionCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -132,7 +132,6 @@ class TestPayrollProcessing(common.SavepointCase):
         )
 
     def setUpCommon(self):
-
         # Payroll Period
         #
         start = datetime(2021, 9, 1)
@@ -142,7 +141,6 @@ class TestPayrollProcessing(common.SavepointCase):
         self.period.set_state_ended()
 
     def test_payslip_batch_by_contract_type(self):
-
         self.setUpCommon()
         start = datetime(2021, 9, 1)
 
@@ -209,7 +207,6 @@ class TestPayrollProcessing(common.SavepointCase):
         )
 
     def test_wizard_uncheck_batch_by_contract_type(self):
-
         self.setUpCommon()
         start = datetime(2021, 9, 1)
 
