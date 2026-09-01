@@ -7,7 +7,6 @@ from odoo import api, fields, models
 
 
 class HrAttendance(models.Model):
-
     _inherit = "hr.attendance"
 
     clock_in = fields.Datetime()
@@ -15,7 +14,6 @@ class HrAttendance(models.Model):
 
     @api.model
     def _get_schedule(self, ee_id, d, contract):
-
         sched_hours = []
         if contract:
             ResourceShift = self.env["resource.schedule.shift"]
@@ -30,7 +28,6 @@ class HrAttendance(models.Model):
 
     @api.model
     def _get_schedule_by_approximation(self, ee_id, action, utcdt, contract):
-
         shift_records = self._get_schedule(ee_id, utcdt.date(), contract)
         dtBestIn = dtBestOut = shiftBest = previousDelta = False
         for utcIn, utcOut, shift in shift_records:
@@ -58,7 +55,6 @@ class HrAttendance(models.Model):
 
     @api.model
     def get_contract_by_date(self, ee_id, d):
-
         con_ids = self.env["hr.contract"].search(
             [
                 ("employee_id", "=", ee_id),
@@ -76,7 +72,6 @@ class HrAttendance(models.Model):
 
     @api.model
     def _process_policy(self, employee_id, vals):
-
         PolicyRounding = self.env["hr.policy.rounding"]
         res = vals.copy()
         contract = False
@@ -124,7 +119,6 @@ class HrAttendance(models.Model):
 
     @api.model_create_multi
     def create(self, vals_list):
-
         cooked_list = []
         for vals in vals_list:
             vals2 = self._process_policy(vals["employee_id"], vals)
@@ -133,7 +127,6 @@ class HrAttendance(models.Model):
         return super().create(cooked_list)
 
     def write(self, vals):
-
         for rec in self:
             vals = self._process_policy(rec.employee_id.id, vals)
             res = super().write(vals)
