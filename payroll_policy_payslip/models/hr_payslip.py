@@ -35,11 +35,9 @@ class LastXDays:
 
 
 class HrPayslip(models.Model):
-
     _inherit = "hr.payslip"
 
     def attendance_dict_init(self, contract, dFrom, dTo):
-
         att_obj = self.env["hr.attendance"]
 
         res = {}
@@ -53,29 +51,24 @@ class HrPayslip(models.Model):
         return res
 
     def attendance_dict_list(self, att_dict):
-
         return att_dict["raw_list"]
 
     def attendance_dict_hours_on_day(self, d, attendance_dict):
-
         return attendance_dict[d]
 
     @api.model
     def holidays_list_init(self, date_from, date_to):
-
-        return self.env["hr.holidays.public"].get_holidays_list(
+        return self.env["calendar.public.holiday"].get_holidays_list(
             start_dt=date_from, end_dt=date_to
         )
 
     @api.model
     def holidays_list_contains(self, d, holidays_list):
-
         res = holidays_list.filtered(lambda x: x.date == d)
         return len(res) > 0
 
     @api.model
     def get_days_off(self, contract):
-
         res = {
             "default": [],
         }
@@ -88,7 +81,6 @@ class HrPayslip(models.Model):
 
     @api.model
     def require_day_off(self, lsd, presence_policy):
-
         work_days = 6
         if presence_policy.work_days_per_week:
             work_days = presence_policy.work_days_per_week
@@ -102,7 +94,6 @@ class HrPayslip(models.Model):
     def setup_worked_days_presence(
         self, contract, today, normal_working_hours, presence_data, attendances
     ):
-
         # Get Presence policy data. Unless the policy changed mid-period
         # this should keep returning the same data (w/out hitting db).
         presence_data = self.get_presence_policies(
@@ -149,7 +140,6 @@ class HrPayslip(models.Model):
                     paccmax,
                     presence_sequence,
                 ):
-
                     presence_sequence += 1
         return (presence_policy, normal_working_hours, presence_data, attendances)
 
@@ -166,7 +156,6 @@ class HrPayslip(models.Model):
     def setup_worked_days_absence(
         self, contract, today, absence_data, attendances, super_res
     ):
-
         # Get Absence data
         #
         absence_data = self.get_absence_policies(
@@ -174,6 +163,13 @@ class HrPayslip(models.Model):
         )
         absence_sequence = 100
         awol_code = False
+        # Payroll names each leave worked_days record after the leave type but
+        # codes it after that type's work entry type, falling back to 'GLOBAL'.
+        # Keep a code -> leave type name map so those records can be recognised.
+        leave_names = {
+            line.code: line.holiday_status_id.name
+            for line in absence_data["policy"].line_ids
+        }
         for abcode, abname, abtype, abrate, useawol in absence_data["codes"]:
             if useawol:
                 awol_code = abcode
@@ -187,11 +183,12 @@ class HrPayslip(models.Model):
             #
             res_dict = False
             for r in super_res:
-                if r["code"] == abcode:
+                if r["code"] == abcode or r["name"] == leave_names.get(abcode):
                     res_dict = r
                     break
 
             if res_dict is not False:
+                res_dict["code"] = abcode
                 res_dict["rate"] = abrate
             else:
                 attendances[abcode] = {
@@ -208,7 +205,6 @@ class HrPayslip(models.Model):
 
     @api.model
     def setup_worked_days_ot(self, contract, today, ot_data, attendances):
-
         # Get OT data
         #
         ot_data = self.get_ot_policies(contract.policy_group_id, today, ot_data)
@@ -253,7 +249,6 @@ class HrPayslip(models.Model):
                         otaccmax,
                         ot_sequence,
                     ):
-
                         ot_sequence += 1
         return (ot_policy, daily_ot, ot_data, attendances)
 
@@ -270,7 +265,6 @@ class HrPayslip(models.Model):
         rest_days,
         working_hours_on_day,
     ):
-
         done = False
         push_lsd = True
         if public_holiday:
@@ -315,7 +309,6 @@ class HrPayslip(models.Model):
         attendances,
         working_hours_on_day,
     ):
-
         # Do the OT between specified times (partial OT) first, so that it
         # doesn't get double-counted in the regular OT.
         #
@@ -338,7 +331,7 @@ class HrPayslip(models.Model):
                     line.tz,
                     punches_list=self.attendance_dict_list(working_hours_dict),
                 )
-                if fields.Float.compare(partial_hr, 0.0, precision_rounding=2) > 0:
+                if fields.Float.compare(partial_hr, 0.0, precision_digits=2) > 0:
                     attendances[line.code]["number_of_hours"] += partial_hr
                     attendances[line.code]["number_of_days"] += 1.0
                     hours_after_ot -= partial_hr
@@ -353,9 +346,7 @@ class HrPayslip(models.Model):
                             line.accrual_max,
                         )
                         if (
-                            fields.Float.compare(
-                                accrued_hours, 0.0, precision_rounding=2
-                            )
+                            fields.Float.compare(accrued_hours, 0.0, precision_digits=2)
                             > 0
                         ):
                             self._add_accrued_hours(line, attendances, accrued_hours)
@@ -381,7 +372,7 @@ class HrPayslip(models.Model):
                         line.accrual_max,
                     )
                     if (
-                        fields.Float.compare(accrued_hours, 0.0, precision_rounding=2)
+                        fields.Float.compare(accrued_hours, 0.0, precision_digits=2)
                         == 1
                     ):
                         self._add_accrued_hours(line, attendances, accrued_hours)
@@ -392,7 +383,6 @@ class HrPayslip(models.Model):
     def check_and_process_standard(
         self, contract, today, presence_policy, attendances, working_hours_on_day
     ):
-
         done = False
         for line in presence_policy.line_ids:
             if line.type == "normal":
@@ -414,10 +404,7 @@ class HrPayslip(models.Model):
                         line.accrual_min,
                         line.accrual_max,
                     )
-                    if (
-                        fields.Float.compare(accrued_hours, 0.0, precision_rounding=2)
-                        > 0
-                    ):
+                    if fields.Float.compare(accrued_hours, 0.0, precision_digits=2) > 0:
                         self._add_accrued_hours(line, attendances, accrued_hours)
 
                 done = True
@@ -425,7 +412,6 @@ class HrPayslip(models.Model):
 
     @api.model
     def consecutive_days_worked(self, lsd, presence_policy):
-
         return lsd.days_worked()
 
     @api.model
@@ -448,7 +434,6 @@ class HrPayslip(models.Model):
         absence_data = None
         ot_data = None
         for contract in contracts:
-
             # Get default set of rest days for this employee/contract
             contract_days_off = self.get_days_off(contract)
 
@@ -637,7 +622,6 @@ class HrPayslip(models.Model):
         return res
 
     def get_presence_policies(self, policy_group_id, day, data):
-
         if data is None or not data["_reuse"]:
             data = {
                 "policy": None,
@@ -654,7 +638,6 @@ class HrPayslip(models.Model):
         return data
 
     def get_presence_data(self, contract, date_from, date_to, data):
-
         # Short-circuit:
         # If the policy for the first day is the same as the one for the
         # last day assume that it will also be the same for the days in
@@ -679,7 +662,6 @@ class HrPayslip(models.Model):
         return res
 
     def get_absence_policies(self, policy_group_id, day, data):
-
         if data is None or not data["_reuse"]:
             data = {
                 "policy": None,
@@ -696,7 +678,6 @@ class HrPayslip(models.Model):
         return data
 
     def get_absence_data(self, contract, date_from, date_to, data):
-
         # Short-circuite
         data2 = None
         data = self.get_absence_policies(contract.policy_group_id, date_from, data)
@@ -719,7 +700,6 @@ class HrPayslip(models.Model):
 
     @api.model
     def get_ot_policies(self, policy_group_id, day, data):
-
         if data is None or not data["_reuse"]:
             data = {
                 "policy": None,
@@ -753,7 +733,6 @@ class HrPayslip(models.Model):
         return data
 
     def get_ot_data(self, contract, date_from, date_to, data):
-
         # Short-circuit
         data2 = None
         data = self.get_ot_policies(contract.policy_group_id, date_from, data)
@@ -765,7 +744,6 @@ class HrPayslip(models.Model):
         return data
 
     def init_last_week_worked(self, contract, date_from):
-
         # Calculate the number of days worked in the last week before the
         # start of this contract. Necessary to calculate Weekly Rest Day OT.
         #
@@ -799,7 +777,6 @@ class HrPayslip(models.Model):
         _ratemax,
         sequence,
     ):
-
         if accrual_code not in attendances:
             apl = self.env["hr.policy.line.accrual"].browse(accrual_policy_line_id)
             attendances[accrual_code] = {
@@ -820,16 +797,15 @@ class HrPayslip(models.Model):
     def _get_accrued_accrual(
         self, worked_hours, pol_acc_rate, pol_acc_min, pol_acc_max
     ):
-
         acc_precision = 2
         accrued = worked_hours
         if (
-            not fields.Float.is_zero(pol_acc_min, precision_rounding=acc_precision)
+            not fields.Float.is_zero(pol_acc_min, precision_digits=acc_precision)
             and accrued < pol_acc_min
         ):
             accrued = pol_acc_min
         elif (
-            not fields.Float.is_zero(pol_acc_max, precision_rounding=acc_precision)
+            not fields.Float.is_zero(pol_acc_max, precision_digits=acc_precision)
             and accrued > pol_acc_max
         ):
             accrued = pol_acc_max
@@ -838,7 +814,6 @@ class HrPayslip(models.Model):
 
     @api.model
     def _add_accrued_hours(self, policy_line, attendances, hours):
-
         attendances[policy_line.accrual_policy_line_id.code]["number_of_hours"] += hours
 
     @api.model
@@ -846,7 +821,7 @@ class HrPayslip(models.Model):
         """Returns worked time in hours according to pol_active_after and pol_duration."""
 
         applied_min = (worked_hours * 60) - pol_active_after
-        if fields.Float.compare(applied_min, 0.0, precision_rounding=0) > 0:
+        if fields.Float.compare(applied_min, 0.0, precision_digits=0) > 0:
             applied_min = (
                 (pol_duration is not False and applied_min > pol_duration)
                 and pol_duration
@@ -869,7 +844,6 @@ class HrPayslip(models.Model):
         lsd,
         worked_hours,
     ):
-
         touched = False
         push_lsd = False
         hours = worked_hours
@@ -893,10 +867,7 @@ class HrPayslip(models.Model):
                         line.accrual_min,
                         line.accrual_max,
                     )
-                    if (
-                        fields.Float.compare(accrued_hours, 0.0, precision_rounding=2)
-                        > 0
-                    ):
+                    if fields.Float.compare(accrued_hours, 0.0, precision_digits=2) > 0:
                         self._add_accrued_hours(line, attendances, accrued_hours)
 
                 hours -= holiday_hours
@@ -917,10 +888,7 @@ class HrPayslip(models.Model):
                         line.accrual_min,
                         line.accrual_max,
                     )
-                    if (
-                        fields.Float.compare(accrued_hours, 0.0, precision_rounding=2)
-                        > 0
-                    ):
+                    if fields.Float.compare(accrued_hours, 0.0, precision_digits=2) > 0:
                         self._add_accrued_hours(line, attendances, accrued_hours)
 
                 hours -= ot_hours
@@ -945,7 +913,6 @@ class HrPayslip(models.Model):
         lsd,
         worked_hours,
     ):
-
         touched = False
         push_lsd = False
         hours = worked_hours
@@ -967,10 +934,7 @@ class HrPayslip(models.Model):
                         line.accrual_min,
                         line.accrual_max,
                     )
-                    if (
-                        fields.Float.compare(accrued_hours, 0.0, precision_rounding=2)
-                        > 0
-                    ):
+                    if fields.Float.compare(accrued_hours, 0.0, precision_digits=2) > 0:
                         self._add_accrued_hours(line, attendances, accrued_hours)
 
                 hours -= rd_hours
@@ -991,10 +955,7 @@ class HrPayslip(models.Model):
                         line.accrual_min,
                         line.accrual_max,
                     )
-                    if (
-                        fields.Float.compare(accrued_hours, 0.0, precision_rounding=2)
-                        > 0
-                    ):
+                    if fields.Float.compare(accrued_hours, 0.0, precision_digits=2) > 0:
                         self._add_accrued_hours(line, attendances, accrued_hours)
 
                 hours -= ot_hours
