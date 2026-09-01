@@ -8,7 +8,6 @@ from odoo import api, fields, models
 
 
 class HrPolicy(models.Model):
-
     _name = "hr.policy.accrual"
     _description = "Accrual Policy"
     _order = "date desc"
@@ -45,7 +44,6 @@ class HrPolicy(models.Model):
 
     @api.model
     def try_calculate_accruals(self):
-
         PolicyGroup = self.env["hr.policy.group"]
         AccrualJob = self.env["hr.policy.line.accrual.job"]
 
@@ -81,7 +79,6 @@ class HrPolicy(models.Model):
                     continue
 
                 for dJob in line_jobs[line.id]:
-
                     # Create a Job for the accrual line
                     job_vals = {
                         "name": dJob,
@@ -102,7 +99,7 @@ class HrPolicy(models.Model):
                         if contract.date_end and contract.date_end < dJob:
                             continue
                         line.calculate_and_deposit(
-                            contract.employee_id, job, dToday=dJob
+                            contract.employee_id, job, d_today=dJob
                         )
 
                         # An employee may have multiple valid contracts. Don't double-count.
@@ -111,7 +108,6 @@ class HrPolicy(models.Model):
 
     @api.model
     def do_accrual_by_period(self, policy_line, employee, dStart, dEnd, descr=None):
-
         res = True
         if not dStart or not dEnd or policy_line.type not in ["calendar"]:
             return False
@@ -119,7 +115,7 @@ class HrPolicy(models.Model):
         dToday = dStart
         while dToday <= dEnd:
             policy_line.calculate_and_deposit(
-                employee, job_id=False, dToday=dToday, descr=descr
+                employee, job=False, d_today=dToday, descr=descr
             )
             dToday += timedelta(days=+1)
 
