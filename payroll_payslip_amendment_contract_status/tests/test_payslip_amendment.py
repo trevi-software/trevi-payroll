@@ -10,7 +10,7 @@ from odoo import fields
 from odoo.tests import common
 
 
-class TestPayslipAmendment(common.SavepointCase):
+class TestPayslipAmendment(common.TransactionCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -66,7 +66,6 @@ class TestPayslipAmendment(common.SavepointCase):
         ).method_direct_trigger()
 
     def test_done_2_contracts(self):
-
         # Setup test
         #
         dstart = date(2021, 1, 1)
@@ -91,29 +90,34 @@ class TestPayslipAmendment(common.SavepointCase):
         )
         psa.do_validate()
 
-        # Create payslip
+        # Create payslip. The structure is set up-front and contract_id is
+        # deliberately left empty: payroll's onchange_employee() pins the
+        # payslip to a single contract, and _get_employee_contracts() then
+        # reports only that one, which hides the consecutive contracts
+        # hr_contract_status makes visible.
         slip = self.Payslip.create(
             {
                 "name": "A Payslip",
                 "employee_id": self.eeSally.id,
                 "date_from": dstart,
                 "date_to": dend,
+                "struct_id": self.pay_struct.id,
             }
         )
-        slip.onchange_employee()
+        slip.onchange_struct_id()
 
         input_lines = slip.input_line_ids.filtered(lambda self: self.code == "SALECOM")
         self.assertEqual(
             len(input_lines), 2, "There must be TWO payslip input lines for SALECOM"
         )
 
-        _res1 = fields.Float.compare(input_lines[0].amount, 25.0, precision_rounding=2)
-        _res2 = fields.Float.compare(input_lines[1].amount, 25.0, precision_rounding=2)
+        _res1 = fields.Float.compare(input_lines[0].amount, 25.0, precision_digits=2)
+        _res2 = fields.Float.compare(input_lines[1].amount, 25.0, precision_digits=2)
         self.assertEqual(
             _res1, 0, "The Input amount should be equal to HALF the payslip amendment"
         )
         self.assertEqual(
-            fields.Float.compare(_res1, _res2, precision_rounding=2),
+            fields.Float.compare(_res1, _res2, precision_digits=2),
             0,
             "The Input amounts should be equal to each other",
         )
