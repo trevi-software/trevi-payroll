@@ -43,7 +43,6 @@ SELECTION_DOM = [
 
 
 class HrPolicyLine(models.Model):
-
     _name = "hr.policy.line.accrual"
     _description = "Accrual Policy Line"
 
@@ -152,7 +151,6 @@ class HrPolicyLine(models.Model):
     )
 
     def pass_constraints(self, employee, dToday=None):
-
         self.ensure_one()
         if dToday is None:
             dToday = date.today()
@@ -178,12 +176,11 @@ class HrPolicyLine(models.Model):
         return job_ids[0].name
 
     def calculate_and_deposit(self, employee, job=False, d_today=None, descr=None):
-
         for rec in self:
             amount = rec.do_calculation(employee, d_today)
             if amount is False:
                 break
-            name = _("Calendar based accrual (%(name)s)" % {"name": self.name})
+            name = _("Calendar based accrual (%(name)s)", name=self.name)
             lines = self.accrual_id.deposit(employee.id, amount, date.today(), name)
             if job:
                 for line in lines:
@@ -195,7 +192,6 @@ class HrPolicyLine(models.Model):
                     )
 
     def do_calculation(self, employee, dToday=None):
-
         self.ensure_one()
 
         # The last day of the month for each month
@@ -289,7 +285,6 @@ class HrPolicyLine(models.Model):
         return amount
 
     def _calculate_premium_weekly(self, srvc_months):
-
         self.ensure_one()
         premium_amount = 0.0
         if self.accrual_rate_premium_minimum <= srvc_months:
@@ -309,7 +304,6 @@ class HrPolicyLine(models.Model):
         return premium_amount
 
     def _calculate_premium_monthly(self, srvc_months):
-
         self.ensure_one()
         premium_amount = 0.0
         if self.accrual_rate_premium_minimum <= srvc_months:
@@ -329,7 +323,6 @@ class HrPolicyLine(models.Model):
         return premium_amount
 
     def _calculate_premium_annual(self, srvc_months):
-
         self.ensure_one()
         premium_amount = 0.0
         if self.accrual_rate_premium_minimum <= srvc_months:

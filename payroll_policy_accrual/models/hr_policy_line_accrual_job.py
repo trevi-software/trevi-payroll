@@ -6,7 +6,6 @@ from odoo import fields, models
 
 
 class HrAccrualJob(models.Model):
-
     _name = "hr.policy.line.accrual.job"
     _description = "Accrual Policy Line Job Run"
 
