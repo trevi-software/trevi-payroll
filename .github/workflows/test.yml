@@ -53,10 +53,56 @@ jobs:
           POSTGRES_DB: odoo
         ports:
           - 5432:5432
+    env:
+      # Cross-repo addon dependencies, see the step below and issue #16.
+      TREVI_HR_REPO: trevi-software/trevi-hr
+      TREVI_HR_REF: "18.0"
+      # Build the addons at their plain manifest version. Without this, whool
+      # derives a post-release segment from the git history, which actions/checkout
+      # does not fetch (it clones with depth 1).
+      WHOOL_POST_VERSION_STRATEGY_OVERRIDE: none
     steps:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
+      # Most addons in this repo depend on addons that live in
+      # trevi-software/trevi-hr. oca_install_addons turns every out-of-repo addon
+      # dependency into an `odoo-addon-<name>==18.0.*` requirement and installs it
+      # from the OCA wheelhouse, where these addons do not exist.
+      # Declaring them here as direct URL requirements takes priority:
+      # oca_list_addons_to_test_as_url_reqs skips addons that already have a URL
+      # requirement, and oca_install_addons appends its own computed requirements
+      # to this same file and installs the lot in one resolution pass.
+      #
+      # This is the full transitive closure, not just the direct dependencies:
+      # hr_contract_values, trevi_hr_job_categories and trevi_hr_usability are not
+      # depended on from this repo, but hr_contract_status pulls them in, and
+      # nothing else would resolve them.
+      #
+      # This has to be a workflow step rather than a committed test-requirements.txt
+      # because the `Detect unreleased dependencies` job rejects URL lines there.
+      #
+      # Mirrors trevi-software/trevi-hr#123. See
+      # https://github.com/trevi-software/trevi-payroll/issues/16
+      - name: Declare trevi-hr dependencies as git requirements
+        run: |
+          for addon in \
+              base_lock \
+              hr_accrual_bank \
+              hr_attendance_day \
+              hr_contract_status \
+              hr_contract_values \
+              hr_contract_values_payroll \
+              hr_employee_seniority_months \
+              hr_employee_status \
+              hr_leave_type_unique \
+              resource_schedule \
+              trevi_hr_job_categories \
+              trevi_hr_usability \
+          ; do
+            echo "odoo-addon-${addon} @ git+https://github.com/${TREVI_HR_REPO}@${TREVI_HR_REF}#subdirectory=${addon}"
+          done >> test-requirements.txt
+          cat test-requirements.txt
       - name: Install addons and dependencies
         run: oca_install_addons
       - name: Check licenses
