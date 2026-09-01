@@ -23,7 +23,7 @@ class TestHrPayslip(TestPayslipBase):
             {
                 "name": "TestLeaveType",
                 "code": "TESTLV",
-                "allocation_type": "no",
+                "requires_allocation": "no",
                 "leave_validation_type": "no_validation",
             }
         )
@@ -54,7 +54,6 @@ class TestHrPayslip(TestPayslipBase):
         contracts[0].date_start = datetime(2022, 1, 1)
 
     def test_holiday_type_code(self):
-
         self.mock_rule.condition_python = "result = worked_days.LVCODE"
         self.mock_rule.amount_python_compute = (
             "result = worked_days.LVCODE.number_of_days"
@@ -62,7 +61,7 @@ class TestHrPayslip(TestPayslipBase):
 
         self.apply_contract_cron()
         self.assertEqual(
-            self.richard_emp.contract_id.state, "trial", "Contract is in 'trial' state"
+            self.richard_emp.contract_id.state, "open", "Contract is in 'open' state"
         )
 
         # Set system parameter
@@ -82,9 +81,8 @@ class TestHrPayslip(TestPayslipBase):
                 "name": "Hol11",
                 "employee_id": self.richard_emp.id,
                 "holiday_status_id": self.holiday_type.id,
-                "date_from": lv_from,
-                "date_to": lv_to,
-                "number_of_days": 1,
+                "request_date_from": lv_from.date(),
+                "request_date_to": lv_to.date(),
             }
         )
         self.assertEqual(
