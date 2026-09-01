@@ -10,13 +10,11 @@ DEFAULT_BATCHBY = "department"
 
 
 class ProcessingWizard(models.TransientModel):
-
     _name = "hr.payroll.processing"
     _description = "HR Payroll Processing Wizard"
 
     @api.model
     def _get_pp(self):
-
         res = False
         if self.env.context is not None:
             res = self.env.context.get("active_id", False)
@@ -24,7 +22,6 @@ class ProcessingWizard(models.TransientModel):
 
     @api.model
     def _get_contracts(self):
-
         res = []
         Contract = self.env["hr.contract"]
         pp_id = self._get_pp()
@@ -52,7 +49,7 @@ class ProcessingWizard(models.TransientModel):
     )
     payroll_period_id = fields.Many2one(
         comodel_name="hr.payroll.period",
-        default=lambda self: self._get_pp,
+        default=lambda self: self._get_pp(),
         readonly=True,
     )
 
@@ -63,7 +60,7 @@ class ProcessingWizard(models.TransientModel):
         relation="hr_payroll_processing_contracts_rel",
         column1="wizard_id",
         column2="contract_id",
-        default=lambda self: self._get_contracts,
+        default=lambda self: self._get_contracts(),
         readonly=True,
     )
 
@@ -80,13 +77,12 @@ class ProcessingWizard(models.TransientModel):
     # Public Holidays
     public_holiday_ids = fields.Many2many(
         string="Public Holidays",
-        comodel_name="hr.holidays.public.line",
+        comodel_name="calendar.public.holiday.line",
         relation="hr_payroll_processing_hol_rel",
         readonly=True,
     )
 
     def _populate_leaves(self):
-
         self.ensure_one()
         Leaves = self.env["hr.leave"]
         res = Leaves.search(
@@ -100,7 +96,6 @@ class ProcessingWizard(models.TransientModel):
         return
 
     def _populate_holidays(self):
-
         self.ensure_one()
         holiday_ids = []
         pp = self.payroll_period_id
@@ -112,7 +107,7 @@ class ProcessingWizard(models.TransientModel):
         dtStart = utcdtStart.astimezone(local_tz)
         utcdtEnd = utc.localize(pp.date_end, is_dst=False)
         dtEnd = utcdtEnd.astimezone(local_tz)
-        holiday_ids = self.env["hr.holidays.public.line"].search(
+        holiday_ids = self.env["calendar.public.holiday.line"].search(
             ["&", ("date", ">=", dtStart.date()), ("date", "<=", dtEnd.date())]
         )
         if len(holiday_ids) > 0:
@@ -123,7 +118,6 @@ class ProcessingWizard(models.TransientModel):
         return
 
     def state_back(self):
-
         wizard = self
         if wizard.state == "holidays":
             self.state_leaves()
@@ -141,7 +135,6 @@ class ProcessingWizard(models.TransientModel):
         }
 
     def state_next(self):
-
         wizard = self
         if wizard.state == "apprvcn":
             self.state_leaves()
@@ -159,26 +152,21 @@ class ProcessingWizard(models.TransientModel):
         }
 
     def generate_payslips(self):
-
         self.create_payroll_register()
         return {"type": "ir.actions.act_window_close"}
 
     def state_contracts(self):
-
         self.write({"state": "apprvcn"})
 
     def state_leaves(self):
-
         self._populate_leaves()
         self.write({"state": "apprvlv"})
 
     def state_holidays(self):
-
         self._populate_holidays()
         self.write({"state": "holidays"})
 
     def create_payroll_register(self):
-
         self.ensure_one()
         if self.payroll_period_id.state in ["payment", "closed"]:
             raise exceptions.UserError(
@@ -209,7 +197,6 @@ class ProcessingWizard(models.TransientModel):
 
     @api.model
     def _remove_register(self, register):
-
         for run in register.run_ids:
             run.slip_ids.unlink()
         register.run_ids.unlink()
@@ -244,7 +231,6 @@ class ProcessingWizard(models.TransientModel):
         date_end,
         batch_by=DEFAULT_BATCHBY,
     ):
-
         batches = self.env["hr.payslip.run"]
         if batch_by != DEFAULT_BATCHBY:
             return batches

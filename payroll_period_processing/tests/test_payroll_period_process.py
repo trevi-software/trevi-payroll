@@ -10,7 +10,7 @@ from odoo.tests import common, new_test_user
 from odoo.addons.mail.tests.common import mail_new_test_user
 
 
-class TestProcessing(common.SavepointCase):
+class TestProcessing(common.TransactionCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -19,8 +19,8 @@ class TestProcessing(common.SavepointCase):
         cls.Wizard = cls.env["hr.payroll.processing"]
         cls.Period = cls.env["hr.payroll.period"]
         cls.Schedule = cls.env["hr.payroll.period.schedule"]
-        cls.HolidayPublic = cls.env["hr.holidays.public"]
-        cls.HolidayPublicLine = cls.env["hr.holidays.public.line"]
+        cls.HolidayPublic = cls.env["calendar.public.holiday"]
+        cls.HolidayPublicLine = cls.env["calendar.public.holiday.line"]
         cls.Department = cls.env["hr.department"].with_context(tracking_disable=True)
         cls.LeaveType = cls.env["hr.leave.type"].with_context(tracking_disable=True)
         cls.payrollOfficer = new_test_user(
@@ -61,9 +61,8 @@ class TestProcessing(common.SavepointCase):
         cls.leave_type_1 = cls.LeaveType.create(
             {
                 "name": "NotLimitedHR",
-                "allocation_type": "no",
+                "requires_allocation": "no",
                 "leave_validation_type": "hr",
-                "validity_start": False,
             }
         )
         cls.employee_leave = cls.env["hr.leave"].create(
@@ -71,9 +70,8 @@ class TestProcessing(common.SavepointCase):
                 "name": "Hol11",
                 "employee_id": cls.employee_emp.id,
                 "holiday_status_id": cls.leave_type_1.id,
-                "date_from": datetime(2021, 9, 1),
-                "date_to": datetime(2021, 9, 3),
-                "number_of_days": 2,
+                "request_date_from": date(2021, 9, 1),
+                "request_date_to": date(2021, 9, 3),
             }
         )
 
@@ -94,7 +92,7 @@ class TestProcessing(common.SavepointCase):
                     "name": "New Year",
                     "date": cls.new_year,
                     "variable_date": False,
-                    "year_id": cls.holidays.id,
+                    "public_holiday_id": cls.holidays.id,
                 },
             ]
         )
@@ -152,7 +150,6 @@ class TestProcessing(common.SavepointCase):
         )
 
     def setUpCommon(self):
-
         # Payroll Period
         #
         start = datetime(2021, 9, 1)
