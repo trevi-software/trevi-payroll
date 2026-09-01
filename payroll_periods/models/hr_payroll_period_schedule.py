@@ -24,7 +24,6 @@ def add_months(sourcedate, months):
 
 
 def get_period_year(dt, annual_pay_periods):
-
     month_number = 0
     year_number = 0
     if dt.day < 15:
@@ -44,21 +43,18 @@ def get_period_year(dt, annual_pay_periods):
 
 
 class HrPayperiodSchedule(models.Model):
-
     _name = "hr.payroll.period.schedule"
     _description = "Payroll Period Schedule"
     _check_company_auto = True
 
     @api.model
     def _tz_list(self):
-
         res = tuple()
         for name in common_timezones:
             res += ((name, name),)
         return res
 
     def _compute_annual_periods(self):
-
         for pps in self:
             if pps.type == "manual":
                 pps.annual_pay_periods = 0
@@ -189,12 +185,10 @@ class HrPayperiodSchedule(models.Model):
     )
 
     def button_add_pay_periods(self):
-
         for sched in self:
             sched.add_pay_period()
 
     def add_pay_period(self):
-
         #
         # XXX - Someone who cares about DST should update this code to handle it.
         #
@@ -288,7 +282,6 @@ class HrPayperiodSchedule(models.Model):
 
     @api.model
     def _get_latest_period(self, sched_id):
-
         PayrollPeriod = self.env["hr.payroll.period"]
         srch_domain = [("schedule_id", "=", sched_id)]
 
@@ -316,7 +309,6 @@ class HrPayperiodSchedule(models.Model):
         sched_ids = self.env["hr.payroll.period.schedule"].search([])
 
         for sched in sched_ids:
-
             # Add up to three periods from now. If there are not periods in
             # the database start from the configured initial date.
             #

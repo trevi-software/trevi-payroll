@@ -6,7 +6,6 @@ from odoo import fields, models
 
 
 class HrPayslipException(models.Model):
-
     _name = "hr.payslip.exception"
     _description = "Payroll Exception"
 
@@ -23,9 +22,7 @@ class HrPayslipException(models.Model):
     ignore = fields.Boolean(default=False)
 
     def button_ignore(self):
-
         self.write({"ignore": True})
 
     def button_unignore(self):
-
         self.write({"ignore": False})
