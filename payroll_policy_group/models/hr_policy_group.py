@@ -6,7 +6,6 @@ from odoo import api, fields, models
 
 
 class PolicyGroup(models.Model):
-
     _name = "hr.policy.group"
     _description = "HR Policy Group"
 
@@ -17,7 +16,6 @@ class PolicyGroup(models.Model):
 
 
 class ContractInit(models.Model):
-
     _inherit = "hr.contract.init"
 
     policy_group_id = fields.Many2one(
@@ -26,12 +24,10 @@ class ContractInit(models.Model):
 
 
 class HrContract(models.Model):
-
     _inherit = "hr.contract"
 
     @api.model
     def _get_policy_group(self):
-
         res = False
         init = self.get_latest_initial_values()
         if init is not None and init.policy_group_id:

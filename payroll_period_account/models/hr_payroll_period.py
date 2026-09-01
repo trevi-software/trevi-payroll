@@ -7,12 +7,10 @@ from odoo import api, models
 
 
 class HrPayrollPeriod(models.Model):
-
     _inherit = "hr.payroll.period"
 
     @api.model
     def payslip_create_hook(self, dictCreate):
-
         if dictCreate.get("run_id", False):
             run = self.env["hr.payslip.run"].browse(dictCreate["run_id"])
             if run.journal_id:

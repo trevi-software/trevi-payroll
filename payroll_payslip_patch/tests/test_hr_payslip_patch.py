@@ -27,7 +27,9 @@ class TestPayslip(TestPayslipBase):
                 "sequence": 5,
                 "category_id": self.ref("payroll.ALW"),
                 "amount_select": "code",
-                "amount_python_compute": "result = (dictionaries.mock is True) and 1.0 or 0.0",
+                "amount_python_compute": (
+                    "result = (dictionaries.mock is True) and 1.0 or 0.0"
+                ),
             }
         )
         self.developer_pay_structure.write(
@@ -44,7 +46,6 @@ class TestPayslip(TestPayslipBase):
         ).method_direct_trigger()
 
     def test_localdict(self):
-
         self.apply_contract_cron()
 
         # I create an employee Payslip
@@ -68,7 +69,6 @@ class TestPayslip(TestPayslipBase):
         richard_payslip._revert_method("get_localdict")
 
     def test_contractdict(self):
-
         self.apply_contract_cron()
         self.mock_rule.amount_python_compute = (
             "result = (current_contract.my_mock_value is True) and 1.0 or 0.0"

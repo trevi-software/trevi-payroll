@@ -1,7 +1,6 @@
 import logging
 from base64 import b64encode
 from json import loads
-from typing import Dict
 
 from requests import codes, request
 
@@ -17,14 +16,15 @@ _logger = logging.getLogger(__name__)
 
 
 class PayrollProcessorMpesaEt(models.Model):
-
     _name = "payroll.processor.mpesa_et"
     _description = "Safaricom Ethiopia M-PESA Payroll Integration"
 
     enabled = fields.Boolean(
         copy=False,
-        help="""* If the processor should process payslips the status should be \'Enabled\'.
-        \n* If the processor should NOT process payslips the status should be \'Disabled\'.""",
+        help="* If the processor should process payslips the status should "
+        "be 'Enabled'.\n"
+        "* If the processor should NOT process payslips the status should "
+        "be 'Disabled'.",
     )
 
     name = fields.Char()
@@ -39,7 +39,7 @@ class PayrollProcessorMpesaEt(models.Model):
 
     api_password = fields.Char(string="Password", copy=False)
 
-    def authenticate(self) -> Dict[str, str]:
+    def authenticate(self) -> dict[str, str]:
         """
         Authenticate against the Safaricom ET API.
 
@@ -74,7 +74,7 @@ class PayrollProcessorMpesaEt(models.Model):
         else:
             response.raise_for_status()
 
-    def get_authorization(self, auth_response: Dict[str, str]) -> str:
+    def get_authorization(self, auth_response: dict[str, str]) -> str:
         """
         Get a bearer authorization from a successful authentication response
         from the Safaricom ET API.
@@ -96,7 +96,7 @@ class PayrollProcessorMpesaEt(models.Model):
 
     def payout(
         self, bearer_auth: str, party_b: str, amount: float, remarks: str
-    ) -> Dict[str, str]:
+    ) -> dict[str, str]:
         """
         Initiate a B2C payment request on the Safaricom ET API.
 
@@ -154,14 +154,15 @@ class PayrollProcessorMpesaEt(models.Model):
 
         if response.status_code == codes.ok:
             _logger.info(
-                "Payment request for {party_b} was successful. Response: {response.text}"
+                "Payment request for %s was successful. Response: %s",
+                party_b,
+                response.text,
             )
             return loads(response.json())
         else:
             response.raise_for_status()
 
-    def translate_payment_response(self, response: Dict[str, str]) -> Dict[str, str]:
-
+    def translate_payment_response(self, response: dict[str, str]) -> dict[str, str]:
         return {
             "ok_conversation": response["ConversationId"],
             "ok_originator_conversation": response["OriginatorConversationID"],
@@ -170,8 +171,7 @@ class PayrollProcessorMpesaEt(models.Model):
             "raw": response.__str__,
         }
 
-    def translate_payment_result(self, response: Dict[str, str]) -> Dict[str, str]:
-
+    def translate_payment_result(self, response: dict[str, str]) -> dict[str, str]:
         return {
             "ok_conversation": response["ConversationId"],
             "ok_originator_conversation": response["OriginatorConversationID"],

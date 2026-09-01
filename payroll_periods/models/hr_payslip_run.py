@@ -11,14 +11,12 @@ from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT as OE_DTFORMAT
 
 
 class HrPayslipRun(models.Model):
-
     _inherit = "hr.payslip.run"
 
     period_id = fields.Many2one("hr.payroll.period", "Payroll Period")
 
     @api.model
     def _get_confirmed_amendments(self, period_id):
-
         psa_ids = self.env["hr.payslip.amendment"].search(
             [
                 ("pay_period_id", "=", period_id),
@@ -28,7 +26,6 @@ class HrPayslipRun(models.Model):
         return psa_ids
 
     def recalculate(self):
-
         Payslip = self.env["hr.payslip"]
         PayrollPeriod = self.env["hr.payroll.period"]
 
@@ -55,8 +52,8 @@ class HrPayslipRun(models.Model):
             .read(["annual_pay_periods", "contract_ids", "tz"])
         )
 
-        # DateTime in db is stored as naive UTC. Convert it to explicit UTC and then convert
-        # that into the time zone of the pay period schedule.
+        # DateTime in db is stored as naive UTC. Convert it to explicit UTC
+        # and then convert that into the time zone of the pay period schedule.
         #
         local_tz = timezone(s_data["tz"])
         utcDTStart = utc.localize(datetime.strptime(p_data["date_start"], OE_DTFORMAT))
@@ -64,8 +61,8 @@ class HrPayslipRun(models.Model):
         utcDTEnd = utc.localize(datetime.strptime(p_data["date_end"], OE_DTFORMAT))
         loclDTEnd = utcDTEnd.astimezone(local_tz)
 
-        # Create payslips for employees, in all departments, that have a contract in this
-        # pay period's schedule
+        # Create payslips for employees, in all departments, that have a
+        # contract in this pay period's schedule
         # Remove any pre-existing payroll registers
         for run in self:
             run_data = run.read(["slip_ids"])
@@ -95,7 +92,6 @@ class HrPayslipRun(models.Model):
         date_end,
         annual_pay_periods,
     ):
-
         Contract = self.env["hr.contract"]
         Department = self.env["hr.department"]
         Employee = self.env["hr.employee"]
@@ -178,7 +174,6 @@ class HrPayslipRun(models.Model):
             #
             slip_ids = []
             for ee in ee_ids:
-
                 if ee.id in seen_ee_ids:
                     continue
 

@@ -6,7 +6,6 @@ from odoo import fields, models
 
 
 class PolicyLinePresence(models.Model):
-
     _name = "hr.policy.line.presence"
     _description = "Presence payroll policy line"
 

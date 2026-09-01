@@ -10,7 +10,6 @@ class HrPayslip(models.Model):
 
     @api.model
     def get_inputs(self, contracts, date_from, date_to):
-
         # Modify all the layers below to use the dates from the payroll period
         #
         periods = self.env["hr.payroll.period"].search(

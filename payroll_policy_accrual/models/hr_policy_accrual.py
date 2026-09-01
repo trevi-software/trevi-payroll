@@ -70,9 +70,9 @@ class HrPolicy(models.Model):
                         d += timedelta(days=1)
                         line_jobs[line.id].append(d)
 
-            # For each accrual line in this accrual policy do a run for each day (beginning
-            # from the last date for which it was run) until today for each contract attached
-            # to the policy group.
+            # For each accrual line in this accrual policy do a run for each
+            # day (beginning from the last date for which it was run) until
+            # today for each contract attached to the policy group.
             #
             for line in accrual_policy.line_ids:
                 if line.type not in ["calendar"]:
@@ -102,7 +102,8 @@ class HrPolicy(models.Model):
                             contract.employee_id, job, d_today=dJob
                         )
 
-                        # An employee may have multiple valid contracts. Don't double-count.
+                        # An employee may have multiple valid contracts.
+                        # Don't double-count.
                         employee_list.append(contract.employee_id.id)
                     job.end_time = datetime.now()
 

@@ -6,7 +6,6 @@ from odoo import fields, models
 
 
 class PolicyGroup(models.Model):
-
     _inherit = "hr.policy.group"
 
     absence_policy_ids = fields.Many2many(

@@ -6,7 +6,6 @@ from odoo import fields, models
 
 
 class PolicyAbsence(models.Model):
-
     _name = "hr.policy.absence"
     _description = "Absence payroll policy"
     _order = "date desc"
@@ -20,7 +19,6 @@ class PolicyAbsence(models.Model):
     )
 
     def get_codes(self):
-
         res = []
         for policy in self:
             [
@@ -30,7 +28,6 @@ class PolicyAbsence(models.Model):
         return res
 
     def paid_codes(self):
-
         res = {}
         for policy in self:
             res[policy.id] = []
@@ -42,7 +39,6 @@ class PolicyAbsence(models.Model):
         return res
 
     def unpaid_codes(self):
-
         res = {}
         for policy in self:
             res[policy.id] = []

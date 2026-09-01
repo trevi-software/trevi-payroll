@@ -2,7 +2,6 @@ from odoo import fields, models
 
 
 class HrEmployee(models.Model):
-
     _inherit = "hr.employee"
 
     # should be in-sync with field in res.company -> payroll_payment_processor

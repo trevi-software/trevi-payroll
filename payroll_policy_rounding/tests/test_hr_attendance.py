@@ -8,7 +8,6 @@ from . import common
 
 class TestHrAttendance(common.TestPolicyCommon):
     def test_create_no_contract(self):
-
         ee = self.HrEmployee.create({"name": "John"})
 
         att = self.HrAttendance.create(
@@ -31,7 +30,6 @@ class TestHrAttendance(common.TestPolicyCommon):
         )
 
     def test_create_no_policy(self):
-
         pg = self.PolicyGroup.create(
             {
                 "name": "PGroup",
@@ -64,7 +62,6 @@ class TestHrAttendance(common.TestPolicyCommon):
         )
 
     def test_create_exact_match(self):
-
         p = self.Policy.create(
             {
                 "name": "P1",
@@ -157,7 +154,6 @@ class TestHrAttendance(common.TestPolicyCommon):
         )
 
     def test_create_in_multi_shift(self):
-
         # See if we pick up the correct shift when multiple shifts are
         # available in the same day
         #
@@ -189,7 +185,6 @@ class TestHrAttendance(common.TestPolicyCommon):
         )
 
     def test_create_in_round_down(self):
-
         line_ids = [
             (
                 0,
@@ -215,7 +210,6 @@ class TestHrAttendance(common.TestPolicyCommon):
         )
 
     def test_create_in_round_up(self):
-
         line_ids = [
             (0, 0, {"attendance_type": "in", "round_type": "up", "round_interval": 5}),
         ]
@@ -237,7 +231,6 @@ class TestHrAttendance(common.TestPolicyCommon):
         )
 
     def test_create_in_round_avg1(self):
-
         line_ids = [
             (
                 0,
@@ -263,7 +256,6 @@ class TestHrAttendance(common.TestPolicyCommon):
         )
 
     def test_create_in_round_avg2(self):
-
         line_ids = [
             (
                 0,
@@ -289,7 +281,6 @@ class TestHrAttendance(common.TestPolicyCommon):
         )
 
     def test_create_early_in_round_down(self):
-
         line_ids = [
             (
                 0,
@@ -315,7 +306,6 @@ class TestHrAttendance(common.TestPolicyCommon):
         )
 
     def test_create_early_in_round_up(self):
-
         line_ids = [
             (0, 0, {"attendance_type": "in", "round_type": "up", "round_interval": 5}),
         ]
@@ -339,7 +329,6 @@ class TestHrAttendance(common.TestPolicyCommon):
         )
 
     def test_create_early_in_round_avg1(self):
-
         line_ids = [
             (
                 0,
@@ -365,7 +354,6 @@ class TestHrAttendance(common.TestPolicyCommon):
         )
 
     def test_create_early_in_round_avg2(self):
-
         line_ids = [
             (
                 0,
@@ -391,7 +379,6 @@ class TestHrAttendance(common.TestPolicyCommon):
         )
 
     def test_create_out_round_down(self):
-
         line_ids = [
             (
                 0,
@@ -417,7 +404,6 @@ class TestHrAttendance(common.TestPolicyCommon):
         )
 
     def test_create_out_round_up(self):
-
         line_ids = [
             (0, 0, {"attendance_type": "out", "round_type": "up", "round_interval": 5}),
         ]
@@ -439,7 +425,6 @@ class TestHrAttendance(common.TestPolicyCommon):
         )
 
     def test_create_out_round_avg1(self):
-
         line_ids = [
             (
                 0,
@@ -465,7 +450,6 @@ class TestHrAttendance(common.TestPolicyCommon):
         )
 
     def test_create_out_round_avg2(self):
-
         line_ids = [
             (
                 0,
@@ -491,7 +475,6 @@ class TestHrAttendance(common.TestPolicyCommon):
         )
 
     def test_create_early_out_round_down(self):
-
         line_ids = [
             (
                 0,
@@ -517,7 +500,6 @@ class TestHrAttendance(common.TestPolicyCommon):
         )
 
     def test_create_early_out_round_up(self):
-
         line_ids = [
             (0, 0, {"attendance_type": "out", "round_type": "up", "round_interval": 5}),
         ]
@@ -539,7 +521,6 @@ class TestHrAttendance(common.TestPolicyCommon):
         )
 
     def test_create_early_out_round_avg1(self):
-
         line_ids = [
             (
                 0,
@@ -565,7 +546,6 @@ class TestHrAttendance(common.TestPolicyCommon):
         )
 
     def test_create_early_out_round_avg2(self):
-
         line_ids = [
             (
                 0,
@@ -591,7 +571,6 @@ class TestHrAttendance(common.TestPolicyCommon):
         )
 
     def test_preauth_ot_in(self):
-
         line_ids = [
             (
                 0,
@@ -622,7 +601,6 @@ class TestHrAttendance(common.TestPolicyCommon):
         )
 
     def test_preauth_ot_out(self):
-
         line_ids = [
             (
                 0,
@@ -653,7 +631,6 @@ class TestHrAttendance(common.TestPolicyCommon):
         )
 
     def test_create_in_grace(self):
-
         line_ids = [
             (
                 0,
@@ -686,7 +663,6 @@ class TestHrAttendance(common.TestPolicyCommon):
         )
 
     def test_create_early_out_grace_period(self):
-
         line_ids = [
             (
                 0,
@@ -719,7 +695,6 @@ class TestHrAttendance(common.TestPolicyCommon):
         )
 
     def test_attach_schedule_sign_in(self):
-
         line_ids = [
             (
                 0,
@@ -756,7 +731,6 @@ class TestHrAttendance(common.TestPolicyCommon):
         )
 
     def test_attach_schedule_sign_out(self):
-
         line_ids = [
             (
                 0,
@@ -792,7 +766,6 @@ class TestHrAttendance(common.TestPolicyCommon):
         )
 
     def test_attach_schedule_sign_out2(self):
-
         line_ids = [
             (
                 0,
@@ -832,7 +805,6 @@ class TestHrAttendance(common.TestPolicyCommon):
         )
 
     def test_write_in_grace(self):
-
         line_ids = [
             (
                 0,
@@ -873,7 +845,6 @@ class TestHrAttendance(common.TestPolicyCommon):
         )
 
     def test_write_early_out_grace_period(self):
-
         line_ids = [
             (
                 0,
@@ -906,7 +877,6 @@ class TestHrAttendance(common.TestPolicyCommon):
         )
 
     def test_create_no_shifts(self):
-
         line_ids = [
             (
                 0,

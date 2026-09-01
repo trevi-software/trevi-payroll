@@ -470,9 +470,10 @@ class HrPayslip(models.Model):
             normal_working_hours = 0
             awol_code = False
 
-            # Initialize policy structures. If the policies didn't change mid-period then
-            # this is the only time in this contract that it hits the db even though it's
-            # called again for every day in the period.
+            # Initialize policy structures. If the policies didn't change
+            # mid-period then this is the only time in this contract that it
+            # hits the db even though it's called again for every day in the
+            # period.
             presence_data = self.get_presence_data(
                 contract, date_from, date_to, presence_data
             )
@@ -818,7 +819,7 @@ class HrPayslip(models.Model):
 
     @api.model
     def _get_applied_time(self, worked_hours, pol_active_after, pol_duration=False):
-        """Returns worked time in hours according to pol_active_after and pol_duration."""
+        """Return worked hours, per pol_active_after and pol_duration."""
 
         applied_min = (worked_hours * 60) - pol_active_after
         if fields.Float.compare(applied_min, 0.0, precision_digits=0) > 0:

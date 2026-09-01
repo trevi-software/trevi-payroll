@@ -2,7 +2,6 @@ from odoo import fields, models
 
 
 class PayslipMpesaEtResponse(models.Model):
-
     _name = "payslip.mpesa_et.response"
     _description = "Safaricom Ethiopia M-PESA Payslip Integration Response"
     _order = "ok_conversation error_request"
