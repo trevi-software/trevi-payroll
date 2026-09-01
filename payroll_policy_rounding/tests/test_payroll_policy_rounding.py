@@ -10,7 +10,6 @@ from . import common
 
 class TestPolicy(common.TestPolicyCommon):
     def test_get_latest_policy(self):
-
         pMarch = self.Policy.create(
             {"name": "P1", "date": date(2020, 3, 1), "tz": "UTC"}
         )
@@ -29,7 +28,6 @@ class TestPolicy(common.TestPolicyCommon):
         self.assertEqual(ap, pDec, "I got the latest policy from available ones")
 
     def test_get_latest_policy_with_future(self):
-
         pastDate = date.today() - relativedelta(days=5)
         futureDate = date.today() + relativedelta(days=1)
         pFuture = self.Policy.create({"name": "PF", "date": futureDate, "tz": "UTC"})

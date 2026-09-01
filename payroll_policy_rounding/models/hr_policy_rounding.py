@@ -10,14 +10,12 @@ from odoo import _, api, fields, models
 
 
 class HrPolicy(models.Model):
-
     _name = "hr.policy.rounding"
     _order = "date desc"
     _description = "Attendance Rounding Policy"
 
     @api.model
     def _tz_list(self):
-
         res = tuple()
         for name in common_timezones:
             res += ((name, name),)
@@ -51,7 +49,6 @@ class HrPolicy(models.Model):
         return res
 
     def process_rounding_policy(self, utcdt, action, shift_record):
-
         self.ensure_one()
 
         # 1. Check if it's within the grace period
@@ -74,7 +71,6 @@ class HrPolicy(models.Model):
 
 
 class PolicyLine(models.Model):
-
     _name = "hr.policy.line.rounding"
     _description = "Attendance Rounding Policy Line"
     _rec_name = "attendance_type"
@@ -98,9 +94,7 @@ class PolicyLine(models.Model):
     preauth_ot = fields.Boolean(string="Pre-authorized OT")
 
     def check_grace_period(self, utcdt, action, shift_record):
-
         for line in self:
-
             # Check if this is an entry type that applies to this line
             #
             if (line.attendance_type == "in") and (action != "sign_in"):
@@ -122,9 +116,7 @@ class PolicyLine(models.Model):
         return False
 
     def check_pre_authorized_ot(self, utcdt, action, shift_record):
-
         for line in self:
-
             # Check if this is an entry type that applies to this line
             #
             if (line.attendance_type == "in") and (action != "sign_in"):
@@ -144,7 +136,6 @@ class PolicyLine(models.Model):
         return False
 
     def calculate_rounding_clock_in(self, utcdt, shift_record):
-
         self.ensure_one()
         new_time = False
         utcdtBottom = utcdt
@@ -196,7 +187,6 @@ class PolicyLine(models.Model):
         return new_time
 
     def calculate_rounding_clock_out(self, utcdt, shift_record):
-
         self.ensure_one()
         new_time = False
         utcdtBottom = utcdt
@@ -219,7 +209,6 @@ class PolicyLine(models.Model):
 
         # Sign-out: punch time is greater than scheduled time
         if utcdt > utcdtOut:
-
             if self.round_type in ["down", "avg"]:
                 utcdtPrevBottom = utcdtIn
                 utcdtBottom = utcdtIn
@@ -249,10 +238,8 @@ class PolicyLine(models.Model):
         return new_time
 
     def do_rounding(self, utcdt, action, shift_record):
-
         new_time = False
         for line in self:
-
             # Check if this is an entry type that applies to this line
             #
             if (line.attendance_type == "in") and (action != "sign_in"):
@@ -261,7 +248,6 @@ class PolicyLine(models.Model):
                 continue
 
             if line.round_interval > 0:
-
                 if line.attendance_type == "in" and action == "sign_in":
                     return line.calculate_rounding_clock_in(utcdt, shift_record)
 

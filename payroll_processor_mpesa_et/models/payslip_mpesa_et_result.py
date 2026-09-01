@@ -2,7 +2,6 @@ from odoo import fields, models
 
 
 class PayslipMpesaEtResult(models.Model):
-
     _name = "payslip.mpesa_et.result"
     _description = "Safaricom Ethiopia M-PESA Payslip Integration Result"
     _order = "tx_completed_at desc"

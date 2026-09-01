@@ -7,7 +7,6 @@ _logger = logging.getLogger(__name__)
 
 
 class HrPayslip(models.Model):
-
     _inherit = "hr.payslip"
 
     state = fields.Selection(
@@ -24,7 +23,8 @@ class HrPayslip(models.Model):
         """Return the default payment method chosen by the company."""
         return self.env.company.payroll_payment_processor
 
-    # should be in-sync with field in res.company and hr.employee -> payroll_payment_processor
+    # should be in-sync with the payroll_payment_processor field in
+    # res.company and hr.employee
     payroll_payment_processor = fields.Selection(
         selection=[
             ("none", _("None")),
@@ -55,7 +55,8 @@ class HrPayslip(models.Model):
         for slip in self:
             if slip.paid:
                 _logger.warning(
-                    "Payslip %s (%s) is already 'Paid'. Discontinuing any further processing.",
+                    "Payslip %s (%s) is already 'Paid'. Discontinuing any "
+                    "further processing.",
                     slip.name,
                     slip.number,
                 )

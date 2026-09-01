@@ -6,7 +6,6 @@ from odoo import fields, models
 
 
 class PolicyOt(models.Model):
-
     _name = "hr.policy.ot"
     _description = "Over-time payroll policy"
     _order = "date desc"
@@ -20,7 +19,6 @@ class PolicyOt(models.Model):
     )
 
     def get_codes(self):
-
         res = []
         for policy in self:
             for line in policy.line_ids:
@@ -40,7 +38,6 @@ class PolicyOt(models.Model):
         return res
 
     def daily_codes(self):
-
         res = []
         for policy in self:
             for line in policy.line_ids:
@@ -49,7 +46,6 @@ class PolicyOt(models.Model):
         return res
 
     def restday_codes(self):
-
         res = []
         for policy in self:
             for line in policy.line_ids:
@@ -58,7 +54,6 @@ class PolicyOt(models.Model):
         return res
 
     def restday2_codes(self):
-
         res = []
         for policy in self:
             for line in policy.line_ids:
@@ -67,7 +62,6 @@ class PolicyOt(models.Model):
         return res
 
     def weekly_codes(self):
-
         res = []
         for policy in self:
             for line in policy.line_ids:
@@ -76,7 +70,6 @@ class PolicyOt(models.Model):
         return res
 
     def holiday_codes(self):
-
         res = []
         for policy in self:
             for line in policy.line_ids:

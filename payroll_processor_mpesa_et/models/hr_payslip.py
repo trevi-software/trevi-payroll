@@ -7,10 +7,10 @@ _logger = logging.getLogger(__name__)
 
 
 class HrPayslip(models.Model):
-
     _inherit = "hr.payslip"
 
-    # should be in-sync with field in res.company and hr.employee -> payroll_payment_processor
+    # should be in-sync with the payroll_payment_processor field in
+    # res.company and hr.employee
     payroll_payment_processor = fields.Selection(
         selection_add=[
             ("mpesa_et", "Safaricom M-PESA (ET)"),
@@ -36,11 +36,9 @@ class HrPayslip(models.Model):
         self.paid = self.paid_mpesa
 
     def refund_sheet(self):
-
         return super().refund_sheet()
 
     def payslip_cancel(self):
-
         if self.filtered(lambda slip: slip.paid_mpesa):
             raise ValidationError(
                 _("Cannot cancel a payslip that is already paid through M-Pesa.")
@@ -49,7 +47,6 @@ class HrPayslip(models.Model):
         return super().payslip_cancel()
 
     def unlink(self):
-
         if self.filtered(lambda slip: slip.paid_mpesa):
             raise ValidationError(
                 _("Cannot delete a payslip that is already paid through M-Pesa.")
@@ -58,7 +55,6 @@ class HrPayslip(models.Model):
         return super().unlink()
 
     def action_payslip_payment(self):
-
         for slip in self:
             if slip.payroll_payment_processor == "mpesa_et":
                 gw = (
@@ -68,7 +64,8 @@ class HrPayslip(models.Model):
                 )
                 if len(gw) == 0:
                     _logger.warning(
-                        "Unable to find an appropriate M-PESA processor for payslip %s (%s)",
+                        "Unable to find an appropriate M-PESA processor "
+                        "for payslip %s (%s)",
                         slip.name,
                         slip.number,
                     )

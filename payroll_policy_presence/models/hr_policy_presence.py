@@ -6,7 +6,6 @@ from odoo import fields, models
 
 
 class PolicyPresence(models.Model):
-
     _name = "hr.policy.presence"
     _description = "Presence payroll policy"
     _order = "date desc"
@@ -26,7 +25,6 @@ class PolicyPresence(models.Model):
     )
 
     def get_codes(self):
-
         res = []
         for policy in self:
             for line in policy.line_ids:

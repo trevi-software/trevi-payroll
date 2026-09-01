@@ -6,7 +6,6 @@ from odoo import _, exceptions, fields, models
 
 
 class PayrollRegisterRun(models.TransientModel):
-
     _name = "hr.payroll.register.run"
     _description = "Pay Slip Creation"
 
@@ -19,7 +18,6 @@ class PayrollRegisterRun(models.TransientModel):
     )
 
     def create_payslip_runs(self):
-
         self.ensure_one()
         Employee = self.env["hr.employee"]
         Payslip = self.env["hr.payslip"]

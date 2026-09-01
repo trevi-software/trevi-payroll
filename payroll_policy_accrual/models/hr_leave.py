@@ -6,11 +6,9 @@ from odoo import fields, models
 
 
 class HrHolidays(models.Model):
-
     _inherit = "hr.leave.allocation"
 
     def do_accrual(self, today, days):
-
         self.ensure_one()
         Accrual = self.env["hr.accrual"]
         AccrualLine = self.env["hr.accrual.line"]
@@ -36,19 +34,16 @@ class HrHolidays(models.Model):
         return
 
     def action_validate(self):
-
         res = super().action_validate()
 
         today = fields.Date.today()
         for record in self:
             if record.holiday_type == "employee" and record.from_accrual:
-
                 record._do_accrual(
                     today, record.employee_id.id, record.number_of_days_temp
                 )
 
             if record.holiday_type == "employee":
-
                 record._do_accrual(
                     today, record.employee_id.id, -record.number_of_days_temp
                 )
@@ -56,7 +51,6 @@ class HrHolidays(models.Model):
         return res
 
     def holidays_refuse(self):
-
         today = fields.Date.today()
         for record in self:
             if record.state not in ["validate", "validate1"]:

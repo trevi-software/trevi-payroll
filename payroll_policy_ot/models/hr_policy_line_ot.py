@@ -8,13 +8,11 @@ from odoo import api, fields, models
 
 
 class PolicyLineOt(models.Model):
-
     _name = "hr.policy.line.ot"
     _description = "Over-time payroll policy line"
 
     @api.model
     def _tz_list(self):
-
         res = tuple()
         for name in common_timezones:
             res += ((name, name),)

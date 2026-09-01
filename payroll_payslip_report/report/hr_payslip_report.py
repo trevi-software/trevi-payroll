@@ -78,7 +78,6 @@ class PayrollReportView(models.Model):
         return group_by_str
 
     def _having(self):
-
         ir_config = self.env["ir.config_parameter"].with_user(SUPERUSER_ID)
         include_category_codes = (
             ir_config.get_param("payroll_payslip_report.include_category_codes")
@@ -98,17 +97,11 @@ class PayrollReportView(models.Model):
 
     def init(self):
         tools.drop_view_if_exists(self.env.cr, self._table)
-        query = """CREATE or REPLACE VIEW %s as ( SELECT
-                   %s
-                   FROM %s
+        query = f"""CREATE or REPLACE VIEW {self._table} as ( SELECT
+                   {self._select()}
+                   FROM {self._from()}
                    GROUP BY
-                   %s
-                   %s
-                   )""" % (
-            self._table,
-            self._select(),
-            self._from(),
-            self._group_by(),
-            self._having(),
-        )
+                   {self._group_by()}
+                   {self._having()}
+                   )"""
         self.env.cr.execute(query)

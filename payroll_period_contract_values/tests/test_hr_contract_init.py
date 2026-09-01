@@ -14,7 +14,6 @@ class TestPayrollHrContractInit(TestContractInit):
         cls.PPSchedule = cls.env["hr.payroll.period.schedule"]
 
     def test_no_schedule(self):
-
         today = fields.Date.today()
         self.HrContractInit.create(
             {
@@ -32,7 +31,6 @@ class TestPayrollHrContractInit(TestContractInit):
         self.assertFalse(contract.pps_id, "Contract pay period schedule field is empty")
 
     def test_contract_has_schedule(self):
-
         today = fields.Date.today()
         pps = self.PPSchedule.create(
             {

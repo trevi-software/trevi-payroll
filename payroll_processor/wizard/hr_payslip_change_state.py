@@ -2,7 +2,6 @@ from odoo import fields, models
 
 
 class HrPayslipChangeState(models.TransientModel):
-
     _inherit = "hr.payslip.change.state"
 
     state = fields.Selection(

@@ -42,7 +42,6 @@ class TestHrPayslip(test_common.TestHrPayslip):
         )
 
     def test_contract_ppf_no_end_date(self):
-
         # I create a contract for "Richard"
         start = date(2022, 4, 1)
         end = date(2022, 4, 30)
@@ -65,7 +64,6 @@ class TestHrPayslip(test_common.TestHrPayslip):
         )
 
     def test_contract_ppf_exact_end_date30(self):
-
         # I create a contract for "Richard"
         start = date(2022, 4, 1)
         end = date(2022, 4, 30)
@@ -86,7 +84,6 @@ class TestHrPayslip(test_common.TestHrPayslip):
         )
 
     def test_contract_ppf_exact_end_date31(self):
-
         # I create a contract for "Richard"
         start = date(2022, 3, 1)
         end = date(2022, 3, 31)
@@ -107,7 +104,6 @@ class TestHrPayslip(test_common.TestHrPayslip):
         )
 
     def test_contract_ppf_half(self):
-
         # I create a contract for "Richard"
         start = date(2022, 4, 1)
         end = date(2022, 4, 30)
@@ -130,7 +126,6 @@ class TestHrPayslip(test_common.TestHrPayslip):
         )
 
     def test_contract_ppf_2contracts(self):
-
         # I create a contract for "Richard"
         start = date(2022, 4, 1)
         end = date(2022, 4, 30)
@@ -161,7 +156,6 @@ class TestHrPayslip(test_common.TestHrPayslip):
         )
 
     def test_contract_ppf_days_less_than_payroll_days(self):
-
         # I create a contract for "Richard" of 10 days
         pay_start = date(2022, 4, 1)
         pay_end = date(2022, 4, 30)
@@ -193,7 +187,6 @@ class TestHrPayslip(test_common.TestHrPayslip):
         )
 
     def test_contract_ppf_days_less_than_payroll_days31(self):
-
         # I create a contract for "Richard" of 10 days
         pay_start = date(2022, 3, 1)
         pay_end = date(2022, 3, 31)
@@ -225,7 +218,6 @@ class TestHrPayslip(test_common.TestHrPayslip):
         )
 
     def test_contract_ppf_february(self):
-
         # I create a contract for "Richard"
         start = date(2022, 2, 1)
         end = date(2022, 2, 15)

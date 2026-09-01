@@ -18,11 +18,9 @@ class PayrollRegister(models.Model):
 
 
 class PayslipException(models.Model):
-
     _inherit = "hr.payslip.exception"
 
     def button_recalculate(self):
-
         for ex in self:
             period = ex.slip_id.payslip_run_id.register_id.period_id
             period.rerun_payslip(ex.slip_id)

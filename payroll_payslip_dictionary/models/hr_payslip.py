@@ -11,7 +11,6 @@ from odoo.addons.payroll.models.hr_payslip import BaseBrowsableObject
 
 
 class HrPayslip(models.Model):
-
     _inherit = "hr.payslip"
 
     @api.model
@@ -41,7 +40,6 @@ class HrPayslip(models.Model):
         )
 
     def _get_working_calendar(self, contract):
-
         return self._get_working_calendar_from_dates(
             contract, self.date_from, self.date_to
         )
@@ -124,7 +122,6 @@ class HrPayslip(models.Model):
         return (contract_days, other_max_days)
 
     def _partial_payroll_factor(self, contract, contracts):
-
         self.ensure_one()
 
         dcEnd = self._get_end_date(contract)

@@ -64,7 +64,6 @@ class TestPresencePolicy(common.TestHrPayslip):
         )
 
     def test_worked_hours(self):
-
         # I set the test rule to detect the number of regular worked hours
         self.test_rule.amount_python_compute = (
             "result_rate = worked_days.PL1.rate * 100 \n"
@@ -112,7 +111,6 @@ class TestPresencePolicy(common.TestHrPayslip):
         )
 
     def test_worked_holiday(self):
-
         # I check that public holidays exist
         ph = self.PublicHoliday.search([("year", "=", 2022)])
         self.assertTrue(ph, "There is a public holiday object")
@@ -167,7 +165,6 @@ class TestPresencePolicy(common.TestHrPayslip):
         )
 
     def test_worked_restday(self):
-
         # I set the test rule to detect the number of rest day worked hours
         self.test_rule.amount_python_compute = (
             "result_rate = worked_days.RST.rate * 100 \n"
@@ -245,7 +242,6 @@ class TestPresencePolicy(common.TestHrPayslip):
         )
 
     def test_worked_restday_weekend(self):
-
         # I set the weekly working days to 5
         self.presence_policy.work_days_per_week = 5
 

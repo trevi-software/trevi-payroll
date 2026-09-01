@@ -58,7 +58,7 @@ class TestPayrollRegister(common.TransactionCase):
             self.assertEqual(
                 0,
                 fields.Float.compare(d[key], den.denomination_qty, 2),
-                "Denomination key: %s" % (key),
+                f"Denomination key: {key}",
             )
 
     def setUpCommon(self):

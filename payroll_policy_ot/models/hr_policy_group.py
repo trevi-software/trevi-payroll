@@ -6,7 +6,6 @@ from odoo import fields, models
 
 
 class PolicyGroup(models.Model):
-
     _name = "hr.policy.group"
     _inherit = "hr.policy.group"
 
