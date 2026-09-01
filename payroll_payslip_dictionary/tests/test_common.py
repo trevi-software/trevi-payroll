@@ -80,7 +80,6 @@ class TestHrPayslip(TestPayslipBase):
         )
 
     def create_payslip(self, start, end, employee):
-
         return self.Payslip.create(
             {
                 "name": f"Payslip of {employee.name}",
