@@ -8,7 +8,7 @@ from odoo import fields
 from odoo.tests import Form, common
 
 
-class TestPayslipAmendment(common.SavepointCase):
+class TestPayslipAmendment(common.TransactionCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -95,7 +95,6 @@ class TestPayslipAmendment(common.SavepointCase):
         ).method_direct_trigger()
 
     def test_amendment_in_period(self):
-
         # Create Payroll Period
         #
         start = datetime(2021, 1, 1)
@@ -137,14 +136,13 @@ class TestPayslipAmendment(common.SavepointCase):
             len(input_lines), 1, "There must be ONE payslip input line for SALECOM"
         )
 
-        _res1 = fields.Float.compare(input_lines[0].amount, 500.0, precision_rounding=2)
+        _res1 = fields.Float.compare(input_lines[0].amount, 500.0, precision_digits=2)
         self.assertEqual(_res1, 0, "The Input amount should be equal to 500.00")
         self.assertEqual(
             psa.state, "done", "The payslip amendment must be in 'done' state"
         )
 
     def test_amendment_not_in_period(self):
-
         # Create Payroll Period
         #
         start = datetime(2021, 1, 1)
@@ -189,7 +187,7 @@ class TestPayslipAmendment(common.SavepointCase):
             len(input_lines), 1, "There must be ONE payslip input line for SALECOM"
         )
 
-        _res1 = fields.Float.compare(input_lines[0].amount, 0.0, precision_rounding=2)
+        _res1 = fields.Float.compare(input_lines[0].amount, 0.0, precision_digits=2)
         self.assertEqual(_res1, 0, "The paylip amendment should NOT have been applied")
 
     def test_amendment_in_period2(self):
@@ -246,14 +244,13 @@ class TestPayslipAmendment(common.SavepointCase):
             len(input_lines), 1, "There must be ONE payslip input line for SALECOM"
         )
 
-        _res1 = fields.Float.compare(input_lines[0].amount, 500.0, precision_rounding=2)
+        _res1 = fields.Float.compare(input_lines[0].amount, 500.0, precision_digits=2)
         self.assertEqual(_res1, 0, "The Input amount should be equal to 500.00")
         self.assertEqual(
             psa.state, "done", "The payslip amendment must be in 'done' state"
         )
 
     def test_onchange_amendment(self):
-
         # Create Payroll Period
         #
         start = datetime(2021, 1, 1)

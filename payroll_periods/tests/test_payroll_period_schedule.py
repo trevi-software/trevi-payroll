@@ -11,7 +11,7 @@ from odoo.tests import common, new_test_user
 from ..models.hr_payroll_period_schedule import add_months
 
 
-class TestSchedule(common.SavepointCase):
+class TestSchedule(common.TransactionCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -62,7 +62,6 @@ class TestSchedule(common.SavepointCase):
         self.assertEqual(datetime(2021, 1, 31, 20, 59, 59), listPP[0].date_end)
 
     def convert_local_to_utc(self, tz_str, lyear, lmonth, lday, lh=0, lm=0, ls=0):
-
         ltz = timezone(tz_str)
         ltzdtToday = ltz.localize(
             datetime(lyear, lmonth, lday, lh, lm, ls), is_dst=None

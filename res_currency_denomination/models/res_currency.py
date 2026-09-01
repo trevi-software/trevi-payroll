@@ -9,7 +9,6 @@ from odoo.tools.float_utils import float_compare
 
 
 class ResCurrencyDenomination(models.Model):
-
     _name = "res.currency.denomination"
     _description = "Currency Denomination"
     _rec_name = "value"
@@ -26,7 +25,6 @@ class ResCurrencyDenomination(models.Model):
 
 
 class ResCurrency(models.Model):
-
     _inherit = "res.currency"
 
     denomination_ids = fields.One2many(
@@ -36,7 +34,6 @@ class ResCurrency(models.Model):
     )
 
     def get_denomination_list(self):
-
         self.ensure_one()
         denominations = []
         smallest_note = 1
@@ -45,7 +42,7 @@ class ResCurrency(models.Model):
         # Arrange in order from largest value to smallest.
         #
         for denom in self.denomination_ids:
-            if float_compare(denom.ratio, 1.00, precision_rounding=2) == 0:
+            if float_compare(denom.ratio, 1.00, precision_digits=2) == 0:
                 smallest_note = denom.value
 
             if len(denominations) == 0:
@@ -75,7 +72,7 @@ class ResCurrency(models.Model):
 
         for currency in self:
             for denom in currency.denomination_ids:
-                if float_compare(denom.ratio, 1.00, precision_rounding=2) == 0:
+                if float_compare(denom.ratio, 1.00, precision_digits=2) == 0:
                     smallest_note = denom.value
 
                 if len(denominations) == 0:

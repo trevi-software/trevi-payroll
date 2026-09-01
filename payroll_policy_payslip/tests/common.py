@@ -8,7 +8,7 @@ from pytz import timezone, utc
 from odoo.tests import common, new_test_user
 
 
-class TestHrPayslip(common.SavepointCase):
+class TestHrPayslip(common.TransactionCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -18,7 +18,7 @@ class TestHrPayslip(common.SavepointCase):
         cls.Rule = cls.env["hr.salary.rule"]
         cls.PolicyGroup = cls.env["hr.policy.group"]
         cls.Attendance = cls.env["hr.attendance"]
-        cls.PublicHoliday = cls.env["hr.holidays.public"]
+        cls.PublicHoliday = cls.env["calendar.public.holiday"]
         cls.PresencePolicy = cls.env["hr.policy.presence"]
         cls.PresencePolicyLine = cls.env["hr.policy.line.presence"]
 
@@ -121,7 +121,6 @@ class TestHrPayslip(common.SavepointCase):
         )
 
     def create_payslip(self, start, end, employee, user=False):
-
         if user is not False:
             Payslip = self.HrPayslip.with_user(user)
         else:

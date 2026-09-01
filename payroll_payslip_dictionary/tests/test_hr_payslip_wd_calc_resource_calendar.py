@@ -42,7 +42,6 @@ class TestHrPayslip(test_common.TestHrPayslip):
         )
 
     def test_contract_ppf_no_end_date(self):
-
         start = date(2022, 4, 1)
         end = date(2022, 4, 30)
         self.create_contract(
@@ -65,7 +64,6 @@ class TestHrPayslip(test_common.TestHrPayslip):
         )
 
     def test_contract_ppf_exact_end_date30(self):
-
         start = date(2022, 4, 1)
         end = date(2022, 4, 30)
         self.create_contract(start, end, self.alice_emp, 5000.0)
@@ -85,7 +83,6 @@ class TestHrPayslip(test_common.TestHrPayslip):
         )
 
     def test_contract_ppf_exact_end_date31(self):
-
         start = date(2022, 3, 1)
         end = date(2022, 3, 31)
         self.create_contract(start, end, self.alice_emp, 5000.0)
@@ -105,7 +102,6 @@ class TestHrPayslip(test_common.TestHrPayslip):
         )
 
     def test_contract_ppf_half(self):
-
         start = date(2022, 4, 1)
         end = date(2022, 4, 30)
         self.create_contract(
@@ -127,7 +123,6 @@ class TestHrPayslip(test_common.TestHrPayslip):
         )
 
     def test_contract_ppf_2contracts(self):
-
         start = date(2022, 4, 1)
         end = date(2022, 4, 30)
         self.create_contract(
@@ -157,7 +152,6 @@ class TestHrPayslip(test_common.TestHrPayslip):
         )
 
     def test_contract_ppf_days_less_than_payroll_days(self):
-
         # I create a contract for "Richard" of 10 days (in the period)
         pay_start = date(2022, 4, 1)
         pay_end = date(2022, 4, 30)
@@ -189,7 +183,6 @@ class TestHrPayslip(test_common.TestHrPayslip):
         )
 
     def test_contract_ppf_february(self):
-
         # I create a contract for "Richard"
         start = date(2022, 2, 1)
         end = date(2022, 2, 15)
@@ -219,7 +212,6 @@ class TestHrPayslip(test_common.TestHrPayslip):
         )
 
     def test_contract_ppf_march(self):
-
         # I create a contract for "Richard" with 11 working days
         start = date(2022, 3, 1)
         end = date(2022, 3, 15)
@@ -255,8 +247,9 @@ class TestHrPayslip(test_common.TestHrPayslip):
         self.assertEqual(len(lines), 2, "I found the BASIC salary lines")
 
         sum_amounts = sum([line.amount for line in lines])
-        self.assertEqual(
+        self.assertAlmostEqual(
             sum_amounts,
             7608.50,
-            "The calculated amount is 0.4783 x first wage + 0.5217 * second wage",
+            places=2,
+            msg="The calculated amount is 0.4783 x first wage + 0.5217 * second wage",
         )

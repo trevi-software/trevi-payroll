@@ -8,7 +8,7 @@ from pytz import timezone, utc
 from odoo.tests import common, new_test_user
 
 
-class TestPolicyCommon(common.SavepointCase):
+class TestPolicyCommon(common.TransactionCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -143,7 +143,6 @@ class TestPolicyCommon(common.SavepointCase):
         return datetime.combine(d, datetime.strptime(sTime, "%H:%M").time())
 
     def get_start_end_dates(self, weeks=1):
-
         total_days = (weeks * 7) - 1
         dStart = date.today()
         while dStart.weekday() != 0:
@@ -167,7 +166,6 @@ class TestPolicyCommon(common.SavepointCase):
         return res
 
     def setup_pg(self, line_ids, tz="UTC"):
-
         p = self.Policy.create(
             {
                 "name": "P1",
