@@ -8,7 +8,6 @@ from odoo import _, exceptions, fields, models
 
 
 class HrPayslipAmendment(models.Model):
-
     _name = "hr.payslip.amendment"
     _inherit = ["mail.thread"]
     _description = "Pay Slip Amendment"
@@ -47,15 +46,13 @@ class HrPayslipAmendment(models.Model):
     note = fields.Text(string="Memo")
 
     def name_get(self):
-
         res = []
         for rec in self:
-            res.append((rec.id, "%s (%s)" % (rec.employee_id.name, rec.input_id.code)))
+            res.append((rec.id, f"{rec.employee_id.name} ({rec.input_id.code})"))
 
         return res
 
     def unlink(self):
-
         for psa in self:
             if psa.state in ["validate", "done"]:
                 raise exceptions.UserError(

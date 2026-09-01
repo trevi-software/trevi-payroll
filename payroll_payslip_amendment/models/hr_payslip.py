@@ -10,7 +10,6 @@ class HrPayslip(models.Model):
 
     @api.model
     def get_inputs(self, contracts, date_from, date_to):
-
         res = super().get_inputs(contracts, date_from, date_to)
 
         psa_ids = self.env["hr.payslip.amendment"].search(
@@ -22,12 +21,10 @@ class HrPayslip(models.Model):
             ]
         )
         for line in res:
-
             # Pay Slip Amendment modifications
             for psa in psa_ids.filtered(
-                lambda self: self.input_id.code == line["code"]
+                lambda psa, line=line: psa.input_id.code == line["code"]
             ):
-
                 # count the number of times this input rule appears (this
                 # is dependent on no. of contracts in pay period), and
                 # distribute the total amount equally among them.
