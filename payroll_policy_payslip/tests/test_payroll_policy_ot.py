@@ -105,7 +105,6 @@ class TestPresencePolicy(common.TestHrPayslip):
         )
 
     def test_daily_ot(self):
-
         # I set the test rules to detect the number of regular and OT worked hours
         self.test_rule.amount_python_compute = (
             "result_rate = worked_days.PL1.rate * 100 \n"
@@ -174,7 +173,6 @@ class TestPresencePolicy(common.TestHrPayslip):
         )
 
     def test_nightly_ot(self):
-
         # I set the test rules to detect the number of regular and OT worked hours
         self.test_rule.amount_python_compute = (
             "result_rate = worked_days.PL1.rate * 100 \n"
@@ -243,7 +241,6 @@ class TestPresencePolicy(common.TestHrPayslip):
         )
 
     def test_nightly_ot_midnight(self):
-
         # I set the test rules to detect the number of regular and OT worked hours
         self.test_rule.amount_python_compute = (
             "result_rate = worked_days.PL1.rate * 100 \n"
@@ -315,7 +312,6 @@ class TestPresencePolicy(common.TestHrPayslip):
         )
 
     def test_nightly_ot_8pm5am(self):
-
         # I set the test rules to detect the number of regular and OT worked hours
         self.test_rule.amount_python_compute = (
             "result_rate = worked_days.PL1.rate * 100 \n"
@@ -387,7 +383,6 @@ class TestPresencePolicy(common.TestHrPayslip):
         )
 
     def test_ot_day_and_night(self):
-
         # I set the test rules to detect the number of regular and OT worked hours
         self.test_rule.amount_python_compute = (
             "result_rate = worked_days.PL1.rate * 100 \n"
@@ -476,7 +471,6 @@ class TestPresencePolicy(common.TestHrPayslip):
         )
 
     def test_restday_ot(self):
-
         # I set the test rules to detect the number of regular and OT worked hours
         self.test_rule.amount_python_compute = (
             "result_rate = worked_days.PL1.rate * 100 \n"
@@ -570,7 +564,6 @@ class TestPresencePolicy(common.TestHrPayslip):
         )
 
     def test_holiday_ot(self):
-
         # I check that public holidays exist
         ph = self.PublicHoliday.search([("year", "=", 2022)])
         self.assertTrue(ph, "There is a public holiday object")

@@ -5,7 +5,6 @@ from odoo import fields, models
 
 
 class HrPayslipWorkedDays(models.Model):
-
     _inherit = "hr.payslip.worked_days"
 
     rate = fields.Float(default=0.0, digits="Payroll Rate")

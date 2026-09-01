@@ -53,7 +53,6 @@ class HrAttendance(models.Model):
 
     @api.model
     def punches_list_search(self, ndtFrom, ndtTo, punches_list):
-
         res = []
         for check_in, check_out in punches_list:
             if check_in >= ndtFrom and check_in <= ndtTo:
@@ -62,7 +61,6 @@ class HrAttendance(models.Model):
 
     @api.model
     def _calculate_rollover(self, utcdt, rollover_hours):
-
         # XXX - assume time part of utcdt is already set to midnight
         return utcdt + timedelta(hours=int(rollover_hours))
 
@@ -79,7 +77,6 @@ class HrAttendance(models.Model):
         self, dtRollover, ot_max_rollover_gap, sin, sout
     ):
         if (len(sout) - len(sin)) == 0:
-
             if len(sout) > 0:
                 dtSout = sout[0]
                 dtSin = sin[0]
@@ -87,7 +84,8 @@ class HrAttendance(models.Model):
                     sin = [dtRollover] + sin
                 elif dtSout < dtSin:
                     sout = sout[1:]
-                    # There may be another session that starts within the rollover period
+                    # There may be another session that starts within the
+                    # rollover period
                     if (
                         dtSin < dtRollover
                         and float((dtSin - dtSout).seconds) / 60.0
@@ -148,7 +146,6 @@ class HrAttendance(models.Model):
         sout,
     ):
         if (len(sin) - len(sout)) == 1:
-
             employee = contract.employee_id
             my_list2 = self.punches_list_search(
                 ndtDayEnd + timedelta(seconds=+1),
@@ -159,7 +156,8 @@ class HrAttendance(models.Model):
                 raise exceptions.ValidationError(
                     _("Attendance Error!"),
                     _(
-                        "There is not a final sign-out record for %(employee)s on %(day)s"
+                        "There is not a final sign-out record for "
+                        "%(employee)s on %(day)s"
                     )
                     % {"employee": employee.name, "day": dDay},
                 )
@@ -270,8 +268,8 @@ class HrAttendance(models.Model):
         # CHECKS AT THE END OF THE DAY
         # Include sessions from tomorrow that should be included in today's attendance.
 
-        # We may have a session that crosses the midnight boundary. If so, add it to today's
-        # session.
+        # We may have a session that crosses the midnight boundary. If so,
+        # add it to today's session.
         #
         dtRollover = (
             self._calculate_rollover(ndtDay + timedelta(days=1), ot_max_rollover_hours)
@@ -329,8 +327,9 @@ class HrAttendance(models.Model):
     def partial_hours_on_day(
         self, contract, dDay, active_after, begin, stop, tz, punches_list=None
     ):
-        """Calculate the number of hours worked between begin and stop hours, but
-        after active_after hours past the beginning of the first sign-in on specified date.
+        """Calculate the number of hours worked between begin and stop hours,
+        but after active_after hours past the beginning of the first sign-in on
+        the specified date.
         """
 
         # Since OpenERP stores datetime in db as UTC, but in naive format we have to do
