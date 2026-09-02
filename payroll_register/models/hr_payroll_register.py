@@ -28,7 +28,7 @@ class HrPayrollRegister(models.Model):
         (
             "unique_name",
             "CHECK(1=1)",
-            _("Payroll Register description must be unique per company."),
+            ("Payroll Register description must be unique per company."),
         )
     ]
 
