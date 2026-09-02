@@ -6,7 +6,7 @@ from datetime import timedelta
 
 from pytz import common_timezones
 
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 
 
 class HrPolicy(models.Model):
@@ -78,7 +78,7 @@ class PolicyLine(models.Model):
         (
             "uniq_id_att_type",
             "UNIQUE(id,attendance_type)",
-            _("Attendance types must be unique per rounding policy line"),
+            ("Attendance types must be unique per rounding policy line"),
         )
     ]
 
