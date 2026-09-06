@@ -120,7 +120,12 @@ class TestAccrualPolicy(common.TransactionCase):
         cc.signal_confirm()
 
         # Create policy that accrues 24 days/year
-        lt = self.LeaveType.create({"name": "Leave type"})
+        # hr_leave_type_unique (pulled in via trevi-hr deps in CI) adds a
+        # required 'code' field on hr.leave.type
+        lt_vals = {"name": "Leave type"}
+        if "code" in self.LeaveType._fields:
+            lt_vals["code"] = "LT"
+        lt = self.LeaveType.create(lt_vals)
         aa = self.Accrual.create({"name": "24 ANNUAL ACCR", "holiday_status_id": lt.id})
         policy = self.Policy.create(
             {
