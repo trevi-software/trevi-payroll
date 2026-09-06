@@ -4,6 +4,7 @@
 from psycopg2 import IntegrityError
 
 from odoo.tests.common import TransactionCase
+from odoo.tools import mute_logger
 
 
 class TestPayrollSalaryCode(TransactionCase):
@@ -30,13 +31,13 @@ class TestPayrollSalaryCode(TransactionCase):
 
     def test_code_required(self):
         """Creating a record without a code raises an error."""
-        with self.assertRaises(Exception):  # noqa: B017
+        with self.assertRaises(Exception), mute_logger("odoo.sql_db"):  # noqa: B017
             self.SalaryCode.create({"description": "no code"})
 
     def test_code_unique(self):
         """Duplicate codes are rejected by the unique constraint."""
         self.SalaryCode.create({"code": "DUP"})
-        with self.cr.savepoint():
+        with self.cr.savepoint(), mute_logger("odoo.sql_db"):
             with self.assertRaises(IntegrityError):
                 self.SalaryCode.create({"code": "DUP"})
                 self.env.cr.flush()
