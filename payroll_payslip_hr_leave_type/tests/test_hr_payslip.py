@@ -60,6 +60,13 @@ class TestHrPayslip(TestPayslipBase):
         )
 
         self.apply_contract_cron()
+        # hr_contract_values' demo data sets a 90-day trial period, so the
+        # cron moves the contract to 'trial' instead of 'open'. End the trial
+        # explicitly to reach 'open'.
+        contract = self.richard_emp.contract_id
+        if contract.state == "trial":
+            contract.trial_date_end = False
+            contract.signal_confirm()
         self.assertEqual(
             self.richard_emp.contract_id.state, "open", "Contract is in 'open' state"
         )
