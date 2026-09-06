@@ -58,13 +58,16 @@ class TestProcessing(common.TransactionCase):
 
         # Leave
         #
-        cls.leave_type_1 = cls.LeaveType.create(
-            {
-                "name": "NotLimitedHR",
-                "requires_allocation": "no",
-                "leave_validation_type": "hr",
-            }
-        )
+        # hr_leave_type_unique (pulled in via trevi-hr deps in CI) adds a
+        # required 'code' field on hr.leave.type
+        leave_type_vals = {
+            "name": "NotLimitedHR",
+            "requires_allocation": "no",
+            "leave_validation_type": "hr",
+        }
+        if "code" in cls.LeaveType._fields:
+            leave_type_vals["code"] = "NLHR"
+        cls.leave_type_1 = cls.LeaveType.create(leave_type_vals)
         cls.employee_leave = cls.env["hr.leave"].create(
             {
                 "name": "Hol11",
