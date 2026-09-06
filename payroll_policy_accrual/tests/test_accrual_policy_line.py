@@ -120,7 +120,7 @@ class TestAccrualPolicy(common.TransactionCase):
         cc.signal_confirm()
 
         # Create policy that accrues 24 days/year
-        lt = self.LeaveType.create({"name": "Leave type", "code": "LT"})
+        lt = self.LeaveType.create({"name": "Leave type"})
         aa = self.Accrual.create({"name": "24 ANNUAL ACCR", "holiday_status_id": lt.id})
         policy = self.Policy.create(
             {
