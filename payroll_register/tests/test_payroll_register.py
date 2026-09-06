@@ -38,10 +38,21 @@ class TestPayrollRegister(common.TransactionCase):
     def create_contract(
         self, eid, state, kanban_state, start, end=None, trial_end=None
     ):
+        # hr_contract_status computes employee.department_id from the
+        # contract's job, so the employee needs a job in the department for
+        # the register wizard's department search to find them.
+        job = self.env["hr.job"].search(
+            [("department_id", "=", self.dept1.id)], limit=1
+        )
+        if not job:
+            job = self.env["hr.job"].create(
+                {"name": "Test Job", "department_id": self.dept1.id}
+            )
         return self.env["hr.contract"].create(
             {
                 "name": "Contract",
                 "employee_id": eid,
+                "job_id": job.id,
                 "state": state,
                 "kanban_state": kanban_state,
                 "wage": 989.92,
