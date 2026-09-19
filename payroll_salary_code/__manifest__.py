@@ -10,10 +10,12 @@
     "license": "AGPL-3",
     "website": "https://github.com/trevi-software/trevi-payroll",
     "depends": [
+        "hr",
         "payroll",
     ],
     "data": [
         "security/ir.model.access.csv",
+        "views/hr_contract_views.xml",
         "views/payroll_salary_code_views.xml",
     ],
     "installable": True,
