@@ -42,6 +42,27 @@ class HrPayslip(models.Model):
             or self.env.company.payroll_payment_processor
         )
 
+    @api.model_create_multi
+    def create(self, vals_list):
+        """Default the processor to the employee's choice on server-side creates.
+
+        ``onchange_employee_id`` only runs in the form view, so an import or an
+        RPC call passing ``employee_id`` without a processor used to fall back
+        to the company's choice and could then be auto-paid by
+        :meth:`action_payslip_payment`. Mirror the onchange here, keeping any
+        processor explicitly supplied by the caller.
+        """
+        for vals in vals_list:
+            if vals.get("payroll_payment_processor"):
+                continue
+            employee = self.env["hr.employee"].browse(vals.get("employee_id"))
+            if employee:
+                vals["payroll_payment_processor"] = (
+                    employee.payroll_payment_processor
+                    or self.env.company.payroll_payment_processor
+                )
+        return super().create(vals_list)
+
     def action_payslip_confirm(self):
         if (
             not self.env.context.get("without_compute_sheet")
