@@ -1,7 +1,7 @@
 {
     "name": "Default Payroll Processor",
     "summary": "Base module for implementing salary payment processors",
-    "version": "18.0.1.0.0",
+    "version": "19.0.1.0.0",
     "author": "TREVI Software",
     "category": "Payroll",
     "license": "AGPL-3",
