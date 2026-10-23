@@ -39,10 +39,10 @@ class TestResConfigSettings(TransactionCase):
                 self.assertEqual(
                     len(field_names),
                     1,
-                    "Expected a single field in the %r setting" % help_prefix,
+                    f"Expected a single field in the {help_prefix!r} setting",
                 )
                 return field_names[0]
-        self.fail("No setting found with help starting with %r" % help_prefix)
+        self.fail(f"No setting found with help starting with {help_prefix!r}")
 
     def test_gross_rule_setting_binds_rule_field(self):
         """Gross Earnings rule setting edits the rule code, not the category."""
