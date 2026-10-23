@@ -17,7 +17,9 @@ class HrPayslip(models.Model):
 
         res = super().get_worked_day_lines(contracts, date_from, date_to)
 
-        leave_types = self.env["hr.leave.type"].search([])
+        # Unbounded on purpose: matched by name against every line returned by
+        # super(), so any leave type may be needed; a limit would drop matches.
+        leave_types = self.env["hr.leave.type"].search([])  # pylint: disable=no-search-all
 
         # Payroll names each leave worked_days record after the leave type but
         # codes it after that type's work entry type, falling back to 'GLOBAL'.
