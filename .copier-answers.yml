@@ -1,8 +1,9 @@
 # Do NOT update manually; changes here will be overwritten by Copier
 _commit: v1.45
 _src_path: gh:OCA/oca-addons-repo-template
-convert_readme_fragments_to_markdown: false
-enable_checklog_odoo: false
+additional_ruff_rules: []
+convert_readme_fragments_to_markdown: true
+enable_checklog_odoo: true
 generate_requirements_txt: true
 github_check_license: true
 github_ci_extra_env: {}
@@ -21,6 +22,6 @@ repo_description: Additional payroll modules for Odoo.
 repo_name: TREVI Payroll
 repo_slug: trevi-payroll
 repo_website: https://github.com/trevi-software/trevi-payroll
-use_pyproject_toml: false
-use_ruff: false
+use_pyproject_toml: true
+use_ruff: true
 
