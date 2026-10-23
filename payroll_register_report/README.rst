@@ -22,7 +22,8 @@ Payroll Register Report
 
 |badge1| |badge2| |badge3|
 
-This module prints a payroll register by batch run. Each batch run prints a summary of each payslip by salary rule category. One per line.
+This module prints a payroll register by batch run. Each batch run
+prints a summary of each payslip by salary rule category. One per line.
 
 **Table of contents**
 
@@ -43,17 +44,17 @@ Credits
 =======
 
 Authors
-~~~~~~~
+-------
 
 * TREVI Software
 
 Other credits
-~~~~~~~~~~~~~
+-------------
 
-* Michael Telahun Makonnen <mtm@trevi.et>
+- Michael Telahun Makonnen <mtm@trevi.et>
 
 Maintainers
-~~~~~~~~~~~
+-----------
 
 This module is part of the `trevi-software/trevi-payroll <https://github.com/trevi-software/trevi-payroll/tree/19.0/payroll_register_report>`_ project on GitHub.
 
