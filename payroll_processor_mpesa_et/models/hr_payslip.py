@@ -1,6 +1,6 @@
 import logging
 
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 from odoo.exceptions import ValidationError
 
 _logger = logging.getLogger(__name__)
@@ -41,15 +41,21 @@ class HrPayslip(models.Model):
     def payslip_cancel(self):
         if self.filtered(lambda slip: slip.paid_mpesa):
             raise ValidationError(
-                _("Cannot cancel a payslip that is already paid through M-Pesa.")
+                self.env._(
+                    "Cannot cancel a payslip that is already paid through M-Pesa."
+                )
             )
 
         return super().payslip_cancel()
 
     def unlink(self):
         if self.filtered(lambda slip: slip.paid_mpesa):
-            raise ValidationError(
-                _("Cannot delete a payslip that is already paid through M-Pesa.")
+            # An M-PESA payout cannot be reversed, so deleting an already paid
+            # payslip would lose the payout record.
+            raise ValidationError(  # pylint: disable=no-raise-unlink
+                self.env._(
+                    "Cannot delete a payslip that is already paid through M-Pesa."
+                )
             )
 
         return super().unlink()

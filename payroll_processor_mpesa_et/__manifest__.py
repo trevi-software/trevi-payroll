@@ -1,7 +1,7 @@
 {
     "name": "Safaricom ET payment processor",
     "summary": "Make salary payments through Safaricom Ethiopia",
-    "version": "18.0.1.0.0",
+    "version": "19.0.1.0.0",
     "author": "TREVI Software",
     "category": "Payroll",
     "license": "AGPL-3",

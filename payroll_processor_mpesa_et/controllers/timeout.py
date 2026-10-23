@@ -4,7 +4,7 @@ from odoo.http import Controller, route
 class TimeoutController(Controller):
     @route(
         "/payroll_processor_mpesa_et/v1/timeout",
-        type="json",
+        type="jsonrpc",
         auth="public",
         website=False,
         methods=["POST"],

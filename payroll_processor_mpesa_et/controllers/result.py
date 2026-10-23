@@ -4,7 +4,7 @@ from odoo.http import Controller, route
 class MyResultController(Controller):
     @route(
         "/payroll_processor_mpesa_et/v1/result",
-        type="json",
+        type="jsonrpc",
         auth="public",
         website=False,
         methods=["POST"],
