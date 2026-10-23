@@ -46,7 +46,7 @@ class TestHrPayslip(TestPayslipBase):
         self.alice_emp = self.env["hr.employee"].create(
             {
                 "name": "Sally",
-                "gender": "female",
+                "sex": "female",
                 "birthday": "1984-05-01",
                 "country_id": self.ref("base.be"),
                 "department_id": self.dept_rd.id,
@@ -68,13 +68,13 @@ class TestHrPayslip(TestPayslipBase):
     def create_contract(self, start, end, employee, wage, name=False):
         return self.Contract.create(
             {
-                "date_start": start,
-                "date_end": end,
+                "date_version": start,
+                "contract_date_start": start,
+                "contract_date_end": end,
                 "name": name if name else f"Contract for {employee.name}",
                 "wage": wage,
                 "employee_id": employee.id,
                 "struct_id": self.basic_pay_structure.id,
-                "kanban_state": "done",
                 "resource_calendar_id": self.resource_calendar_std.id,
             }
         )

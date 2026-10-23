@@ -83,9 +83,9 @@ class HrPayslip(models.Model):
         """
 
         dcEnd = False
-        if contract.date_end:
-            if contract.date_end <= self.date_to:
-                dcEnd = contract.date_end
+        if contract.contract_date_end:
+            if contract.contract_date_end <= self.date_to:
+                dcEnd = contract.contract_date_end
             else:
                 dcEnd = self.date_to
 
@@ -127,7 +127,7 @@ class HrPayslip(models.Model):
         dcEnd = self._get_end_date(contract)
 
         # both start and end of contract are out of the bounds of the payslip
-        if contract.date_start <= self.date_from and (
+        if contract.contract_date_start <= self.date_from and (
             not dcEnd or dcEnd >= self.date_to
         ):
             return 1
@@ -136,8 +136,8 @@ class HrPayslip(models.Model):
         #
         dcTempStart = self.date_from
         dcTempEnd = self.date_to
-        if contract.date_start > self.date_from:
-            dcTempStart = contract.date_start
+        if contract.contract_date_start > self.date_from:
+            dcTempStart = contract.contract_date_start
         if dcEnd and dcEnd < self.date_to:
             dcTempEnd = dcEnd
 
