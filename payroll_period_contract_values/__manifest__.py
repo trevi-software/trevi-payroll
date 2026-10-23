@@ -5,14 +5,14 @@
 {
     "name": "Payroll Period Schedule in Contracts",
     "summary": "Links payroll period schedules with employee contracts.",
-    "version": "18.0.1.0.0",
+    "version": "19.0.1.0.0",
     "category": "Payroll",
     "images": ["static/src/img/main_screenshot.png"],
     "license": "AGPL-3",
     "author": "TREVI Software, Michael Telahun Makonnen",
     "website": "https://github.com/trevi-software/trevi-payroll",
     "depends": [
-        "hr_contract",
+        "hr",
         "hr_contract_values_payroll",
         "payroll_periods",
     ],

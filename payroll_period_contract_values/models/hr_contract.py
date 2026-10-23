@@ -5,8 +5,13 @@
 from odoo import api, fields, models
 
 
-class HrContract(models.Model):
-    _inherit = "hr.contract"
+class HrVersion(models.Model):
+    """In Odoo 19 ``hr_contract`` was merged into ``hr`` and ``hr.contract``
+    was renamed ``hr.version``, so the payroll period schedule default is set
+    on the employee's contract version.
+    """
+
+    _inherit = "hr.version"
 
     @api.model
     def _get_pay_sched(self):

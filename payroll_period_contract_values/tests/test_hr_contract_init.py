@@ -22,7 +22,7 @@ class TestPayrollHrContractInit(TestContractInit):
                 "trial_period": 60,
             }
         )
-        contract = self.HrContract.create(
+        contract = self.HrVersion.create(
             {
                 "name": "C1",
                 "employee_id": self.eeJohn.id,
@@ -48,7 +48,7 @@ class TestPayrollHrContractInit(TestContractInit):
                 "pay_sched_id": pps.id,
             }
         )
-        contract = self.HrContract.create(
+        contract = self.HrVersion.create(
             {
                 "name": "C1",
                 "employee_id": self.eeJohn.id,

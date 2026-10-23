@@ -22,7 +22,9 @@ Payroll Period Schedule in Contracts
 
 |badge1| |badge2| |badge3|
 
-This module links Initial Contract Values and Payroll Period Schedules so that the payroll period schedule can automatically be populated for an employee contract.
+This module links Initial Contract Values and Payroll Period Schedules
+so that the payroll period schedule can automatically be populated for
+an employee contract.
 
 **Table of contents**
 
@@ -43,18 +45,18 @@ Credits
 =======
 
 Authors
-~~~~~~~
+-------
 
 * TREVI Software
 * Michael Telahun Makonnen
 
 Other credits
-~~~~~~~~~~~~~
+-------------
 
-* Michael Telahun Makonnen <mtm@trevi.et>
+- Michael Telahun Makonnen <mtm@trevi.et>
 
 Maintainers
-~~~~~~~~~~~
+-----------
 
 This module is part of the `trevi-software/trevi-payroll <https://github.com/trevi-software/trevi-payroll/tree/19.0/payroll_period_contract_values>`_ project on GitHub.
 
