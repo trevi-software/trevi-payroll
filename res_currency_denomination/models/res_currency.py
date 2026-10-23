@@ -22,7 +22,7 @@ class ResCurrencyDenomination(models.Model):
     ratio = fields.Float(
         help="Ratio of this denomination to the smallest integral denomination."
     )
-    value = fields.Float(digits=(12, 6))
+    value = fields.Float(digits=(12, 6), required=True)
 
     @api.constrains("value")
     def _check_value(self):

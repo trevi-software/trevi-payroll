@@ -27,7 +27,7 @@ class TestResCurrencyDenomination(TransactionCase):
             self.assertEqual(
                 item["qty"],
                 int(item["qty"]),
-                "Denomination quantity must be a whole number: %s" % item,
+                f"Denomination quantity must be a whole number: {item}",
             )
         self.assertAlmostEqual(
             self._total(breakdown),
@@ -44,7 +44,7 @@ class TestResCurrencyDenomination(TransactionCase):
                 self._total(breakdown),
                 amount,
                 2,
-                "Breakdown for %s must sum back to the amount" % amount,
+                f"Breakdown for {amount} must sum back to the amount",
             )
 
     def test_zero_value_denomination_is_rejected(self):
