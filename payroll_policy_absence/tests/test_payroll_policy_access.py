@@ -4,16 +4,18 @@
 from datetime import date
 
 from odoo.exceptions import AccessError
-from odoo.tests import common, new_test_user
+from odoo.tests import Form
+from odoo.tests.common import TransactionCase, new_test_user
 
 
-class TestPolicyAccess(common.TransactionCase):
+class TestPolicyAccess(TransactionCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
 
         cls.Policy = cls.env["hr.policy.absence"]
         cls.PolicyLine = cls.env["hr.policy.line.absence"]
+        cls.LeaveType = cls.env["hr.leave.type"]
         cls.leave_type = cls.env.ref("hr_holidays.leave_type_paid_time_off")
         cls.policy = cls.Policy.create({"name": "POLICY1", "date": date.today()})
         cls.line = cls.PolicyLine.create(
@@ -58,27 +60,40 @@ class TestPolicyAccess(common.TransactionCase):
             self.Policy.with_user(self.userHRM).create(
                 {"name": "POLICY2", "date": date.today()}
             )
-            self.OtPolicyLine.with_user(self.userHRM).create(
-                {"name": "line2", "type": "daily"}
+        with self.assertRaises(AccessError):
+            self.PolicyLine.with_user(self.userHRM).create(
+                {
+                    "name": "line2",
+                    "code": "L2",
+                    "type": "paid",
+                    "holiday_status_id": self.leave_type.id,
+                }
             )
         # Unlink fails
         with self.assertRaises(AccessError):
             self.policy.with_user(self.userHRM).unlink()
+        with self.assertRaises(AccessError):
             self.line.with_user(self.userHRM).unlink()
         # Read succeeds
-        try:
-            self.Policy.with_user(self.userHRM).browse(self.policy.id)
-        except AccessError:
-            self.fail("Caught an unexpected exception reading hr.policy.presence")
-        try:
-            self.PolicyLine.with_user(self.userHRM).browse(self.policy.id)
-        except AccessError:
-            self.fail("Caught an unexpected exception reading hr.policy.line.presence")
+        policy_data = (
+            self.Policy.with_user(self.userHRM)
+            .browse(self.policy.id)
+            .read(["name", "date"])
+        )
+        self.assertEqual(policy_data[0]["name"], "POLICY1")
+        line_data = (
+            self.PolicyLine.with_user(self.userHRM)
+            .browse(self.line.id)
+            .read(["name", "code"])
+        )
+        self.assertEqual(line_data[0]["name"], "Line1")
+        self.assertEqual(line_data[0]["code"], "L1")
         # Write fails
         with self.assertRaises(AccessError):
             self.Policy.with_user(self.userHRM).browse(self.policy.id).write(
                 {"name": "POLICY3"}
             )
+        with self.assertRaises(AccessError):
             self.PolicyLine.with_user(self.userHRM).browse(self.line.id).write(
                 {"name": "line3"}
             )
@@ -91,27 +106,38 @@ class TestPolicyAccess(common.TransactionCase):
             self.Policy.with_user(self.userPU).create(
                 {"name": "POL2", "date": date.today()}
             )
+        with self.assertRaises(AccessError):
             self.PolicyLine.with_user(self.userPU).create(
-                {"name": "line2", "type": "daily"}
+                {
+                    "name": "line2",
+                    "code": "L2",
+                    "type": "paid",
+                    "holiday_status_id": self.leave_type.id,
+                }
             )
         # Unlink fails
         with self.assertRaises(AccessError):
             self.policy.with_user(self.userPU).unlink()
+        with self.assertRaises(AccessError):
             self.line.with_user(self.userPU).unlink()
         # Read succeeds
-        try:
-            self.Policy.with_user(self.userPU).browse(self.policy.id)
-        except AccessError:
-            self.fail("Caught an unexpected exception reading hr.policy.presence")
-        try:
-            self.PolicyLine.with_user(self.userPU).browse(self.policy.id)
-        except AccessError:
-            self.fail("Caught an unexpected exception reading hr.policy.line.presence")
+        policy_data = (
+            self.Policy.with_user(self.userPU).browse(self.policy.id).read(["name"])
+        )
+        self.assertEqual(policy_data[0]["name"], "POLICY1")
+        line_data = (
+            self.PolicyLine.with_user(self.userPU)
+            .browse(self.line.id)
+            .read(["name", "code"])
+        )
+        self.assertEqual(line_data[0]["name"], "Line1")
+        self.assertEqual(line_data[0]["code"], "L1")
         # Write fails
         with self.assertRaises(AccessError):
             self.Policy.with_user(self.userPU).browse(self.policy.id).write(
                 {"name": "POL3"}
             )
+        with self.assertRaises(AccessError):
             self.PolicyLine.with_user(self.userPU).browse(self.line.id).write(
                 {"name": "line3"}
             )
@@ -120,48 +146,56 @@ class TestPolicyAccess(common.TransactionCase):
         """Payroll Manager has complete access"""
 
         # Read succeeds
-        try:
-            self.Policy.with_user(self.userPM).browse(self.policy.id)
-        except AccessError:
-            self.fail("Caught an unexpected exception reading hr.policy.presence")
-        try:
-            self.PolicyLine.with_user(self.userPM).browse(self.line.id)
-        except AccessError:
-            self.fail("Caught an unexpected exception reading hr.policy.line.presence")
+        policy_data = (
+            self.Policy.with_user(self.userPM).browse(self.policy.id).read(["name"])
+        )
+        self.assertEqual(policy_data[0]["name"], "POLICY1")
+        line_data = (
+            self.PolicyLine.with_user(self.userPM)
+            .browse(self.line.id)
+            .read(["name", "code"])
+        )
+        self.assertEqual(line_data[0]["name"], "Line1")
+        self.assertEqual(line_data[0]["code"], "L1")
         # Write succeeds
-        try:
-            self.Policy.with_user(self.userPM).browse(self.policy.id).write(
-                {"name": "XX"}
-            )
-        except AccessError:
-            self.fail("Caught an unexpected exception writing hr.policy.presence")
-        try:
-            self.PolicyLine.with_user(self.userPM).browse(self.line.id).write(
-                {"name": "XX"}
-            )
-        except AccessError:
-            self.fail("Caught an unexpected exception writing hr.policy.line.presence")
+        self.Policy.with_user(self.userPM).browse(self.policy.id).write({"name": "XX"})
+        self.PolicyLine.with_user(self.userPM).browse(self.line.id).write(
+            {"name": "XX"}
+        )
+        self.assertEqual(self.policy.name, "XX")
+        self.assertEqual(self.line.name, "XX")
         # Create/Unlink succeeds
-        try:
-            pol = self.Policy.with_user(self.userPM).create(
-                {"name": "Policy test pm", "date": date.today()}
-            )
-            pol.unlink()
-        except AccessError:
-            self.fail(
-                "Caught unexpected exception creating/unlinking hr.policy.presence"
-            )
-        try:
-            line = self.PolicyLine.with_user(self.userPM).create(
-                {
-                    "name": "line test pm",
-                    "code": "A",
-                    "type": "paid",
-                    "holiday_status_id": self.leave_type.id,
-                }
-            )
-            line.unlink()
-        except AccessError:
-            self.fail(
-                "Caught unexpected exception creating/unlinking hr.policy.line.presence"
-            )
+        pol = self.Policy.with_user(self.userPM).create(
+            {"name": "Policy test pm", "date": date.today()}
+        )
+        pol.unlink()
+        line = self.PolicyLine.with_user(self.userPM).create(
+            {
+                "name": "line test pm",
+                "code": "A",
+                "type": "paid",
+                "holiday_status_id": self.leave_type.id,
+            }
+        )
+        line.unlink()
+
+    def test_onchange_holiday_generates_name_and_code(self):
+        """Selecting a leave type fills the name and derives a default code"""
+
+        leave = self.LeaveType.create({"name": "Compassionate"})
+        with Form(self.PolicyLine) as form:
+            form.holiday_status_id = leave
+            form.type = "paid"
+            self.assertEqual(form.name, "Compassionate")
+            self.assertEqual(form.code, "COMPASSI")
+
+    def test_onchange_holiday_keeps_existing_code(self):
+        """An already set code is not overwritten by the onchange"""
+
+        leave = self.LeaveType.create({"name": "Compassionate"})
+        with Form(self.PolicyLine) as form:
+            form.code = "KEEP"
+            form.holiday_status_id = leave
+            form.type = "paid"
+            self.assertEqual(form.name, "Compassionate")
+            self.assertEqual(form.code, "KEEP")
