@@ -22,13 +22,15 @@ Default Salary Rules and Categories
 
 |badge1| |badge2| |badge3|
 
-This module defines a default set of salary rule and category code settings that can be used by an
-administrator to specify the codes of often used rules and categories. Developers can then rely on
-the codes configured in those settings to develop their modules regardless of the actual codes
-used by the administrator.  Salary rule categories modeled after these settings are made available.
-Additionaly a very basic set of salary rules that are essential to correct payslip calculations
-are included.
-In addition this module allows salary rule categories to be archived.
+This module defines a default set of salary rule and category code
+settings that can be used by an administrator to specify the codes of
+often used rules and categories. Developers can then rely on the codes
+configured in those settings to develop their modules regardless of the
+actual codes used by the administrator. Salary rule categories modeled
+after these settings are made available. Additionaly a very basic set of
+salary rules that are essential to correct payslip calculations are
+included. In addition this module allows salary rule categories to be
+archived.
 
 **Table of contents**
 
@@ -49,17 +51,17 @@ Credits
 =======
 
 Authors
-~~~~~~~
+-------
 
 * TREVI Software
 
 Other credits
-~~~~~~~~~~~~~
+-------------
 
-* Michael Telahun Makonnen <mtm@trevi.et>
+- Michael Telahun Makonnen <mtm@trevi.et>
 
 Maintainers
-~~~~~~~~~~~
+-----------
 
 This module is part of the `trevi-software/trevi-payroll <https://github.com/trevi-software/trevi-payroll/tree/19.0/payroll_default_salary_rules>`_ project on GitHub.
 
