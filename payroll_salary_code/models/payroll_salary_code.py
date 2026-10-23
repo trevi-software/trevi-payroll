@@ -8,6 +8,7 @@ class PayrollSalaryCode(models.Model):
     _name = "payroll.salary.code"
     _description = "Payroll Salary Code"
     _order = "code"
+    _rec_name = "code"
 
     _code_uniq = models.Constraint(
         "UNIQUE(code)",
