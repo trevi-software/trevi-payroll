@@ -22,7 +22,8 @@ Payroll Periods and Payslip Amendments
 
 |badge1| |badge2| |badge3|
 
-This module links Payslip Amendments and Payroll Periods so that each payslip amendment is associated with a payroll period.
+This module links Payslip Amendments and Payroll Periods so that each
+payslip amendment is associated with a payroll period.
 
 **Table of contents**
 
@@ -43,12 +44,12 @@ Credits
 =======
 
 Authors
-~~~~~~~
+-------
 
 * TREVI Software
 
 Maintainers
-~~~~~~~~~~~
+-----------
 
 This module is part of the `trevi-software/trevi-payroll <https://github.com/trevi-software/trevi-payroll/tree/19.0/payroll_period_payslip_amendment>`_ project on GitHub.
 
