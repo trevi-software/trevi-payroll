@@ -55,9 +55,12 @@ class TestHrPayslip(TestPayslipBase):
         contracts[0].contract_date_end = False
 
     def test_holiday_type_code(self):
-        self.mock_rule.condition_python = "result = worked_days.LVCODE"
+        # The rule must consume the code this module supplies (the leave type's
+        # own code), not an arbitrary placeholder, otherwise the test would pass
+        # even if the module stopped rewriting the worked-days line code.
+        self.mock_rule.condition_python = "result = worked_days.TESTLV"
         self.mock_rule.amount_python_compute = (
-            "result = worked_days.LVCODE.number_of_days"
+            "result = worked_days.TESTLV.number_of_days"
         )
 
         self.apply_contract_cron()
@@ -117,4 +120,17 @@ class TestHrPayslip(TestPayslipBase):
             ),
             1,
             "The 'WORK100' worked days line is still there",
+        )
+
+        # The salary rule reads worked_days.TESTLV, so its condition is met and
+        # it must produce a salary line whose amount equals the number of days
+        # supplied by the leave worked-days line.
+        salary_line = richard_payslip.line_ids.filtered(
+            lambda line: line.code == "TESTLV"
+        )
+        self.assertEqual(len(salary_line), 1, "The salary rule computed a salary line")
+        self.assertEqual(
+            salary_line.total,
+            1.0,
+            "The salary line amount equals the leave's worked days",
         )
