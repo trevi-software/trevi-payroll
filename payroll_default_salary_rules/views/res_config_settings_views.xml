@@ -121,8 +121,8 @@
                                     better to use the sum of the Gross Earnings
                                     category for calculations."
                     >
-                        <label for="categ_gross" />
-                        <field name="categ_gross" />
+                        <label for="rule_gross" />
+                        <field name="rule_gross" />
                     </setting>
                     <setting
                         help="Net earnings payslip line. Useful in cases where
@@ -131,8 +131,8 @@
                                 the sum of the Net Earnings category for
                                 calculations."
                     >
-                        <label for="categ_net" />
-                        <field name="categ_net" />
+                        <label for="rule_net" />
+                        <field name="rule_net" />
                     </setting>
                 </block>
             </xpath>
