@@ -32,7 +32,7 @@
                     <button
                         name="do_cancel"
                         type="object"
-                        invisible="state not in ['draft', 'validate']"
+                        invisible="state != 'validate'"
                         class="oe_highlight"
                         string="Cancel"
                     />

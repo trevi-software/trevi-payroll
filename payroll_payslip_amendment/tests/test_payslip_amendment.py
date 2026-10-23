@@ -277,6 +277,89 @@ class TestPayslipAmendment(common.TransactionCase):
             psa.state, "validate", "The payslip amendment must be in 'validate' state"
         )
 
+    def test_only_validated_amendments_applied(self):
+        dstart = date(2021, 1, 1)
+        dend = date(2021, 1, 31)
+
+        # Draft amendment: must be ignored.
+        self.Amendment.create(
+            {
+                "employee_id": self.eeSally.id,
+                "input_id": self.input_commision.id,
+                "amount": 100,
+                "date": date(2021, 1, 15),
+            }
+        )
+        # Cancelled amendment: must be ignored.
+        psa_cancel = self.Amendment.create(
+            {
+                "employee_id": self.eeSally.id,
+                "input_id": self.input_commision.id,
+                "amount": 100,
+                "date": date(2021, 1, 15),
+            }
+        )
+        psa_cancel.do_validate()
+        psa_cancel.do_cancel()
+        # Done (already applied) amendment: must be ignored.
+        psa_done = self.Amendment.create(
+            {
+                "employee_id": self.eeSally.id,
+                "input_id": self.input_commision.id,
+                "amount": 100,
+                "date": date(2021, 1, 15),
+            }
+        )
+        psa_done.do_validate()
+        psa_done.do_done()
+        # Confirmed amendment: the only one that must be applied.
+        psa_validate = self.Amendment.create(
+            {
+                "employee_id": self.eeSally.id,
+                "input_id": self.input_commision.id,
+                "amount": 100,
+                "date": date(2021, 1, 15),
+            }
+        )
+        psa_validate.do_validate()
+
+        self.create_contract(self.eeSally.id, start=dstart)
+        slip = self.Payslip.create(
+            {
+                "name": "A Payslip",
+                "employee_id": self.eeSally.id,
+                "date_from": dstart,
+                "date_to": dend,
+            }
+        )
+        slip.onchange_employee()
+
+        input_lines = slip.input_line_ids.filtered(lambda self: self.code == "SALECOM")
+        self.assertEqual(
+            len(input_lines), 1, "There must be a payslip input line for SALECOM"
+        )
+        _res = fields.Float.compare(input_lines[0].amount, 100.00, precision_digits=2)
+        self.assertEqual(
+            _res,
+            0,
+            "Only the confirmed amendment may change the payslip amount",
+        )
+        self.assertEqual(
+            psa_validate.state,
+            "done",
+            "The confirmed amendment must be applied and set to 'done'",
+        )
+        self.assertEqual(
+            psa_cancel.state,
+            "cancel",
+            "The cancelled amendment must be left untouched",
+        )
+        self.assertEqual(
+            psa_done.state,
+            "done",
+            "The already-applied amendment must be left untouched",
+        )
+
     def test_done_multiple_amendments(self):
         dpsa1 = date(2021, 1, 15)
         dpsa2 = date(2021, 1, 31)

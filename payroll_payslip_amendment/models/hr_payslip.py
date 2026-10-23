@@ -15,7 +15,7 @@ class HrPayslip(models.Model):
         psa_ids = self.env["hr.payslip.amendment"].search(
             [
                 ("employee_id", "=", contracts[0].employee_id.id),
-                ("state", "not in", ["draft, cancel, done"]),
+                ("state", "=", "validate"),
                 ("date", ">=", date_from),
                 ("date", "<=", date_to),
             ]
