@@ -50,8 +50,7 @@ class TestPayslipPaymentProcessor(TestPayslipBase):
         self.assertNotEqual(
             slip.state,
             "done",
-            "The payslip must not be marked done when the employee is paid "
-            "manually",
+            "The payslip must not be marked done when the employee is paid manually",
         )
 
     def test_action_payslip_payment_pays_none(self):
