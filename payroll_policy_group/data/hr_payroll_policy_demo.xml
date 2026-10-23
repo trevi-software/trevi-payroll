@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="policygroup_demo" model="hr.policy.group">
+        <field name="name">Demo group for all employees</field>
+    </record>
+</odoo>
