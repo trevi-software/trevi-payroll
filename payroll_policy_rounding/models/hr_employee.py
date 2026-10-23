@@ -2,7 +2,7 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 
-from odoo import _, exceptions, fields, models
+from odoo import exceptions, fields, models
 
 
 class HrAttendance(models.Model):
@@ -41,14 +41,12 @@ class HrAttendance(models.Model):
             attendance.write(vals)
         else:
             raise exceptions.UserError(
-                _(
+                self.env._(
                     "Cannot perform check out on %(empl_name)s, "
                     "could not find corresponding check in. "
                     "Your attendances have probably been modified "
-                    "manually by human resources."
+                    "manually by human resources.",
+                    empl_name=self.sudo().name,
                 )
-                % {
-                    "empl_name": self.sudo().name,
-                }
             )
         return attendance

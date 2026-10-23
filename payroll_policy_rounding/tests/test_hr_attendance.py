@@ -8,7 +8,7 @@ from . import common
 
 class TestHrAttendance(common.TestPolicyCommon):
     def test_create_no_contract(self):
-        ee = self.HrEmployee.create({"name": "John"})
+        ee = self.create_employee("John")
 
         att = self.HrAttendance.create(
             {
@@ -37,10 +37,9 @@ class TestHrAttendance(common.TestPolicyCommon):
         )
 
         start = date.today() - timedelta(days=1)
-        ee = self.HrEmployee.create({"name": "John"})
+        ee = self.create_employee("John")
         cc = self.create_contract(ee.id, start=start)
         cc.policy_group_id = pg
-        self.apply_contract_cron()
 
         att = self.HrAttendance.create(
             {

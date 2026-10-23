@@ -5,7 +5,7 @@
 {
     "name": "Rounding Policy",
     "summary": "Define attendance check-in and check-out rounding policies",
-    "version": "18.0.1.0.0",
+    "version": "19.0.1.0.0",
     "category": "Human Resources",
     "author": "TREVI Software,Michael Telahun Makonnen",
     "license": "AGPL-3",
@@ -13,7 +13,7 @@
     "website": "https://github.com/trevi-software/trevi-payroll",
     "depends": [
         "hr_attendance",
-        "hr_contract",
+        "hr",
         "payroll_policy_group",
         "resource_schedule",
     ],

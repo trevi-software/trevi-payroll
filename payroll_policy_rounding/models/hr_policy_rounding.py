@@ -74,13 +74,13 @@ class PolicyLine(models.Model):
     _name = "hr.policy.line.rounding"
     _description = "Attendance Rounding Policy Line"
     _rec_name = "attendance_type"
-    _sql_constraints = [
-        (
-            "uniq_id_att_type",
-            "UNIQUE(id,attendance_type)",
-            ("Attendance types must be unique per rounding policy line"),
-        )
-    ]
+    # Odoo 19 removed the ``_sql_constraints`` model attribute (it logs a
+    # deprecation warning, which the repo's CI escalates to an error); the
+    # replacement is a class-level ``models.Constraint`` named after it.
+    _uniq_id_att_type = models.Constraint(
+        "UNIQUE(id,attendance_type)",
+        "Attendance types must be unique per rounding policy line",
+    )
 
     policy_id = fields.Many2one(comodel_name="hr.policy.rounding")
     attendance_type = fields.Selection(

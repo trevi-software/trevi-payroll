@@ -12,9 +12,12 @@ class TestPolicyCommon(common.TransactionCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
+        cls.env = cls.env(context=dict(cls.env.context, tracking_disable=True))
 
         cls.HrAttendance = cls.env["hr.attendance"]
-        cls.HrContract = cls.env["hr.contract"]
+        # Odoo 19 merged ``hr_contract`` into ``hr``: a contract is now the
+        # employee's ``hr.version`` record.
+        cls.HrVersion = cls.env["hr.version"]
         cls.HrEmployee = cls.env["hr.employee"]
         cls.PolicyGroup = cls.env["hr.policy.group"]
         cls.Policy = cls.env["hr.policy.rounding"]
@@ -108,36 +111,49 @@ class TestPolicyCommon(common.TransactionCase):
         )
 
         # Employee with contract
-        cls.test_employee = cls.HrEmployee.create(
-            {"name": "Test Employee", "resource_calendar_id": cls.default_calendar.id}
+        cls.test_employee = cls.create_employee(
+            "Test Employee", resource_calendar_id=cls.default_calendar.id
         )
-        cls.test_contract = cls.create_contract(cls)
-        cls.apply_contract_cron(cls)
+        cls.test_contract = cls.create_contract()
 
-    def create_contract(
-        self, eid=None, state="draft", kanban_state="done", start=None, end=None
-    ):
+    @classmethod
+    def create_employee(cls, name="John", **vals):
+        """Create an employee whose initial version is backdated.
+
+        Every ``hr.employee`` in Odoo 19 owns an ``hr.version`` dated today and
+        ``hr.version`` enforces a unique ``(employee_id, date_version)`` index.
+        Backdating the initial version leaves room for the contract version
+        created by :meth:`create_contract`, which is dated today so that it is
+        the employee's *current* version.
+        """
+        vals.setdefault("date_version", "2000-01-01")
+        return cls.HrEmployee.create(dict({"name": name}, **vals))
+
+    @classmethod
+    def create_contract(cls, eid=None, start=None, end=None):
+        """Create the employee's contract as an ``hr.version`` record.
+
+        In Odoo 19 the contract is an ``hr.version``: the former
+        ``date_start`` / ``date_end`` are ``contract_date_start`` /
+        ``contract_date_end`` here. The ``state`` / ``kanban_state`` fields do
+        not exist any more; whether the contract is running is expressed by
+        the computed ``is_current`` / ``is_past`` / ``is_future`` flags.
+        """
         if eid is None:
-            eid = self.test_employee.id
+            eid = cls.test_employee.id
         if start is None:
             start = date.today()
-        return self.HrContract.create(
+        return cls.HrVersion.create(
             {
                 "name": "Contract",
                 "employee_id": eid,
-                "state": state,
-                "kanban_state": kanban_state,
+                "date_version": date.today(),
                 "wage": 1,
-                "date_start": start,
-                "date_end": end,
-                "resource_calendar_id": self.default_calendar.id,
+                "contract_date_start": start,
+                "contract_date_end": end,
+                "resource_calendar_id": cls.default_calendar.id,
             }
         )
-
-    def apply_contract_cron(self):
-        self.env.ref(
-            "hr_contract.ir_cron_data_contract_update_state"
-        ).method_direct_trigger()
 
     def make_datetime(self, d: date, sTime: str) -> datetime:
         return datetime.combine(d, datetime.strptime(sTime, "%H:%M").time())

@@ -22,10 +22,12 @@ Rounding Policy
 
 |badge1| |badge2| |badge3|
 
-This module defines properties of an attendance rounding policy, such as:
-    * Check-in grace period
-    * Early check-in and late check-out rounding
-    * Rounding intervals (for example 15 minute rounding intervals)
+This module defines properties of an attendance rounding policy, such
+as:
+
+- Check-in grace period
+- Early check-in and late check-out rounding
+- Rounding intervals (for example 15 minute rounding intervals)
 
 **Table of contents**
 
@@ -46,18 +48,18 @@ Credits
 =======
 
 Authors
-~~~~~~~
+-------
 
 * TREVI Software
 * Michael Telahun Makonnen
 
 Other credits
-~~~~~~~~~~~~~
+-------------
 
-* Michael Telahun Makonnen <mtm@trevi.et>
+- Michael Telahun Makonnen <mtm@trevi.et>
 
 Maintainers
-~~~~~~~~~~~
+-----------
 
 This module is part of the `trevi-software/trevi-payroll <https://github.com/trevi-software/trevi-payroll/tree/19.0/payroll_policy_rounding>`_ project on GitHub.
 

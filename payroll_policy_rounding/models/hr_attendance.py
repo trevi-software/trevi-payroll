@@ -55,14 +55,18 @@ class HrAttendance(models.Model):
 
     @api.model
     def get_contract_by_date(self, ee_id, d):
-        con_ids = self.env["hr.contract"].search(
+        # Odoo 19 merged hr_contract into hr: the contract is now the
+        # employee's ``hr.version`` and its validity dates are the
+        # ``contract_date_start`` / ``contract_date_end`` fields.
+        con_ids = self.env["hr.version"].search(
             [
                 ("employee_id", "=", ee_id),
-                ("date_start", "<=", d),
+                ("contract_date_start", "<=", d),
                 "|",
-                ("date_end", "=", False),
-                ("date_end", ">=", d),
-            ]
+                ("contract_date_end", "=", False),
+                ("contract_date_end", ">=", d),
+            ],
+            order="date_version desc",
         )
 
         if len(con_ids) > 0:
