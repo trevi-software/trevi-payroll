@@ -2,7 +2,7 @@
 # Copyright (C) 2011,2013 Michael Telahun Makonnen <mmakonnen@gmail.com>.
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl.html).
 
-from odoo import _, exceptions, fields, models
+from odoo import exceptions, fields, models
 
 
 class PayrollRegisterRun(models.TransientModel):
@@ -27,17 +27,17 @@ class PayrollRegisterRun(models.TransientModel):
         register_id = self.env.context.get("active_id", False)
         if not register_id:
             raise exceptions.ValidationError(
-                _("Programming Error !")
+                self.env._("Programming Error !")
                 + "\n"
-                + _("Unable to determine Payroll Register Id.")
+                + self.env._("Unable to determine Payroll Register Id.")
             )
         pr = PayrollRegister.browse(register_id)
 
         if not self.department_ids:
             raise exceptions.UserError(
-                _("Warning !")
+                self.env._("Warning !")
                 + "\n"
-                + _("No departments selected for payslip generation.")
+                + self.env._("No departments selected for payslip generation.")
             )
 
         # Create a payslip batch for each department, and then for each employee

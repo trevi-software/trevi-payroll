@@ -4,7 +4,7 @@
 
 from datetime import datetime
 
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 
 
 class HrPayrollRun(models.Model):
@@ -33,11 +33,11 @@ class HrPayrollRegister(models.Model):
     def _get_default_name(self):
         month_name = datetime.now().strftime("%B")
         year = datetime.now().year
-        name = _("Payroll for the Month of %(month)s %(year)s") % {
-            "month": month_name,
-            "year": year,
-        }
-        return name
+        return self.env._(
+            "Payroll for the Month of %(month)s %(year)s",
+            month=month_name,
+            year=year,
+        )
 
     name = fields.Char(
         string="Description",
