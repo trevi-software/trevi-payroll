@@ -4,7 +4,8 @@
 
 import math
 
-from odoo import fields, models
+from odoo import api, fields, models
+from odoo.exceptions import ValidationError
 from odoo.tools.float_utils import float_compare
 
 
@@ -22,6 +23,14 @@ class ResCurrencyDenomination(models.Model):
         help="Ratio of this denomination to the smallest integral denomination."
     )
     value = fields.Float(digits=(12, 6))
+
+    @api.constrains("value")
+    def _check_value(self):
+        for denom in self:
+            if denom.value <= 0:
+                raise ValidationError(
+                    self.env._("The denomination value must be greater than zero.")
+                )
 
 
 class ResCurrency(models.Model):
@@ -107,9 +116,9 @@ class ResCurrency(models.Model):
             if notes == 0 and cents >= (denom * cents_factor):
                 cooked_denom = int(denom * cents_factor)
                 if cents >= cooked_denom:
-                    denom_qty_list[denom] += cents / cooked_denom
+                    denom_qty_list[denom] += cents // cooked_denom
                 elif denom == denominations[-1]:
-                    denom_qty_list[denom] += cents / cents_factor
+                    denom_qty_list[denom] += cents // cents_factor
                     cents = 0
                 cents = cents % cooked_denom
 
