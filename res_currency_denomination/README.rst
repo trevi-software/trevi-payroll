@@ -22,7 +22,8 @@ Currency Denominations
 
 |badge1| |badge2| |badge3|
 
-This module provides an extensible method for denoting the denominations of individual currencies.
+This module provides an extensible method for denoting the denominations
+of individual currencies.
 
 **Table of contents**
 
@@ -43,18 +44,18 @@ Credits
 =======
 
 Authors
-~~~~~~~
+-------
 
 * TREVI Software
 * Michael Telahun Makonnen
 
 Other credits
-~~~~~~~~~~~~~
+-------------
 
-* Michael Telahun Makonnen <mtm@trevi.et>
+- Michael Telahun Makonnen <mtm@trevi.et>
 
 Maintainers
-~~~~~~~~~~~
+-----------
 
 This module is part of the `trevi-software/trevi-payroll <https://github.com/trevi-software/trevi-payroll/tree/19.0/res_currency_denomination>`_ project on GitHub.
 
