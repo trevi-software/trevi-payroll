@@ -11,10 +11,7 @@
                 expr="//page[@name='payroll_information']//div[@name='wage']"
                 position="after"
             >
-                <field
-                    name="payroll_salary_code"
-                    groups="hr.group_hr_manager"
-                />
+                <field name="payroll_salary_code" groups="hr.group_hr_manager" />
             </xpath>
         </field>
     </record>

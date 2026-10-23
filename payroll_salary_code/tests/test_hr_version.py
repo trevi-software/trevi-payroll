@@ -48,7 +48,7 @@ class TestHrVersion(TransactionCase):
             {
                 "name": name,
                 "employee_id": self.employee.id,
-                "date_version": "2010-01-%02d" % self._date_seq,
+                "date_version": f"2010-01-{self._date_seq:02d}",
                 "resource_calendar_id": self.calendar.id,
                 "wage": wage,
             }
