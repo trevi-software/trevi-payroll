@@ -32,7 +32,8 @@ This module provides a report to analyze payslips.
 Known issues / Roadmap
 ======================
 
-Changes to the "Include Category Codes" setting in Payroll Settings will not take effect until the module is upgraded.
+Changes to the "Include Category Codes" setting in Payroll Settings will
+not take effect until the module is upgraded.
 
 Bug Tracker
 ===========
@@ -48,17 +49,18 @@ Credits
 =======
 
 Authors
-~~~~~~~
+-------
 
 * TREVI Software
 
 Other credits
-~~~~~~~~~~~~~
+-------------
 
-Cybrosys Technologies (<https://www.cybrosys.com>)
+Cybrosys Technologies
+(<`https://www.cybrosys.com\\> <https://www.cybrosys.com\>>`__)
 
 Maintainers
-~~~~~~~~~~~
+-----------
 
 This module is part of the `trevi-software/trevi-payroll <https://github.com/trevi-software/trevi-payroll/tree/19.0/payroll_payslip_report>`_ project on GitHub.
 

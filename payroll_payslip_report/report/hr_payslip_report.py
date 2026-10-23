@@ -33,7 +33,7 @@ class PayrollReportView(models.Model):
 
     def _select(self):
         select_str = """
-            min(psl.id),
+            min(psl.id) as line_id,
             ps.id, ps.number,
             emp.id as name,
             dp.id as department_id,
@@ -53,9 +53,10 @@ class PayrollReportView(models.Model):
                 join hr_payslip ps on ps.id=psl.slip_id
                 join hr_salary_rule rlu on rlu.id = psl.salary_rule_id
                 join hr_employee emp on ps.employee_id=emp.id
+                join hr_version vrs on vrs.id = psl.contract_id
                 join hr_salary_rule_category rl on rl.id = psl.category_id
-                left join hr_department dp on emp.department_id=dp.id
-                left join hr_job jb on emp.job_id=jb.id
+                left join hr_department dp on vrs.department_id=dp.id
+                left join hr_job jb on vrs.job_id=jb.id
                 join res_company cmp on cmp.id=ps.company_id
              """
         return from_str
