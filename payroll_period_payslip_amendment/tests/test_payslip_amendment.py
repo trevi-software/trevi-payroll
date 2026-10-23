@@ -271,3 +271,71 @@ class TestPayslipAmendment(common.TransactionCase):
         )
 
         f.save()
+
+    def test_amendment_other_schedule_period(self):
+        """
+        The period used to widen the amendment date range must belong to the
+        contract's payroll schedule. Several schedules can define overlapping
+        periods; picking a period from another schedule would use the wrong
+        dates and drop an amendment dated at the end of the real period.
+        """
+
+        start = datetime(2021, 1, 1)
+        end = datetime(2021, 1, 31, 23, 59, 59)
+        pps = self.create_payroll_schedule("manual", start.date())
+        pp = self.create_payroll_period(pps.id, start, end)
+
+        # A second schedule whose period overlaps the January monthly period
+        # but starts earlier, so it is picked first when periods are not
+        # filtered by schedule.
+        pps_other = self.create_payroll_schedule(
+            "manual", datetime(2020, 12, 16).date()
+        )
+        self.create_payroll_period(
+            pps_other.id,
+            datetime(2020, 12, 16),
+            datetime(2021, 1, 15, 23, 59, 59),
+        )
+
+        run = self.Run.create(
+            {
+                "name": "Run A",
+                "date_start": start.date(),
+                "date_end": end.date(),
+                "period_id": pp.id,
+            }
+        )
+
+        # The contract belongs to the January monthly schedule only.
+        self.create_contract(self.eeSally.id, start.date(), end.date(), pps_id=pps.id)
+
+        # Amendment dated at the end of the January period.
+        psa = self.Amendment.create(
+            {
+                "employee_id": self.eeSally.id,
+                "input_id": self.input_commision.id,
+                "amount": 500,
+                "period_id": pp.id,
+            }
+        )
+        psa._onchange_period_id()
+        psa.do_validate()
+        self.assertEqual(psa.date, end.date())
+
+        slip = pp.create_payslip(self.eeSally.id, run_id=run.id)
+
+        input_lines = slip.input_line_ids.filtered(lambda self: self.code == "SALECOM")
+        self.assertEqual(
+            len(input_lines), 1, "There must be ONE payslip input line for SALECOM"
+        )
+
+        _res1 = fields.Float.compare(input_lines[0].amount, 500.0, precision_digits=2)
+        self.assertEqual(
+            _res1,
+            0,
+            "The amendment must use the contract's schedule period, not another "
+            "schedule's overlapping period",
+        )
+        self.assertEqual(
+            psa.state, "done", "The payslip amendment must be in 'done' state"
+        )
