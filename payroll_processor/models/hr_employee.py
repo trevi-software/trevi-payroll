@@ -1,4 +1,4 @@
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 
 
 class HrEmployee(models.Model):
@@ -12,10 +12,10 @@ class HrEmployee(models.Model):
     # should be in-sync with field in res.company -> payroll_payment_processor
     payroll_payment_processor = fields.Selection(
         selection=[
-            ("none", _("None")),
-            ("manual", _("Manual")),
+            ("none", "None"),
+            ("manual", "Manual"),
         ],
-        default=_get_payroll_payment_processor,
+        default=lambda self: self._get_payroll_payment_processor(),
         help="The payment processor to use when processing "
         "the employee's payslips for payment.",
         index=True,

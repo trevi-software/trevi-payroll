@@ -1,7 +1,6 @@
 import logging
 
 from odoo import api, fields, models
-from odoo.tools.translate import _
 
 _logger = logging.getLogger(__name__)
 
@@ -27,10 +26,10 @@ class HrPayslip(models.Model):
     # res.company and hr.employee
     payroll_payment_processor = fields.Selection(
         selection=[
-            ("none", _("None")),
-            ("manual", _("Manual")),
+            ("none", "None"),
+            ("manual", "Manual"),
         ],
-        default=_get_payroll_payment_processor,
+        default=lambda self: self._get_payroll_payment_processor(),
         help="The payment processor to use when processing the payslip for payment.",
         index=True,
         tracking=True,
