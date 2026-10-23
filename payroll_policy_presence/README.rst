@@ -23,12 +23,14 @@ Payroll Presence Policy
 |badge1| |badge2| |badge3|
 
 Define Employee Presence Policies
-=================================
+---------------------------------
+
 Define properties of an employee presence policy, such as:
-    * The number of regular working hours in a day
-    * The maximum possible hours
-    * Rate (multiplier of base wage)
-    * Accrual to time bank
+
+- The number of regular working hours in a day
+- The maximum possible hours
+- Rate (multiplier of base wage)
+- Accrual to time bank
 
 **Table of contents**
 
@@ -49,18 +51,18 @@ Credits
 =======
 
 Authors
-~~~~~~~
+-------
 
 * TREVI Software
 * Michael Telahun Makonnen
 
 Other credits
-~~~~~~~~~~~~~
+-------------
 
-* Michael Telahun Makonnen <mtm@trevi.et>
+- Michael Telahun Makonnen <mtm@trevi.et>
 
 Maintainers
-~~~~~~~~~~~
+-----------
 
 This module is part of the `trevi-software/trevi-payroll <https://github.com/trevi-software/trevi-payroll/tree/19.0/payroll_policy_presence>`_ project on GitHub.
 
