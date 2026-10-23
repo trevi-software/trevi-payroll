@@ -22,7 +22,8 @@ Payroll Salary Code
 
 |badge1| |badge2| |badge3|
 
-Implements codes that can be associated with various other items (for example hr.employee) to denote salary levels.
+Implements codes that can be associated with various other items (for
+example hr.employee) to denote salary levels.
 
 **Table of contents**
 
@@ -43,17 +44,17 @@ Credits
 =======
 
 Authors
-~~~~~~~
+-------
 
 * TREVI Software
 
 Other credits
-~~~~~~~~~~~~~
+-------------
 
-* Michael Telahun Makonnen <michael.telahun@dindin.et>
+- Michael Telahun Makonnen <michael.telahun@dindin.et>
 
 Maintainers
-~~~~~~~~~~~
+-----------
 
 This module is part of the `trevi-software/trevi-payroll <https://github.com/trevi-software/trevi-payroll/tree/19.0/payroll_salary_code>`_ project on GitHub.
 

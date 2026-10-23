@@ -9,9 +9,10 @@ class PayrollSalaryCode(models.Model):
     _description = "Payroll Salary Code"
     _order = "code"
 
-    _sql_constraints = [
-        ("code_uniq", "unique(code)", "The code must be unique."),
-    ]
+    _code_uniq = models.Constraint(
+        "UNIQUE(code)",
+        "The code must be unique.",
+    )
 
     code = fields.Char(
         required=True,
@@ -23,7 +24,7 @@ class PayrollSalaryCode(models.Model):
     )
     contract_ids = fields.One2many(
         string="Contracts",
-        comodel_name="hr.contract",
+        comodel_name="hr.version",
         inverse_name="payroll_salary_code",
         help="Contracts the salary code is assigned to.",
     )

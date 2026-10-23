@@ -4,7 +4,7 @@
 {
     "name": "Payroll Salary Code",
     "summary": "Manage payroll salary codes.",
-    "version": "18.0.1.0.0",
+    "version": "19.0.1.0.0",
     "category": "Payroll",
     "author": "TREVI Software",
     "license": "AGPL-3",
@@ -15,7 +15,7 @@
     ],
     "data": [
         "security/ir.model.access.csv",
-        "views/hr_contract_views.xml",
+        "views/hr_version_views.xml",
         "views/payroll_salary_code_views.xml",
     ],
     "installable": True,

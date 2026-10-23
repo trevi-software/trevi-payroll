@@ -4,42 +4,58 @@
 from odoo.tests.common import TransactionCase
 
 
-class TestHrContract(TransactionCase):
-    def setUp(self):
-        super().setUp()
+class TestHrVersion(TransactionCase):
+    """Odoo 19 merged ``hr.contract`` into ``hr``, so the salary code now lives
+    on ``hr.version``."""
 
-        self.Contract = self.env["hr.contract"]
-        self.Employee = self.env["hr.employee"]
-        self.SalaryCode = self.env["payroll.salary.code"]
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.env = cls.env(context=dict(cls.env.context, tracking_disable=True))
 
-        self.code_tra = self.SalaryCode.create(
+        cls.Version = cls.env["hr.version"]
+        cls.Employee = cls.env["hr.employee"]
+        cls.SalaryCode = cls.env["payroll.salary.code"]
+
+        cls.code_tra = cls.SalaryCode.create(
             {
                 "code": "TRA",
                 "description": "Transport allowance",
             }
         )
-        self.code_hse = self.SalaryCode.create(
+        cls.code_hse = cls.SalaryCode.create(
             {
                 "code": "HSE",
                 "description": "Housing allowance",
             }
         )
 
-        self.employee = self.Employee.create({"name": "Test Employee"})
-        self.calendar = self.env["resource.calendar"].create({"name": "Test Calendar"})
+        # An employee always owns a version dated today, and
+        # (employee_id, date_version) is unique. Backdate that first version so
+        # the versions created by the tests do not collide with it.
+        cls.employee = cls.Employee.create(
+            {"name": "Test Employee", "date_version": "2000-01-01"}
+        )
+        cls.calendar = cls.env["resource.calendar"].create({"name": "Test Calendar"})
+
+    def setUp(self):
+        super().setUp()
+        self._date_seq = 0
 
     def _create_contract(self, name="Test Contract", wage=1000):
-        return self.Contract.create(
+        self._date_seq += 1
+        return self.Version.create(
             {
                 "name": name,
                 "employee_id": self.employee.id,
+                "date_version": "2010-01-%02d" % self._date_seq,
                 "resource_calendar_id": self.calendar.id,
                 "wage": wage,
             }
         )
 
     def test_field_present(self):
-        """The many2one field exists on hr.contract."""
+        """The many2one field exists on hr.version."""
         contract = self._create_contract()
         self.assertFalse(contract.payroll_salary_code)
 
