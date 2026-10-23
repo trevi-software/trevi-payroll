@@ -1,0 +1,45 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* payroll_period_contract_values
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-23 13:31+0000\n"
+"PO-Revision-Date: 2026-10-23 13:31+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: payroll_period_contract_values
+#: model:ir.model.fields,field_description:payroll_period_contract_values.field_hr_contract_init__display_name
+#: model:ir.model.fields,field_description:payroll_period_contract_values.field_hr_version__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: payroll_period_contract_values
+#: model:ir.model,name:payroll_period_contract_values.model_hr_version
+msgid "Employee Contract / Version"
+msgstr ""
+
+#. module: payroll_period_contract_values
+#: model:ir.model.fields,field_description:payroll_period_contract_values.field_hr_contract_init__id
+#: model:ir.model.fields,field_description:payroll_period_contract_values.field_hr_version__id
+msgid "ID"
+msgstr ""
+
+#. module: payroll_period_contract_values
+#: model:ir.model,name:payroll_period_contract_values.model_hr_contract_init
+msgid "Initial Contract Settings"
+msgstr ""
+
+#. module: payroll_period_contract_values
+#: model:ir.model.fields,field_description:payroll_period_contract_values.field_hr_contract_init__pay_sched_id
+#: model:ir.model.fields,field_description:payroll_period_contract_values.field_hr_employee__pps_id
+#: model:ir.model.fields,field_description:payroll_period_contract_values.field_hr_version__pps_id
+msgid "Payroll Period Schedule"
+msgstr ""
