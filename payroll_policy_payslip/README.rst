@@ -22,8 +22,9 @@ Payroll Policy Payslip
 
 |badge1| |badge2| |badge3|
 
-This module applies payslip processing using payroll policies. It processes an employee's payslip
-using the presense, absence, OT, and accrual policies defined in the system.
+This module applies payslip processing using payroll policies. It
+processes an employee's payslip using the presense, absence, OT, and
+accrual policies defined in the system.
 
 **Table of contents**
 
@@ -44,18 +45,18 @@ Credits
 =======
 
 Authors
-~~~~~~~
+-------
 
 * TREVI Software
 * Michael Telahun Makonnen
 
 Other credits
-~~~~~~~~~~~~~
+-------------
 
-* Michael Telahun Makonnen <mtm@trevi.et>
+- Michael Telahun Makonnen <mtm@trevi.et>
 
 Maintainers
-~~~~~~~~~~~
+-----------
 
 This module is part of the `trevi-software/trevi-payroll <https://github.com/trevi-software/trevi-payroll/tree/19.0/payroll_policy_payslip>`_ project on GitHub.
 

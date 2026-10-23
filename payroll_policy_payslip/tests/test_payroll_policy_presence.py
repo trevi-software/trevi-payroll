@@ -16,7 +16,7 @@ class TestPresencePolicy(common.TestHrPayslip):
         cls.AccrualPolicy = cls.env["hr.policy.accrual"]
         cls.AccrualPolicyLine = cls.env["hr.policy.line.accrual"]
 
-        cls.lt = cls.LeaveType.create({"name": "Rest-day Compensatory", "code": "ARD"})
+        cls.lt = cls.LeaveType.create({"name": "Rest-day Compensatory"})
         cls.aa = cls.Accrual.create(
             {"name": "Compensatory Rest day", "holiday_status_id": cls.lt.id}
         )
@@ -45,7 +45,7 @@ class TestPresencePolicy(common.TestHrPayslip):
             {
                 "name": "Accrual test rule",
                 "code": "ACRTEST",
-                "category_id": cls.env.ref("payroll.ALW").id,
+                "category_id": cls.rule_category.id,
                 "sequence": 6,
                 "amount_select": "code",
                 "amount_python_compute": "result = 0",
@@ -75,7 +75,6 @@ class TestPresencePolicy(common.TestHrPayslip):
         start = date(2022, 4, 1)
         end = date(2022, 4, 30)
         self.create_contract(contract_start, False, self.richard_emp, 5000.0)
-        self.apply_contract_cron()
 
         # I create attendance for one day
         self.Attendance.create(
@@ -127,7 +126,6 @@ class TestPresencePolicy(common.TestHrPayslip):
         start = date(2022, 4, 1)
         end = date(2022, 4, 30)
         self.create_contract(contract_start, False, self.richard_emp, 5000.0)
-        self.apply_contract_cron()
 
         # I create attendance on a public holiday
         self.Attendance.create(
@@ -181,7 +179,6 @@ class TestPresencePolicy(common.TestHrPayslip):
         start = date(2022, 4, 1)
         end = date(2022, 4, 30)
         self.create_contract(contract_start, False, self.richard_emp, 5000.0)
-        self.apply_contract_cron()
 
         # I create attendance for seven days in a row
         monday = date(2022, 4, 4)
@@ -264,7 +261,6 @@ class TestPresencePolicy(common.TestHrPayslip):
         start = date(2022, 4, 1)
         end = date(2022, 4, 30)
         self.create_contract(contract_start, False, self.richard_emp, 5000.0)
-        self.apply_contract_cron()
 
         # I create attendance for eight days in a row
         monday = date(2022, 4, 4)

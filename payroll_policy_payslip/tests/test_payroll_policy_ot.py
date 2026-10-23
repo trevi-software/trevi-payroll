@@ -19,7 +19,7 @@ class TestPresencePolicy(common.TestHrPayslip):
             {
                 "name": "OT Test rule",
                 "code": "OTTEST",
-                "category_id": cls.env.ref("payroll.ALW").id,
+                "category_id": cls.rule_category.id,
                 "sequence": 6,
                 "amount_select": "code",
                 "amount_python_compute": "result = 0",
@@ -32,7 +32,7 @@ class TestPresencePolicy(common.TestHrPayslip):
             {
                 "name": "OT 2 Test rule",
                 "code": "OTTEST2",
-                "category_id": cls.env.ref("payroll.ALW").id,
+                "category_id": cls.rule_category.id,
                 "sequence": 7,
                 "amount_select": "code",
                 "amount_python_compute": "result = 0",
@@ -120,7 +120,6 @@ class TestPresencePolicy(common.TestHrPayslip):
         start = date(2022, 4, 1)
         end = date(2022, 4, 30)
         self.create_contract(contract_start, False, self.richard_emp, 5000.0)
-        self.apply_contract_cron()
 
         # I create attendance for one day
         self.Attendance.create(
@@ -188,7 +187,6 @@ class TestPresencePolicy(common.TestHrPayslip):
         start = date(2022, 4, 1)
         end = date(2022, 4, 30)
         self.create_contract(contract_start, False, self.richard_emp, 5000.0)
-        self.apply_contract_cron()
 
         # I create attendance for one day
         self.Attendance.create(
@@ -256,7 +254,6 @@ class TestPresencePolicy(common.TestHrPayslip):
         start = date(2022, 4, 1)
         end = date(2022, 4, 30)
         self.create_contract(contract_start, False, self.richard_emp, 5000.0)
-        self.apply_contract_cron()
 
         # I create attendance for one day
         self.Attendance.create(
@@ -327,7 +324,6 @@ class TestPresencePolicy(common.TestHrPayslip):
         start = date(2022, 4, 1)
         end = date(2022, 4, 30)
         self.create_contract(contract_start, False, self.richard_emp, 5000.0)
-        self.apply_contract_cron()
 
         # I create attendance for one day
         self.Attendance.create(
@@ -402,7 +398,6 @@ class TestPresencePolicy(common.TestHrPayslip):
         start = date(2022, 4, 1)
         end = date(2022, 4, 30)
         self.create_contract(contract_start, False, self.richard_emp, 5000.0)
-        self.apply_contract_cron()
 
         # I create attendance for one day to include regurlar, OT, and Night OT hours
         self.Attendance.create(
@@ -490,7 +485,6 @@ class TestPresencePolicy(common.TestHrPayslip):
         start = date(2022, 4, 1)
         end = date(2022, 4, 30)
         self.create_contract(contract_start, False, self.richard_emp, 5000.0)
-        self.apply_contract_cron()
 
         # I create attendance for seven days
         monday = date(2022, 4, 4)
@@ -589,7 +583,6 @@ class TestPresencePolicy(common.TestHrPayslip):
         start = date(2022, 4, 1)
         end = date(2022, 4, 30)
         self.create_contract(contract_start, False, self.richard_emp, 5000.0)
-        self.apply_contract_cron()
 
         # I create attendance for five days
         monday = date(2022, 4, 1)

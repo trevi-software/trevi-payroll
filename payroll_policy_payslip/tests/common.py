@@ -13,7 +13,7 @@ class TestHrPayslip(common.TransactionCase):
     def setUpClass(cls):
         super().setUpClass()
 
-        cls.Contract = cls.env["hr.contract"]
+        cls.Contract = cls.env["hr.version"]
         cls.HrPayslip = cls.env["hr.payslip"]
         cls.Rule = cls.env["hr.salary.rule"]
         cls.PolicyGroup = cls.env["hr.policy.group"]
@@ -23,16 +23,23 @@ class TestHrPayslip(common.TransactionCase):
         cls.PresencePolicyLine = cls.env["hr.policy.line.presence"]
 
         cls.resource_calendar_std = cls.env.ref("resource.resource_calendar_std")
-        cls.payroll_structure = cls.env.ref("payroll.structure_base")
+
+        # ``payroll.structure_base`` and the ``ALW`` category only exist in the
+        # ``payroll`` demo data, which is not installed by default, so build
+        # the minimal structure the tests need.
+        cls.rule_category = cls.env["hr.salary.rule.category"].create(
+            {"name": "Allowance", "code": "ALW"}
+        )
+        cls.payroll_structure = cls.env["hr.payroll.structure"].create(
+            {"name": "Base for new structures", "code": "BASE"}
+        )
 
         # Create a new employee "Richard"
         cls.richard_emp = cls.env["hr.employee"].create(
             {
                 "name": "Richard",
-                "gender": "male",
                 "birthday": "1984-05-01",
                 "country_id": cls.env.ref("base.be").id,
-                "department_id": cls.env.ref("hr.dep_rd").id,
                 "resource_calendar_id": cls.resource_calendar_std.id,
                 "tz": "Africa/Addis_Ababa",
             }
@@ -43,7 +50,7 @@ class TestHrPayslip(common.TransactionCase):
             {
                 "name": "Test rule",
                 "code": "TEST",
-                "category_id": cls.env.ref("payroll.ALW").id,
+                "category_id": cls.rule_category.id,
                 "sequence": 5,
                 "amount_select": "code",
                 "amount_python_compute": "result=contract.wage",
@@ -106,15 +113,20 @@ class TestHrPayslip(common.TransactionCase):
         cls.default_policy_group.presence_policy_ids = [(4, cls.presence_policy.id)]
 
     def create_contract(self, start, end, employee, wage, name=False):
+        # Odoo 19 replaced ``hr.contract`` with ``hr.version``. Every employee
+        # owns a version dated today, so the test contract is created with a
+        # backdated ``date_version`` (unique per employee) and its own start
+        # date; otherwise the computed ``date_end`` would be capped by the
+        # employee's default version and the contract would look historical.
         return self.Contract.create(
             {
-                "date_start": start,
-                "date_end": end,
                 "name": name if name else f"Contract for {employee.name}",
-                "wage": wage,
                 "employee_id": employee.id,
+                "date_version": start,
+                "contract_date_start": start,
+                "contract_date_end": end,
+                "wage": wage,
                 "struct_id": self.payroll_structure.id,
-                "kanban_state": "done",
                 "resource_calendar_id": self.resource_calendar_std.id,
                 "policy_group_id": self.default_policy_group.id,
             }
@@ -134,11 +146,6 @@ class TestHrPayslip(common.TransactionCase):
                 "date_to": end,
             }
         )
-
-    def apply_contract_cron(self):
-        self.env.ref(
-            "hr_contract.ir_cron_data_contract_update_state"
-        ).method_direct_trigger()
 
     def localize_dt(self, dt, tz, reverse=False):
         """

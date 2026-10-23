@@ -3,7 +3,7 @@
 
 from datetime import datetime, timedelta
 
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 
 
 class LastXDays:
@@ -459,7 +459,7 @@ class HrPayslip(models.Model):
 
             attendances = {
                 "MAX": {
-                    "name": _("Maximum Possible Working Hours"),
+                    "name": self.env._("Maximum Possible Working Hours"),
                     "sequence": 1,
                     "code": "MAX",
                     "number_of_days": 0.0,

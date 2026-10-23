@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 
 from pytz import timezone, utc
 
-from odoo import _, api, exceptions, models
+from odoo import api, exceptions, models
 
 
 class HrAttendance(models.Model):
@@ -154,12 +154,13 @@ class HrAttendance(models.Model):
             )
             if len(my_list2) == 0:
                 raise exceptions.ValidationError(
-                    _("Attendance Error!"),
-                    _(
+                    self.env._("Attendance Error!"),
+                    self.env._(
                         "There is not a final sign-out record for "
-                        "%(employee)s on %(day)s"
-                    )
-                    % {"employee": employee.name, "day": dDay},
+                        "%(employee)s on %(day)s",
+                        employee=employee.name,
+                        day=dDay,
+                    ),
                 )
 
             check_in, check_out = my_list2[0]
@@ -178,12 +179,13 @@ class HrAttendance(models.Model):
 
             else:
                 raise exceptions.ValidationError(
-                    _("Attendance Error!"),
-                    _(
+                    self.env._("Attendance Error!"),
+                    self.env._(
                         "There is a sign-in with no corresponding sign-out"
-                        "for %(employee)s on %(day)s"
-                    )
-                    % {"employee": employee.name, "day": dDay},
+                        "for %(employee)s on %(day)s",
+                        employee=employee.name,
+                        day=dDay,
+                    ),
                 )
         return (sin, sout)
 
@@ -304,9 +306,14 @@ class HrAttendance(models.Model):
         sin, sout = self._get_normalized_punches(contract, dDay, punches_list)
         if len(sin) != len(sout):
             raise exceptions.ValidationError(
-                _("Number of Sign-in and Sign-out records do not match!"),
-                _("Employee: %(name)s\nSign-in(s): %(in)s\nSign-out(s): %(out)s")
-                % {"name": contract.employee_id.name, "in": sin, "out": sout},
+                self.env._("Number of Sign-in and Sign-out records do not match!"),
+                self.env._(
+                    "Employee: %(name)s\nSign-in(s): %(sign_in)s"
+                    "\nSign-out(s): %(sign_out)s",
+                    name=contract.employee_id.name,
+                    sign_in=str(sin),
+                    sign_out=str(sout),
+                ),
             )
 
         return sin, sout

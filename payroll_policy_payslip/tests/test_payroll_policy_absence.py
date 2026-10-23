@@ -21,7 +21,7 @@ class TestAbsencePolicy(common.TestHrPayslip):
             {
                 "name": "Absence test rule",
                 "code": "ABTEST",
-                "category_id": cls.env.ref("payroll.ALW").id,
+                "category_id": cls.rule_category.id,
                 "sequence": 6,
                 "amount_select": "code",
                 "amount_python_compute": "result = 0",
@@ -31,7 +31,7 @@ class TestAbsencePolicy(common.TestHrPayslip):
             {
                 "name": "AWOL test rule",
                 "code": "AWTEST",
-                "category_id": cls.env.ref("payroll.ALW").id,
+                "category_id": cls.rule_category.id,
                 "sequence": 6,
                 "amount_select": "code",
                 "amount_python_compute": "result = 0",
@@ -44,7 +44,6 @@ class TestAbsencePolicy(common.TestHrPayslip):
         cls.awol_leave_type = cls.LeaveType.create(
             {
                 "name": "Absent without Leave",
-                "code": "AWOL",
                 "unpaid": True,
             }
         )
@@ -53,16 +52,14 @@ class TestAbsencePolicy(common.TestHrPayslip):
         cls.sick_leave_type = cls.LeaveType.create(
             {
                 "name": "Sick Leave",
-                "code": "SICK50",
-                "requires_allocation": "no",
+                "requires_allocation": False,
                 "leave_validation_type": "hr",
             }
         )
         cls.hourly_leave_type = cls.LeaveType.create(
             {
                 "name": "Hourly Leave",
-                "code": "HOURLY",
-                "requires_allocation": "no",
+                "requires_allocation": False,
                 "leave_validation_type": "hr",
                 "request_unit": "hour",
             }
@@ -125,7 +122,6 @@ class TestAbsencePolicy(common.TestHrPayslip):
         start = date(2022, 4, 1)
         end = date(2022, 4, 30)
         self.create_contract(contract_start, False, self.richard_emp, 5000.0)
-        self.apply_contract_cron()
 
         # I create an employee Payslip and process it
         richard_payslip = self.create_payslip(
@@ -188,7 +184,6 @@ class TestAbsencePolicy(common.TestHrPayslip):
         start = date(2022, 4, 1)
         end = date(2022, 4, 30)
         self.create_contract(contract_start, False, self.richard_emp, 5000.0)
-        self.apply_contract_cron()
 
         # I create an employee Payslip and process it
         richard_payslip = self.create_payslip(
@@ -260,7 +255,6 @@ class TestAbsencePolicy(common.TestHrPayslip):
         start = date(2022, 4, 1)
         end = date(2022, 4, 30)
         self.create_contract(contract_start, False, self.richard_emp, 5000.0)
-        self.apply_contract_cron()
 
         # I create an employee Payslip and process it
         richard_payslip = self.create_payslip(
@@ -344,7 +338,6 @@ class TestAbsencePolicy(common.TestHrPayslip):
         start = date(2022, 4, 1)
         end = date(2022, 4, 30)
         self.create_contract(contract_start, False, self.richard_emp, 5000.0)
-        self.apply_contract_cron()
 
         # I create an employee Payslip and process it
         richard_payslip = self.create_payslip(
