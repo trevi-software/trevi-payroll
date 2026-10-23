@@ -401,7 +401,7 @@ class TestAccrualPolicy(common.TransactionCase):
         """Two policy groups sharing a policy both receive accruals."""
 
         today = date.today()
-        start = date(today.year - 1, today.month, today.day)
+        start = today - relativedelta(years=1)
 
         ee1 = self.create_employee("Shared1")
         c1 = self.create_contract(ee1.id, start)
