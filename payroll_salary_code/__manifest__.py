@@ -1,0 +1,23 @@
+# Copyright (C) 2025 Trevi Software (https://trevi.et)
+# License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl.html).
+
+{
+    "name": "Payroll Salary Code",
+    "summary": "Manage payroll salary codes.",
+    "version": "19.0.1.0.0",
+    "category": "Payroll",
+    "author": "TREVI Software",
+    "license": "AGPL-3",
+    "website": "https://github.com/trevi-software/trevi-payroll",
+    "depends": [
+        "hr",
+        "payroll",
+    ],
+    "data": [
+        "security/ir.model.access.csv",
+        "views/hr_version_views.xml",
+        "views/payroll_salary_code_views.xml",
+    ],
+    "installable": True,
+    "application": False,
+}
