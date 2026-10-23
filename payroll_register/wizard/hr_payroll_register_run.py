@@ -46,8 +46,8 @@ class PayrollRegisterRun(models.TransientModel):
         for dept in self.department_ids:
             run_res = {
                 "name": dept.complete_name,
-                "date_start": pr.date_start,
-                "date_end": pr.date_end,
+                "date_start": fields.Date.to_date(pr.date_start),
+                "date_end": fields.Date.to_date(pr.date_end),
                 "register_id": register_id,
             }
             run_id = PayslipRun.create(run_res)

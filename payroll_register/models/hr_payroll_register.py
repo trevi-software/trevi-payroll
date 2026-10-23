@@ -4,8 +4,7 @@
 
 from datetime import datetime
 
-from odoo import api, fields, models
-from odoo.tools.translate import _
+from odoo import _, api, fields, models
 
 
 class HrPayrollRun(models.Model):
@@ -24,13 +23,11 @@ class HrPayrollRun(models.Model):
 class HrPayrollRegister(models.Model):
     _name = "hr.payroll.register"
     _description = "Payroll Register"
-    _sql_constraints = [
-        (
-            "unique_name",
-            "CHECK(1=1)",
-            ("Payroll Register description must be unique per company."),
-        )
-    ]
+
+    _unique_name = models.Constraint(
+        "CHECK(1=1)",
+        "Payroll Register description must be unique per company.",
+    )
 
     @api.model
     def _get_default_name(self):
@@ -86,20 +83,19 @@ class HrPayrollRegister(models.Model):
     )
 
     def _compute_change(self):
-        res = 0
         for reg in self:
+            res = 0
             for den in reg.denomination_ids:
                 res += den.denomination * den.denomination_qty
             reg.exact_change = res
 
-    def name_get(self):
-        res = []
+    @api.depends("name", "period_name")
+    def _compute_display_name(self):
         for rec in self:
             if not rec.period_name or rec.period_name in rec.name:
-                res.append((rec.id, f"{rec.name}"))
+                rec.display_name = f"{rec.name}"
             else:
-                res.append((rec.id, f"{rec.period_name} {rec.name}"))
-        return res
+                rec.display_name = f"{rec.period_name} {rec.name}"
 
     def action_delete_runs(self):
         PayslipRun = self.env["hr.payslip.run"]

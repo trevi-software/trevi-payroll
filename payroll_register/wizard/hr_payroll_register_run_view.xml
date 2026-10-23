@@ -6,11 +6,9 @@
         <field name="type">form</field>
         <field name="arch" type="xml">
             <form string="Payslip Creation by Department">
-                <group colspan="4">
-                    <separator string="Payslips by Department" colspan="4" />
-                    <h3
-                    >"This wizard will generate payslips for selected departments."</h3>
-                    <newline />
+                <separator string="Payslips by Department" />
+                <p>"This wizard will generate payslips for selected departments."</p>
+                <group>
                     <field name="department_ids" nolabel="1" />
                 </group>
                 <separator />

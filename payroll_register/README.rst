@@ -22,7 +22,8 @@ Payroll Register
 
 |badge1| |badge2| |badge3|
 
-This module links payslips to one payroll register. Payslips are organized by department.
+This module links payslips to one payroll register. Payslips are
+organized by department.
 
 **Table of contents**
 
@@ -43,18 +44,18 @@ Credits
 =======
 
 Authors
-~~~~~~~
+-------
 
 * TREVI Software
 * Michael Telahun Makonnen
 
 Other credits
-~~~~~~~~~~~~~
+-------------
 
-* Michael Telahun Makonnen <mtm@trevi.et>
+- Michael Telahun Makonnen <mtm@trevi.et>
 
 Maintainers
-~~~~~~~~~~~
+-----------
 
 This module is part of the `trevi-software/trevi-payroll <https://github.com/trevi-software/trevi-payroll/tree/19.0/payroll_register>`_ project on GitHub.
 

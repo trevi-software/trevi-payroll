@@ -12,6 +12,7 @@ class TestPayrollRegister(common.TransactionCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
+        cls.env = cls.env(context=dict(cls.env.context, tracking_disable=True))
 
         cls.Wizard = cls.env["hr.payroll.register.run"]
         cls.Register = cls.env["hr.payroll.register"]
@@ -19,13 +20,32 @@ class TestPayrollRegister(common.TransactionCase):
         cls.start = datetime(2021, 1, 1)
         cls.end = datetime(2021, 1, 31)
         cls.dept1 = cls.env["hr.department"].create({"name": "Dept A"})
+        cls.job = cls.env["hr.job"].create(
+            {"name": "Test Job", "department_id": cls.dept1.id}
+        )
         cls.eeJohn = cls.env["hr.employee"].create(
             {
                 "name": "John Smith",
                 "department_id": cls.dept1.id,
+                "job_id": cls.job.id,
             }
         )
-        cls.pay_struct = cls.env.ref("payroll.structure_base")
+        # Demo data is not installed in Odoo 19, so build the salary
+        # structure the contract needs: a single NET rule paying the wage.
+        cls.pay_struct = cls.env["hr.payroll.structure"].create(
+            {"name": "Test Structure", "code": "TEST"}
+        )
+        net_rule = cls.env["hr.salary.rule"].create(
+            {
+                "name": "Net Salary",
+                "code": "NET",
+                "sequence": 100,
+                "condition_select": "none",
+                "amount_select": "code",
+                "amount_python_compute": "result = contract.wage",
+            }
+        )
+        cls.pay_struct.write({"rule_ids": [(6, 0, [net_rule.id])]})
         # Payroll Manager user
         cls.userPM = new_test_user(
             cls.env,
@@ -35,30 +55,21 @@ class TestPayrollRegister(common.TransactionCase):
             email="ric@example.com",
         )
 
-    def create_contract(
-        self, eid, state, kanban_state, start, end=None, trial_end=None
-    ):
-        # hr_contract_status computes employee.department_id from the
-        # contract's job, so the employee needs a job in the department for
-        # the register wizard's department search to find them.
-        job = self.env["hr.job"].search(
-            [("department_id", "=", self.dept1.id)], limit=1
-        )
-        if not job:
-            job = self.env["hr.job"].create(
-                {"name": "Test Job", "department_id": self.dept1.id}
-            )
-        return self.env["hr.contract"].create(
+    def create_contract(self, eid, start, end=None, trial_end=None):
+        # hr.contract is gone in Odoo 19: a contract is now an hr.version.
+        # The employee already owns a version dated today, so the new one is
+        # pinned to its own (backdated) date_version to avoid the unique
+        # (employee_id, date_version) index.
+        return self.env["hr.version"].create(
             {
-                "name": "Contract",
                 "employee_id": eid,
-                "job_id": job.id,
-                "state": state,
-                "kanban_state": kanban_state,
+                "job_id": self.job.id,
+                "department_id": self.dept1.id,
+                "date_version": start,
+                "contract_date_start": start,
+                "contract_date_end": end,
                 "wage": 989.92,
-                "date_start": start,
                 "trial_date_end": trial_end,
-                "date_end": end,
                 "struct_id": self.pay_struct.id,
             }
         )
@@ -73,7 +84,7 @@ class TestPayrollRegister(common.TransactionCase):
             )
 
     def setUpCommon(self):
-        self.create_contract(self.eeJohn.id, "open", "normal", self.start.date())
+        self.create_contract(self.eeJohn.id, self.start.date())
 
     def test_no_active_id(self):
         """If 'active_id' is not in the context raise an error"""
