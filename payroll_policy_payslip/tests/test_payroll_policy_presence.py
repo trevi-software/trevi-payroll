@@ -319,3 +319,62 @@ class TestPresencePolicy(common.TestHrPayslip):
             200,
             "Rest day hours are accrued at a 2:1 rate",
         )
+
+    def test_presence_policy_per_contract(self):
+        # A payslip can cover several contracts, each with its own policy
+        # group. Each contract must be resolved against its own policies: the
+        # caches resolved for the first contract must not leak into the second.
+        #
+        # Policy group B uses a 6 hour normal workday, group A (the default)
+        # an 8 hour one.
+        group_b = self.PolicyGroup.create({"name": "policy group B"})
+        policy_b = self.PresencePolicy.create(
+            {"name": "POLICY2", "date": date(2000, 1, 1)}
+        )
+        self.PresencePolicyLine.create(
+            {
+                "name": "Presence Line - Normal 6h workday",
+                "code": "PL2",
+                "type": "normal",
+                "active_after": 0.0,
+                "duration": 6.0 * 60,
+                "policy_id": policy_b.id,
+            }
+        )
+        group_b.presence_policy_ids = [(4, policy_b.id)]
+
+        start = date(2022, 4, 1)
+        end = date(2022, 4, 30)
+        # 2022-04-01..15 has 11 working days, 2022-04-16..30 has 10.
+        contract_a = self.create_contract(
+            date(2022, 4, 1), date(2022, 4, 15), self.richard_emp, 5000.0, name="C-A"
+        )
+        contract_b = self.create_contract(
+            date(2022, 4, 16),
+            date(2022, 4, 30),
+            self.richard_emp,
+            5000.0,
+            name="C-B",
+            policy_group=group_b,
+        )
+
+        richard_payslip = self.create_payslip(
+            start, end, self.richard_emp, user=self.payroll_user
+        )
+        lines = richard_payslip.get_worked_day_lines(
+            contract_a | contract_b, start, end
+        )
+
+        max_by_contract = {
+            line["contract_id"]: line for line in lines if line["code"] == "MAX"
+        }
+        self.assertEqual(
+            max_by_contract[contract_a.id]["number_of_hours"],
+            88.0,
+            "Contract A requires 11 working days of 8 hours",
+        )
+        self.assertEqual(
+            max_by_contract[contract_b.id]["number_of_hours"],
+            60.0,
+            "Contract B requires 10 working days of 6 hours (its own policy)",
+        )

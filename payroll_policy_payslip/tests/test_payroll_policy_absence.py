@@ -379,3 +379,94 @@ class TestAbsencePolicy(common.TestHrPayslip):
             20.5,
             "In worked days line field 'number_of_days' 1/2 day is subtracted",
         )
+
+    def test_absence_multiple_contracts(self):
+        # Two contracts use the same policy group (both with AWOL). The second
+        # contract must get its own AWOL worked-days line: matching the first
+        # contract's line (which lives in ``super_res``) left the second
+        # contract without an AWOL entry and raised a KeyError when the AWOL
+        # hours were added.
+        start = date(2022, 4, 1)
+        end = date(2022, 4, 30)
+        # 2022-04-01..15 has 11 working days, 2022-04-16..30 has 10.
+        contract_a = self.create_contract(
+            date(2022, 4, 1), date(2022, 4, 15), self.richard_emp, 5000.0, name="C-A"
+        )
+        contract_b = self.create_contract(
+            date(2022, 4, 16), date(2022, 4, 30), self.richard_emp, 5000.0, name="C-B"
+        )
+
+        richard_payslip = self.create_payslip(
+            start, end, self.richard_emp, user=self.payroll_user
+        )
+        lines = richard_payslip.get_worked_day_lines(
+            contract_a | contract_b, start, end
+        )
+
+        awol_by_contract = {
+            line["contract_id"]: line for line in lines if line["code"] == "AWOL"
+        }
+        self.assertEqual(
+            len(awol_by_contract),
+            2,
+            "Each contract gets its own AWOL worked days line",
+        )
+        self.assertAlmostEqual(
+            awol_by_contract[contract_a.id]["number_of_hours"],
+            88.0,
+            msg="Contract A is AWOL for 11 working days of 8 hours",
+        )
+        self.assertAlmostEqual(
+            awol_by_contract[contract_b.id]["number_of_hours"],
+            80.0,
+            msg="Contract B is AWOL for 10 working days of 8 hours",
+        )
+
+    def test_absence_policy_change_mid_period(self):
+        # The presence policy is replaced mid-period by one with a different
+        # normal duration and a new code. The required hours must follow the
+        # policy active on each day (8h before 2022-04-16, 6h after) instead of
+        # accumulating to 14h, which would mark worked days as AWOL and inflate
+        # MAX.
+        policy2 = self.PresencePolicy.create(
+            {"name": "POLICY2", "date": date(2022, 4, 16)}
+        )
+        self.PresencePolicyLine.create(
+            {
+                "name": "Presence Line - Normal 6h workday",
+                "code": "PL2",
+                "type": "normal",
+                "active_after": 0.0,
+                "duration": 6.0 * 60,
+                "policy_id": policy2.id,
+            }
+        )
+        self.default_policy_group.presence_policy_ids = [(4, policy2.id)]
+
+        self.test_rule.amount_python_compute = (
+            "result_rate = worked_days.PL1.rate * 100 \n"
+            "result = worked_days.PL1.number_of_hours"
+        )
+        self.absence_test_rule.amount_python_compute = (
+            "result_rate = worked_days.AWOL.rate * 100 \n"
+            "result = worked_days.AWOL.number_of_hours"
+        )
+
+        start = date(2022, 4, 1)
+        end = date(2022, 4, 30)
+        self.create_contract(date(2022, 1, 1), False, self.richard_emp, 5000.0)
+
+        richard_payslip = self.create_payslip(
+            start, end, self.richard_emp, user=self.payroll_user
+        )
+        richard_payslip.onchange_employee()
+        richard_payslip.compute_sheet()
+
+        line = richard_payslip.line_ids.filtered(lambda line: line.code == "ABTEST")
+        self.assertEqual(len(line), 1, "I found the Absence Test line")
+        # 11 working days x 8h (01-15) + 10 working days x 6h (16-30)
+        self.assertEqual(
+            line[0].amount,
+            148.0,
+            "AWOL follows the policy active on each day (8h then 6h)",
+        )

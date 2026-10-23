@@ -112,7 +112,7 @@ class TestHrPayslip(common.TransactionCase):
         # I put the presence policy in the policy group
         cls.default_policy_group.presence_policy_ids = [(4, cls.presence_policy.id)]
 
-    def create_contract(self, start, end, employee, wage, name=False):
+    def create_contract(self, start, end, employee, wage, name=None, policy_group=None):
         # Odoo 19 replaced ``hr.contract`` with ``hr.version``. Every employee
         # owns a version dated today, so the test contract is created with a
         # backdated ``date_version`` (unique per employee) and its own start
@@ -128,7 +128,9 @@ class TestHrPayslip(common.TransactionCase):
                 "wage": wage,
                 "struct_id": self.payroll_structure.id,
                 "resource_calendar_id": self.resource_calendar_std.id,
-                "policy_group_id": self.default_policy_group.id,
+                "policy_group_id": (
+                    policy_group.id if policy_group else self.default_policy_group.id
+                ),
             }
         )
 

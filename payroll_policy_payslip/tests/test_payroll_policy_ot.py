@@ -654,3 +654,78 @@ class TestPresencePolicy(common.TestHrPayslip):
             250,
             "Holiday OT hours are paid at 2.5x normal rate",
         )
+
+    def test_ot_window_outside_attendance(self):
+        # OT window 08:00-10:00 but attendance 12:00-16:00 (same timezone): the
+        # session lies entirely after the window. It must contribute no OT
+        # hours, and the regular hours must stay positive. Previously ``end``
+        # was clamped to 10:00 while ``start`` stayed at 12:00, and the
+        # negative difference's ``.seconds`` was read as 22 hours of overtime.
+        self.OtPolicyLine.create(
+            {
+                "name": "OT Line - Morning window",
+                "code": "OTW",
+                "type": "daily",
+                "active_after": 0.0,
+                "active_start_time": "08:00",
+                "active_end_time": "10:00",
+                "rate": 1.5,
+                "policy_id": self.ot_policy.id,
+                "tz": "Africa/Addis_Ababa",
+            }
+        )
+
+        # I set the test rules to detect the regular and OT worked hours
+        self.test_rule.amount_python_compute = (
+            "result_rate = worked_days.PL1.rate * 100 \n"
+            "result = worked_days.PL1.number_of_hours"
+        )
+        self.ot_test_rule.amount_python_compute = (
+            "result_rate = worked_days.OTW.rate * 100 \n"
+            "result = worked_days.OTW.number_of_hours"
+        )
+
+        # I create a contract for "Richard"
+        contract_start = date(2022, 1, 1)
+        start = date(2022, 4, 1)
+        end = date(2022, 4, 30)
+        self.create_contract(contract_start, False, self.richard_emp, 5000.0)
+
+        # Attendance entirely outside the OT window
+        self.Attendance.create(
+            {
+                "employee_id": self.richard_emp.id,
+                "check_in": self.localize_dt(
+                    datetime.combine(start, datetime.strptime("12:00", "%H:%M").time()),
+                    self.richard_emp.tz,
+                    reverse=True,
+                ),
+                "check_out": self.localize_dt(
+                    datetime.combine(start, datetime.strptime("16:00", "%H:%M").time()),
+                    self.richard_emp.tz,
+                    reverse=True,
+                ),
+            }
+        )
+
+        richard_payslip = self.create_payslip(
+            start, end, self.richard_emp, user=self.payroll_user
+        )
+        richard_payslip.onchange_employee()
+        richard_payslip.compute_sheet()
+
+        line = richard_payslip.line_ids.filtered(lambda line: line.code == "TEST")
+        self.assertEqual(len(line), 1, "I found the Normal Test line")
+        self.assertEqual(
+            line[0].amount,
+            4.0,
+            "All 4 worked hours are regular (the session is outside the window)",
+        )
+
+        line = richard_payslip.line_ids.filtered(lambda line: line.code == "OTTEST")
+        self.assertEqual(len(line), 1, "I found the OT Test line")
+        self.assertEqual(
+            line[0].amount,
+            0.0,
+            "No overtime is booked for a session outside the OT window",
+        )

@@ -101,6 +101,14 @@ class HrPayslip(models.Model):
         )
         presence_policy = presence_data["policy"]
         presence_sequence = 50
+        # Required normal hours are the sum of the ``normal`` lines of the
+        # policy active on *this* day. It is recomputed for every day instead
+        # of being accumulated across the period: when a policy change
+        # mid-period introduces a new normal code with a different duration,
+        # accumulating would add the new duration on top of the old one and
+        # inflate the requirement (e.g. 8h -> 14h), wrongly marking worked
+        # days as AWOL and inflating MAX.
+        normal_working_hours = 0.0
         for (
             pcode,
             pname,
@@ -113,10 +121,10 @@ class HrPayslip(models.Model):
             paccmin,
             paccmax,
         ) in presence_data["codes"]:
-            if attendances.get(pcode, False):
-                continue
             if ptype == "normal":
                 normal_working_hours += float(pduration) / 60.0
+            if attendances.get(pcode, False):
+                continue
             attendances[pcode] = {
                 "name": pname,
                 "code": pcode,
@@ -179,10 +187,17 @@ class HrPayslip(models.Model):
                 continue
 
             # If the leave has already been added by the parent class, only
-            # modify the rate.
+            # modify the rate. Only consider records belonging to the current
+            # contract: a payslip can cover several contracts and their worked
+            # days lines are accumulated in ``super_res``, so matching by code
+            # alone would pick up a previous contract's line, leave this
+            # contract without its own AWOL entry and raise a KeyError when
+            # the AWOL hours are added.
             #
             res_dict = False
             for r in super_res:
+                if r.get("contract_id") != contract.id:
+                    continue
                 if r["code"] == abcode or r["name"] == leave_names.get(abcode):
                     res_dict = r
                     break
@@ -434,6 +449,15 @@ class HrPayslip(models.Model):
         absence_data = None
         ot_data = None
         for contract in contracts:
+            # Reset the policy caches for every contract. A payslip can cover
+            # several contracts, each with its own policy group, and the
+            # ``_reuse`` flag resolved for a previous contract would otherwise
+            # make the helpers below return that contract's policies without
+            # ever checking this contract's ``policy_group_id``.
+            presence_data = None
+            absence_data = None
+            ot_data = None
+
             # Get default set of rest days for this employee/contract
             contract_days_off = self.get_days_off(contract)
 

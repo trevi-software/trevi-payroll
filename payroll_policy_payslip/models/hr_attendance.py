@@ -367,6 +367,14 @@ class HrAttendance(models.Model):
             if worked_hours == 0 and end <= dtBegin:
                 lead_hours += float((end - start).seconds) / 60.0 / 60.0
             elif worked_hours == 0 and end > dtBegin:
+                # Ignore sessions that start at or after the end of the
+                # window: they lie entirely outside it and must not contribute
+                # any (lead or partial) hours. Without this check ``end`` was
+                # clamped to ``dtStop`` while ``start`` stayed after it, and
+                # the negative difference's ``.seconds`` was read as a huge
+                # positive value (~22h).
+                if start >= dtStop:
+                    continue
                 if start < dtBegin:
                     lead_hours += float((dtBegin - start).seconds) / 60.0 / 60.0
                     start = dtBegin
