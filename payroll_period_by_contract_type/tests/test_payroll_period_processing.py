@@ -1,7 +1,7 @@
 # Copyright (C) 2021 Trevi Software (https://trevi.et)
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl.html).
 
-from datetime import datetime
+from datetime import date, datetime
 
 from pytz import timezone, utc
 
@@ -12,6 +12,7 @@ class TestPayrollProcessing(common.TransactionCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
+        cls.env = cls.env(context=dict(cls.env.context, tracking_disable=True))
 
         cls.Employee = cls.env["hr.employee"]
         cls.Department = cls.env["hr.department"]
@@ -60,21 +61,48 @@ class TestPayrollProcessing(common.TransactionCase):
         )
 
         # Employee
+        # Odoo 19: every employee always owns an hr.version dated today, so the
+        # employee's own version is backdated to leave the contract dates free.
         #
         cls.emp_sally = cls.Employee.create(
             {
                 "name": "Sally",
                 "department_id": cls.dept_rd.id,
+                "date_version": date(2000, 1, 1),
             }
         )
         cls.emp_john = cls.Employee.create(
             {
                 "name": "John",
                 "department_id": cls.dept_sales.id,
+                "date_version": date(2000, 1, 1),
             }
         )
 
-        cls.pay_struct = cls.env.ref("payroll.structure_base")
+        # Odoo 19 does not install demo data, so 'payroll.structure_base' does
+        # not exist. Build the salary structure the contracts need: a NET rule
+        # that pays the wage.
+        cls.cat_net = cls.env["hr.salary.rule.category"].create(
+            {"name": "Net", "code": "NET"}
+        )
+        cls.rule_net = cls.env["hr.salary.rule"].create(
+            {
+                "name": "Net Salary",
+                "code": "NET",
+                "category_id": cls.cat_net.id,
+                "sequence": 100,
+                "condition_select": "none",
+                "amount_select": "code",
+                "amount_python_compute": "result = contract.wage",
+            }
+        )
+        cls.pay_struct = cls.env["hr.payroll.structure"].create(
+            {
+                "name": "Test Structure",
+                "code": "TEST",
+                "rule_ids": [(6, 0, [cls.rule_net.id])],
+            }
+        )
 
     def create_payroll_schedule(self, stype=False, initial_date=False):
         return self.Schedule.create(
@@ -105,28 +133,31 @@ class TestPayrollProcessing(common.TransactionCase):
     def create_contract(
         self,
         eid,
-        state,
-        kanban_state,
         start,
         end=None,
         trial_end=None,
         pps_id=None,
         job_id=False,
+        department_id=False,
         contract_type_id=False,
     ):
-        return self.env["hr.contract"].create(
+        # Odoo 19: hr.contract is gone; a contract is an hr.version carrying the
+        # contract dates. date_version is unique per employee, so it is pinned
+        # to the contract's start date. department_id is not derived from the
+        # job on the version, so it is set explicitly.
+        return self.env["hr.version"].create(
             {
                 "name": "Contract",
                 "employee_id": eid,
-                "state": state,
-                "kanban_state": kanban_state,
                 "wage": 1,
-                "date_start": start,
+                "date_version": start,
+                "contract_date_start": start,
+                "contract_date_end": end,
                 "trial_date_end": trial_end,
-                "date_end": end,
                 "struct_id": self.pay_struct.id,
                 "pps_id": pps_id,
                 "job_id": job_id,
+                "department_id": department_id,
                 "contract_type_id": contract_type_id,
             }
         )
@@ -147,22 +178,20 @@ class TestPayrollProcessing(common.TransactionCase):
         # Create contracts for Sally and John
         self.create_contract(
             self.emp_sally.id,
-            "draft",
-            "done",
             start.date(),
             pps_id=self.period_schedule.id,
             job_id=self.job_ux_designer.id,
+            department_id=self.dept_rd.id,
             contract_type_id=self.ctype_fulltime.id,
-        ).signal_confirm()
+        )
         self.create_contract(
             self.emp_john.id,
-            "draft",
-            "done",
             start.date(),
             pps_id=self.period_schedule.id,
             job_id=self.job_sales_associate.id,
+            department_id=self.dept_sales.id,
             contract_type_id=self.ctype_parttime.id,
-        ).signal_confirm()
+        )
 
         # Start payroll wizard
         wiz = (
@@ -213,22 +242,20 @@ class TestPayrollProcessing(common.TransactionCase):
         # Create contracts for Sally and John
         self.create_contract(
             self.emp_sally.id,
-            "draft",
-            "done",
             start.date(),
             pps_id=self.period_schedule.id,
             job_id=self.job_ux_designer.id,
+            department_id=self.dept_rd.id,
             contract_type_id=self.ctype_fulltime.id,
-        ).signal_confirm()
+        )
         self.create_contract(
             self.emp_john.id,
-            "draft",
-            "done",
             start.date(),
             pps_id=self.period_schedule.id,
             job_id=self.job_sales_associate.id,
+            department_id=self.dept_sales.id,
             contract_type_id=self.ctype_parttime.id,
-        ).signal_confirm()
+        )
 
         # Start payroll wizard
         wiz = (

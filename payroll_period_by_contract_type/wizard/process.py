@@ -45,18 +45,27 @@ class ProcessPayroll(models.TransientModel):
 
         # batch_by == "contract_type"
         employees = self.env["hr.employee"]
-        ctypes = self.env["hr.contract.type"].search([])
+        # Every contract type must be visited: a limit would silently drop the
+        # payslips of any type it skipped, so the unbounded search is intended.
+        ContractType = self.env["hr.contract.type"]
+        ctypes = ContractType.search([])  # pylint: disable=no-search-all
         for dept in departments:
             employees |= self._get_employees_from_department(
                 dept, contracts, date_start, date_end
             )
 
+        # Odoo 19: a contract is an hr.version and its contract fields carry the
+        # 'hr.group_hr_manager' group, so read them as sudo to keep the batching
+        # usable by a payroll user.
+        employee_ctypes = {}
+        for contract in contracts.sudo():
+            employee = contract.employee_id
+            if employee and employee not in employee_ctypes:
+                employee_ctypes[employee] = contract.contract_type_id
+
         for ctype in ctypes:
             ees = employees.filtered(
-                lambda e, ctype=ctype: contracts.filtered(
-                    lambda c, e=e: c.employee_id == e
-                )[0].contract_type_id
-                == ctype
+                lambda e, ctype=ctype: employee_ctypes.get(e) == ctype
             )
             if len(ees) == 0:
                 continue

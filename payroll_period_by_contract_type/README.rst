@@ -22,8 +22,9 @@ Payroll Period Batch by contract type
 
 |badge1| |badge2| |badge3|
 
-This module introduces a **"Batch by contract type"** field in Payroll Period Schedule that if checked will cause Odoo to
-generate payslip batches based not on departments but on contract types.
+This module introduces a **"Batch by contract type"** field in Payroll
+Period Schedule that if checked will cause Odoo to generate payslip
+batches based not on departments but on contract types.
 
 **Table of contents**
 
@@ -44,17 +45,17 @@ Credits
 =======
 
 Authors
-~~~~~~~
+-------
 
 * TREVI Software
 
 Other credits
-~~~~~~~~~~~~~
+-------------
 
-* Michael Telahun Makonnen <mtm@trevi.et>
+- Michael Telahun Makonnen <mtm@trevi.et>
 
 Maintainers
-~~~~~~~~~~~
+-----------
 
 This module is part of the `trevi-software/trevi-payroll <https://github.com/trevi-software/trevi-payroll/tree/19.0/payroll_period_by_contract_type>`_ project on GitHub.
 
