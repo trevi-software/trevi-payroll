@@ -17,13 +17,19 @@ class TestPayslipAmendment(common.TransactionCase):
         cls.Payslip = cls.env["hr.payslip"]
         cls.Amendment = cls.env["hr.payslip.amendment"]
 
-        cls.eeSally = cls.env["hr.employee"].create({"name": "Sally"})
+        # A backdated version keeps the employee's "today" version from capping
+        # the date_end of the versions created by the tests.
+        cls.eeSally = cls.env["hr.employee"].create(
+            {"name": "Sally", "date_version": date(2000, 1, 1)}
+        )
 
         cls.rule_commision = cls.env["hr.salary.rule"].create(
             {
                 "name": "Commission",
                 "code": "COMM",
-                "category_id": cls.env.ref("payroll.ALW").id,
+                "category_id": cls.env["hr.salary.rule.category"]
+                .create({"name": "Allowance", "code": "ALW"})
+                .id,
                 "sequence": 17,
                 "amount_select": "code",
                 "amount_python_compute": "result = inputs.SALECOM.amount",
@@ -37,32 +43,26 @@ class TestPayslipAmendment(common.TransactionCase):
             }
         )
 
-        cls.pay_struct = cls.env.ref("payroll.structure_base")
+        cls.pay_struct = cls.env["hr.payroll.structure"].create(
+            {"name": "Test Structure", "code": "TEST"}
+        )
         cls.pay_struct.write({"rule_ids": [(4, cls.rule_commision.id)]})
 
-    def create_contract(
-        self, eid, state, kanban_state, start=None, end=None, trial_end=None
-    ):
+    def create_contract(self, eid, start=None, end=None, trial_end=None):
         if start is None:
             start = date.today()
-        return self.env["hr.contract"].create(
+        return self.env["hr.version"].create(
             {
                 "name": "Contract",
                 "employee_id": eid,
-                "state": state,
-                "kanban_state": kanban_state,
                 "wage": 1,
-                "date_start": start,
+                "date_version": start,
+                "contract_date_start": start,
                 "trial_date_end": trial_end,
-                "date_end": end,
+                "contract_date_end": end,
                 "struct_id": self.pay_struct.id,
             }
         )
-
-    def apply_contract_cron(self):
-        self.env.ref(
-            "hr_contract.ir_cron_data_contract_update_state"
-        ).method_direct_trigger()
 
     def test_default_date(self):
         psa = self.Amendment.create(
@@ -129,7 +129,7 @@ class TestPayslipAmendment(common.TransactionCase):
             }
         )
         self.assertEqual(
-            psa.name_get()[0][1],
+            psa.display_name,
             "Sally (SALECOM)",
             "Payslip amendment name is composed of employee name and Input code",
         )
@@ -214,8 +214,7 @@ class TestPayslipAmendment(common.TransactionCase):
             }
         )
         psa.do_validate()
-        cc = self.create_contract(self.eeSally.id, "draft", "done", start=dstart)
-        self.apply_contract_cron()
+        cc = self.create_contract(self.eeSally.id, start=dstart)
         slip = self.Payslip.create(
             {
                 "name": "A Payslip",
@@ -254,8 +253,7 @@ class TestPayslipAmendment(common.TransactionCase):
             }
         )
         psa.do_validate()
-        cc = self.create_contract(self.eeSally.id, "draft", "done", start=dstart)
-        self.apply_contract_cron()
+        cc = self.create_contract(self.eeSally.id, start=dstart)
         slip = self.Payslip.create(
             {
                 "name": "A Payslip",
@@ -304,8 +302,7 @@ class TestPayslipAmendment(common.TransactionCase):
         self.assertEqual(psa2.state, "validate", "Amendment 2 is in state: 'validate'")
         dstart = date(2021, 1, 1)
         dend = date(2021, 1, 31)
-        self.create_contract(self.eeSally.id, "draft", "done", start=dstart)
-        self.apply_contract_cron()
+        self.create_contract(self.eeSally.id, start=dstart)
         slip = self.Payslip.create(
             {
                 "name": "A Payslip",

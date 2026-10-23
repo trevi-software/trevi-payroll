@@ -4,7 +4,7 @@
 
 from datetime import date
 
-from odoo import _, exceptions, fields, models
+from odoo import _, api, exceptions, fields, models
 
 
 class HrPayslipAmendment(models.Model):
@@ -44,13 +44,12 @@ class HrPayslipAmendment(models.Model):
         tracking=True,
     )
     note = fields.Text(string="Memo")
+    display_name = fields.Char(compute="_compute_display_name")
 
-    def name_get(self):
-        res = []
+    @api.depends("employee_id.name", "input_id.code")
+    def _compute_display_name(self):
         for rec in self:
-            res.append((rec.id, f"{rec.employee_id.name} ({rec.input_id.code})"))
-
-        return res
+            rec.display_name = f"{rec.employee_id.name} ({rec.input_id.code})"
 
     def unlink(self):
         for psa in self:

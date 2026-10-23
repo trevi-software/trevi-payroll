@@ -22,7 +22,8 @@ Pay Slip Amendment
 
 |badge1| |badge2| |badge3|
 
-This module allows the Payroll Officer to make changes to an individual payslip by using Payslip Inputs.
+This module allows the Payroll Officer to make changes to an individual
+payslip by using Payslip Inputs.
 
 **Table of contents**
 
@@ -43,18 +44,18 @@ Credits
 =======
 
 Authors
-~~~~~~~
+-------
 
 * TREVI Software
 * Michael Telahun Makonnen
 
 Other credits
-~~~~~~~~~~~~~
+-------------
 
-* Michael Telahun Makonnen <mtm@trevi.et>
+- Michael Telahun Makonnen <mtm@trevi.et>
 
 Maintainers
-~~~~~~~~~~~
+-----------
 
 This module is part of the `trevi-software/trevi-payroll <https://github.com/trevi-software/trevi-payroll/tree/19.0/payroll_payslip_amendment>`_ project on GitHub.
 
