@@ -230,6 +230,51 @@ class ProcessingWizard(models.TransientModel):
         )
         return c_ids.mapped("employee_id")
 
+    def _get_employees_without_department(self, contracts, date_start, date_end):
+        """Employees with a contract in the period but no department.
+
+        ``_create_batches`` groups payslips into one batch per department, so
+        an employee whose contract version and employee record both have no
+        department is never visited by that loop and would be silently left
+        out of the payroll register.
+        """
+        c_ids = self.env["hr.version"].search(
+            [
+                ("id", "in", contracts.ids),
+                ("contract_date_start", "<=", date_end),
+                "|",
+                ("contract_date_end", "=", False),
+                ("contract_date_end", ">=", date_start),
+                ("department_id", "=", False),
+                ("employee_id.department_id", "=", False),
+            ]
+        )
+        return c_ids.mapped("employee_id")
+
+    def _create_batch(self, register, name, ee_ids, date_start, date_end, dept_ids):
+        run_res = {
+            "name": name,
+            "date_start": date_start,
+            "date_end": date_end,
+            "register_id": register.id,
+            "period_id": register.period_id.id,
+            "department_ids": [(6, 0, dept_ids)],
+        }
+        batch = self.env["hr.payslip.run"].create(run_res)
+
+        # Create a pay slip for each employee in each department that has
+        # a contract in the pay period schedule of this pay period
+        payslips = self.env["hr.payslip"]
+        for ee in ee_ids.sorted(key=lambda e: e.name):
+            if not self.payroll_period_id.process_employee(ee.id):
+                continue
+
+            payslips |= self.payroll_period_id.create_payslip(ee.id, batch.id)
+
+        # Calculate payroll for all the pay slips in this batch (run)
+        payslips.compute_sheet()
+        return batch
+
     def _create_batches(
         self,
         register,
@@ -252,29 +297,23 @@ class ProcessingWizard(models.TransientModel):
             if len(ee_ids) == 0:
                 continue
 
-            run_res = {
-                "name": dept.complete_name,
-                "date_start": date_start,
-                "date_end": date_end,
-                "register_id": register.id,
-                "period_id": register.period_id.id,
-                "department_ids": [(6, 0, [dept.id])],
-            }
-            batch = self.env["hr.payslip.run"].create(run_res)
+            batches |= self._create_batch(
+                register, dept.complete_name, ee_ids, date_start, date_end, [dept.id]
+            )
 
-            # Create a pay slip for each employee in each department that has
-            # a contract in the pay period schedule of this pay period
-            payslips = self.env["hr.payslip"]
-            ee_ids = ee_ids.sorted(key=lambda e: e.name)
-            for ee in ee_ids:
-                if not self.payroll_period_id.process_employee(ee.id):
-                    continue
-
-                payslips |= self.payroll_period_id.create_payslip(ee.id, batch.id)
-
-            # Calculate payroll for all the pay slips in this batch (run)
-            payslips.compute_sheet()
-            batches |= batch
+        # Employees with no department are not visited by the loop above, so
+        # they would be silently dropped from the register. Group them into a
+        # single unassigned batch so they still get payslips.
+        ee_ids = self._get_employees_without_department(contracts, date_start, date_end)
+        if len(ee_ids) > 0:
+            batches |= self._create_batch(
+                register,
+                self.env._("No Department"),
+                ee_ids,
+                date_start,
+                date_end,
+                [],
+            )
 
         return batches
 

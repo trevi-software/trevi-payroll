@@ -266,6 +266,52 @@ class TestProcessing(common.TransactionCase):
         if fail:
             self.assertFail("Unable to find department in payslip batches")
 
+    def test_payslip_no_department_employee(self):
+        """An employee with no department still gets a payslip.
+
+        The register batches payslips by department, so an employee whose
+        contract version and employee record both have no department must
+        not be silently dropped from the register.
+        """
+
+        self.setUpCommon()
+        start = datetime(2021, 9, 1)
+        employee = self.Employee.create(
+            {
+                "name": "No Department Employee",
+                # See employee_emp: backdate the hire version so the contract
+                # version below becomes the employee's current version.
+                "date_version": date(2000, 1, 1),
+            }
+        )
+        self.assertFalse(employee.department_id)
+        contract = self.env["hr.version"].create(
+            {
+                "name": "Contract",
+                "employee_id": employee.id,
+                "wage": 1,
+                "date_version": start.date(),
+                "contract_date_start": start.date(),
+                "struct_id": self.pay_struct.id,
+                "pps_id": self.schedule.id,
+            }
+        )
+        self.assertFalse(contract.department_id)
+
+        wiz = (
+            self.Wizard.with_user(self.payrollOfficer)
+            .with_context(active_id=self.period.id)
+            .create({})
+        )
+        wiz.create_payroll_register()
+
+        register = self.period.register_id
+        self.assertIn(
+            employee,
+            register.run_ids.slip_ids.mapped("employee_id"),
+            "Employee without a department was left out of the payroll register",
+        )
+
     def test_payslip_tz_date_start(self):
         """Payroll batch run and payslip start/end dates"""
 
