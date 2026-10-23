@@ -37,17 +37,22 @@ payslip is processed.
 Usage
 =====
 
-The new values provided by this module are: \* payroll.max_weekly_hours
-- the maximum number of weekly work hours \* payroll.max_working_days -
-the maximum number of working days in the period \*
-payroll.max_working_hours - the maximum number of working days in the
-period \* payroll.seniority - the length of employment calculated in
-months \* payroll.contracts.cummulative_ppf - the sum of the payroll
-period factors of all the contracts \* current_contract.ppf - the
-payroll period factor for the contract being processed \*
-current_contract.daily_wage - the wage on the contract being processed
-converted to a daily wage \* current_contract.hourly_wage - the wage on
-the contract being processed converted to an hourly wage
+The new values provided by this module are:
+
+- payroll.max_weekly_hours - the maximum number of weekly work hours
+- payroll.max_working_days - the maximum number of working days in the
+  period
+- payroll.max_working_hours - the maximum number of working hours in the
+  period
+- payroll.seniority - the length of employment calculated in months
+- payroll.contracts.cummulative_ppf - the sum of the payroll period
+  factors of all the contracts
+- current_contract.ppf - the payroll period factor for the contract
+  being processed
+- current_contract.daily_wage - the wage on the contract being processed
+  converted to a daily wage
+- current_contract.hourly_wage - the wage on the contract being
+  processed converted to an hourly wage
 
 The payroll period factor is a decimal denoting the validity period of
 the contract between the start and end dates of the payslip. A factor of

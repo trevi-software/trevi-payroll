@@ -65,10 +65,10 @@ class TestHrPayslip(TestPayslipBase):
         else:
             return False
 
-    def create_contract(self, start, end, employee, wage, name=False):
+    def create_contract(self, start, end, employee, wage, name=None, date_version=None):
         return self.Contract.create(
             {
-                "date_version": start,
+                "date_version": date_version or start,
                 "contract_date_start": start,
                 "contract_date_end": end,
                 "name": name if name else f"Contract for {employee.name}",

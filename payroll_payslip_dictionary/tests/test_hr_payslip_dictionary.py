@@ -367,3 +367,79 @@ class TestHrPayslip(test_common.TestHrPayslip):
             5000.0,
             "The NET salary for the previous payslip was 5000.00",
         )
+
+    def test_contract_prevps_ignores_later_period(self):
+        # I set the test rule to detect previous payslip in dictionary
+        self.test_rule.amount_python_compute = "result = payroll.PREVPS.exists"
+
+        contract_start = date(2022, 1, 1)
+        start1 = date(2022, 3, 1)
+        end1 = date(2022, 3, 31)
+        start2 = date(2022, 4, 1)
+        end2 = date(2022, 4, 30)
+        self.create_contract(contract_start, False, self.alice_emp, 5000.0)
+
+        self.apply_contract_cron()
+
+        # I create a Payslip for April and complete it BEFORE the March one
+        alice_payslip02 = self.create_payslip(start2, end2, self.alice_emp)
+        alice_payslip02.compute_sheet()
+        alice_payslip02.action_payslip_done()
+        self.assertEqual(alice_payslip02.state, "done", "The April payslip is closed")
+
+        # I create the Payslip for March and process it afterwards
+        alice_payslip01 = self.create_payslip(start1, end1, self.alice_emp)
+        alice_payslip01.compute_sheet()
+
+        line = alice_payslip01.line_ids.filtered(lambda line: line.code == "TEST")
+        self.assertEqual(len(line), 1, "I found the Test line")
+        self.assertEqual(
+            line[0].amount,
+            0.0,
+            "A payslip for a later period is NOT the previous payslip",
+        )
+
+    def test_contract_mid_period_wage_change(self):
+        # I set the test rule to detect the payroll period factor
+        self.test_rule.amount_python_compute = "result = current_contract.ppf"
+
+        # I create a contract for "Richard"
+        contract_start = date(2022, 1, 1)
+        start = date(2022, 4, 1)
+        end = date(2022, 4, 30)
+        self.create_contract(contract_start, False, self.alice_emp, 5000.0)
+
+        # I give a raise in the middle of the period. The new version belongs
+        # to the SAME contract, so it keeps the original contract start date
+        # and its date_version differs from it.
+        self.create_contract(
+            contract_start,
+            False,
+            self.alice_emp,
+            10000.0,
+            "Wage increase for Sally",
+            date_version=date(2022, 4, 16),
+        )
+
+        self.apply_contract_cron()
+
+        # I create an employee Payslip and process it
+        alice_payslip = self.create_payslip(start, end, self.alice_emp)
+        alice_payslip.compute_sheet()
+
+        # The contract still covers the whole period, so the period is paid
+        # once, at the wage of the version in effect.
+        line = alice_payslip.line_ids.filtered(lambda line: line.code == "TEST")
+        self.assertEqual(len(line), 1, "I found the Test line")
+        self.assertEqual(
+            line[0].amount,
+            1.0,
+            "The contract covers the entire pay period",
+        )
+        basic = alice_payslip.line_ids.filtered(lambda line: line.code == "BASIC")
+        self.assertEqual(len(basic), 1, "I found the BASIC salary line")
+        self.assertEqual(
+            basic[0].amount,
+            10000.0,
+            "The new version does not pay the contract twice",
+        )

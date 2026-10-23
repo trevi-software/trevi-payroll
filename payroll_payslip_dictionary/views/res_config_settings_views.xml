@@ -17,6 +17,12 @@
                         <field name="working_days_calculation" />
                     </setting>
                     <setting
+                        help="Maximum possible regular working hours an employee may work during the day."
+                    >
+                        <label for="daily_max_regular_hours" />
+                        <field name="daily_max_regular_hours" />
+                    </setting>
+                    <setting
                         help="Maximum possible regular working hours an employee may work during the week."
                     >
                         <label for="weekly_max_regular_hours" />

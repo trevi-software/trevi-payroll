@@ -179,6 +179,13 @@ class HrPayslip(models.Model):
         if contract_days > total_days:
             contract_days = total_days
 
+        # A period without any scheduled working day (for example a payslip
+        # covering only a week-end on a Monday to Friday calendar) has no
+        # portion to divide the contract days into.
+        #
+        if not total_days:
+            return 0.0
+
         return float(contract_days) / float(total_days)
 
     def get_dictionary(self, contracts):
@@ -239,9 +246,17 @@ class HrPayslip(models.Model):
                 self.date_to
             )
 
-        # Calculate net amount of previous payslip
+        # Calculate net amount of previous payslip. Only payslips that ended
+        # before this period started qualify as the previous payslip: a later
+        # period may well have been calculated (and completed) first and must
+        # not be reported as the previous pay.
+        #
         ps_ids = self.env["hr.payslip"].search(
-            [("employee_id", "=", self.employee_id.id), ("state", "=", "done")],
+            [
+                ("employee_id", "=", self.employee_id.id),
+                ("state", "=", "done"),
+                ("date_to", "<", self.date_from),
+            ],
             order="date_from desc",
             limit=1,
         )
@@ -293,7 +308,9 @@ class HrPayslip(models.Model):
                 decimal_places,
             )
 
-            # Calculate hourly and daily rates
+            # Calculate hourly and daily rates. A period without scheduled
+            # working days has no daily/hourly rate to derive; leave the rates
+            # at zero instead of dividing by zero.
             daily_hrs = 0
             total_days = 0
             wd_calculation = IrConfig.get_param(
@@ -308,12 +325,14 @@ class HrPayslip(models.Model):
                 total_days = monthrange(self.date_from.year, self.date_from.month)[1]
             else:
                 daily_hrs, _weekly_hrs, total_days = self._get_working_defaults()
-            res["daily_wage"] = round(
-                contract.wage / total_days, payroll_decimal_places
-            )
-            res["hourly_wage"] = round(
-                contract.wage / total_days / daily_hrs, payroll_decimal_places
-            )
+            if total_days:
+                res["daily_wage"] = round(
+                    contract.wage / total_days, payroll_decimal_places
+                )
+                if daily_hrs:
+                    res["hourly_wage"] = round(
+                        contract.wage / total_days / daily_hrs, payroll_decimal_places
+                    )
 
         return res
 

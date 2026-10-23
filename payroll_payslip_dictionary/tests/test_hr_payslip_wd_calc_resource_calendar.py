@@ -253,3 +253,33 @@ class TestHrPayslip(test_common.TestHrPayslip):
             places=2,
             msg="The calculated amount is 0.4783 x first wage + 0.5217 * second wage",
         )
+
+    def test_contract_ppf_no_working_days(self):
+        # I create a contract covering the whole period
+        self.create_contract(date(2022, 1, 1), False, self.alice_emp, 5000.0)
+
+        # I set the test rule to detect the hourly rate in the dictionary
+        self.test_rule.amount_python_compute = "result = current_contract.hourly_wage"
+
+        self.apply_contract_cron()
+
+        # I create a Payslip for a week-end only: April 30, 2022 is a Saturday
+        # and May 1, 2022 is a Sunday, so the period has no working days.
+        alice_payslip = self.create_payslip(
+            date(2022, 4, 30), date(2022, 5, 1), self.alice_emp
+        )
+        alice_payslip.compute_sheet()
+
+        line = alice_payslip.line_ids.filtered(lambda line: line.code == "BASIC")
+        self.assertEqual(len(line), 1, "I found the BASIC salary line")
+        self.assertEqual(
+            line[0].amount,
+            5000.00,
+            "The contract covers the entire period",
+        )
+
+        # The daily and hourly rates of a period without working days are zero
+        # rather than a division by zero.
+        line = alice_payslip.line_ids.filtered(lambda line: line.code == "TEST")
+        self.assertEqual(len(line), 1, "I found the Test line")
+        self.assertEqual(line[0].amount, 0.0, "There is no hourly rate")
