@@ -22,7 +22,8 @@ Payslip Time-off codes
 
 |badge1| |badge2| |badge3|
 
-This module modifies the payslip worked days calculation in payslips to use leave type codes, instead of names.
+This module modifies the payslip worked days calculation in payslips to
+use leave type codes, instead of names.
 
 **Table of contents**
 
@@ -43,17 +44,17 @@ Credits
 =======
 
 Authors
-~~~~~~~
+-------
 
 * TREVI Software
 
 Other credits
-~~~~~~~~~~~~~
+-------------
 
-* Michael Telahun Makonnen <mtm@trevi.et>
+- Michael Telahun Makonnen <mtm@trevi.et>
 
 Maintainers
-~~~~~~~~~~~
+-----------
 
 This module is part of the `trevi-software/trevi-payroll <https://github.com/trevi-software/trevi-payroll/tree/19.0/payroll_payslip_hr_leave_type>`_ project on GitHub.
 

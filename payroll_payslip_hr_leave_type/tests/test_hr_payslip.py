@@ -12,7 +12,7 @@ class TestHrPayslip(TestPayslipBase):
     def setUp(self):
         super().setUp()
 
-        self.Contract = self.env["hr.contract"]
+        self.Contract = self.env["hr.version"]
         self.HrPayslip = self.env["hr.payslip"]
         self.Rule = self.env["hr.salary.rule"]
         self.Requests = self.env["hr.leave"]
@@ -23,35 +23,36 @@ class TestHrPayslip(TestPayslipBase):
             {
                 "name": "TestLeaveType",
                 "code": "TESTLV",
-                "requires_allocation": "no",
+                "company_id": self.env.company.id,
+                "requires_allocation": False,
                 "leave_validation_type": "no_validation",
             }
         )
 
-        self.basic_rule = self.env.ref("payroll.hr_rule_basic")
-        self.basic_rule.amount_python_compute = "result = contract.wage"
+        # 19.0: 'payroll.hr_rule_basic' and 'payroll.structure_base' only exist
+        # in payroll's demo data, which is no longer installed by default.
+        # TestPayslipBase already builds the basic rule and the structure.
         self.mock_rule = self.Rule.create(
             {
                 "name": "Leave Salary Rule",
                 "code": "TESTLV",
                 "sequence": 5,
-                "category_id": self.ref("payroll.ALW"),
+                "category_id": self.categ_alw.id,
                 "condition_select": "python",
                 "condition_python": "result = 0",
                 "amount_select": "code",
                 "amount_python_compute": "result = 1000.0",
             }
         )
-        self.developer_pay_structure.write(
-            {"parent_id": self.ref("payroll.structure_base")}
-        )
         self.developer_pay_structure.write({"rule_ids": [(4, self.mock_rule.id)]})
 
         self.resource_calendar_std = self.env.ref("resource.resource_calendar_std")
         contracts = self.Contract.search([("employee_id", "=", self.richard_emp.id)])
         contracts[0].resource_calendar_id = self.resource_calendar_std
-        contracts[0].kanban_state = "done"
-        contracts[0].date_start = datetime(2022, 1, 1)
+        # 19.0: hr.contract is gone, hr.version is the contract record. The
+        # contract start is a stored field now; date_start is computed from it.
+        contracts[0].contract_date_start = datetime(2022, 1, 1)
+        contracts[0].contract_date_end = False
 
     def test_holiday_type_code(self):
         self.mock_rule.condition_python = "result = worked_days.LVCODE"
@@ -60,16 +61,10 @@ class TestHrPayslip(TestPayslipBase):
         )
 
         self.apply_contract_cron()
-        # hr_contract_values' demo data sets a 90-day trial period, so the
-        # cron moves the contract to 'trial' instead of 'open'. End the trial
-        # explicitly to reach 'open'.
-        contract = self.richard_emp.contract_id
-        if contract.state == "trial":
-            contract.trial_date_end = False
-            contract.signal_confirm()
-        self.assertEqual(
-            self.richard_emp.contract_id.state, "open", "Contract is in 'open' state"
-        )
+        # hr.contract.state ('open'/'trial') has no equivalent in 19.0; the
+        # contract is simply the employee's current hr.version.
+        contract = self.richard_emp.version_id
+        self.assertTrue(contract.is_current, "Contract is the current version")
 
         # Set system parameter
         self.env["ir.config_parameter"].sudo().set_param(
