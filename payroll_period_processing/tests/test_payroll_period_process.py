@@ -26,11 +26,33 @@ class TestProcessing(common.TransactionCase):
         cls.payrollOfficer = new_test_user(
             cls.env,
             login="Payroff",
-            groups="base.group_user,payroll.group_payroll_user",
+            groups=("base.group_user,payroll.group_payroll_user,hr.group_hr_manager"),
             name="Pyaroll Officer",
             email="payroff@example.com",
         )
-        cls.pay_struct = cls.env.ref("payroll.structure_base")
+        # Odoo 19 does not install payroll demo data, so 'payroll.structure_base'
+        # does not exist. Build the salary structure the contracts need.
+        cls.cat_net = cls.env["hr.salary.rule.category"].create(
+            {"name": "Net", "code": "NET"}
+        )
+        cls.rule_net = cls.env["hr.salary.rule"].create(
+            {
+                "name": "Net Salary",
+                "code": "NET",
+                "category_id": cls.cat_net.id,
+                "sequence": 100,
+                "condition_select": "none",
+                "amount_select": "code",
+                "amount_python_compute": "result = contract.wage",
+            }
+        )
+        cls.pay_struct = cls.env["hr.payroll.structure"].create(
+            {
+                "name": "Test Structure",
+                "code": "TEST",
+                "rule_ids": [(6, 0, [cls.rule_net.id])],
+            }
+        )
         cls.rd_dept = cls.Department.create(
             {
                 "name": "Research and devlopment",
@@ -53,6 +75,11 @@ class TestProcessing(common.TransactionCase):
                 "name": "David Employee",
                 "user_id": cls.user_employee.id,
                 "department_id": cls.rd_dept.id,
+                # Odoo 19: every employee owns an hr.version, dated today by
+                # default, and (employee_id, date_version) is unique. Backdate
+                # the hire version so the contract versions created by the tests
+                # can be pinned to their own start date and become current.
+                "date_version": date(2000, 1, 1),
             }
         )
 
@@ -62,7 +89,7 @@ class TestProcessing(common.TransactionCase):
         # required 'code' field on hr.leave.type
         leave_type_vals = {
             "name": "NotLimitedHR",
-            "requires_allocation": "no",
+            "requires_allocation": False,
             "leave_validation_type": "hr",
         }
         if "code" in cls.LeaveType._fields:
@@ -128,27 +155,28 @@ class TestProcessing(common.TransactionCase):
     def create_contract(
         self,
         eid,
-        state,
-        kanban_state,
         start,
         end=None,
         trial_end=None,
         pps_id=None,
         job_id=False,
     ):
-        return self.env["hr.contract"].create(
+        # hr_contract was merged into hr: a contract is now an hr.version.
+        # state/kanban_state no longer exist; the version dates and the
+        # is_current/is_past/is_future computed flags express the same thing.
+        return self.env["hr.version"].create(
             {
                 "name": "Contract",
                 "employee_id": eid,
-                "state": state,
-                "kanban_state": kanban_state,
                 "wage": 1,
-                "date_start": start,
+                "date_version": start,
+                "contract_date_start": start,
                 "trial_date_end": trial_end,
-                "date_end": end,
+                "contract_date_end": end,
                 "struct_id": self.pay_struct.id,
                 "pps_id": pps_id,
                 "job_id": job_id,
+                "department_id": self.rd_dept.id,
             }
         )
 
@@ -191,7 +219,7 @@ class TestProcessing(common.TransactionCase):
 
         self.setUpCommon()
         start = datetime(2021, 9, 1)
-        cc = self.create_contract(self.employee_emp.id, "draft", "done", start)
+        cc = self.create_contract(self.employee_emp.id, start.date())
         wiz = (
             self.Wizard.with_user(self.payrollOfficer)
             .with_context(active_id=self.period.id)
@@ -207,13 +235,10 @@ class TestProcessing(common.TransactionCase):
         start = datetime(2021, 9, 1)
         cc = self.create_contract(
             self.employee_emp.id,
-            "draft",
-            "done",
             start.date(),
             pps_id=self.schedule.id,
             job_id=self.job_ux_designer.id,
         )
-        cc.signal_confirm()
         wiz = (
             self.Wizard.with_user(self.payrollOfficer)
             .with_context(active_id=self.period.id)
@@ -247,15 +272,12 @@ class TestProcessing(common.TransactionCase):
         self.setUpCommon()
         start = datetime(2021, 9, 1)
         utc_start_dt = datetime(2021, 8, 31, 21, 0, 0)
-        cc = self.create_contract(
+        self.create_contract(
             self.employee_emp.id,
-            "draft",
-            "done",
             start.date(),
             pps_id=self.schedule.id,
             job_id=self.job_ux_designer.id,
         )
-        cc.signal_confirm()
         wiz = (
             self.Wizard.with_user(self.payrollOfficer)
             .with_context(active_id=self.period.id)

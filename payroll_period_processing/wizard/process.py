@@ -4,7 +4,7 @@
 
 from pytz import timezone, utc
 
-from odoo import _, api, exceptions, fields, models
+from odoo import api, exceptions, fields, models
 
 DEFAULT_BATCHBY = "department"
 
@@ -22,18 +22,21 @@ class ProcessingWizard(models.TransientModel):
 
     @api.model
     def _get_contracts(self):
+        # Odoo 19: hr_contract was merged into hr and hr.contract was renamed
+        # hr.version. There is no draft/confirmed state any more, so list every
+        # contract version that overlaps the payroll period.
         res = []
-        Contract = self.env["hr.contract"]
+        Contract = self.env["hr.version"]
         pp_id = self._get_pp()
         if pp_id:
             pp = self.env["hr.payroll.period"].browse(pp_id)
             res = Contract.search(
                 [
-                    ("date_start", "<=", pp.date_end),
-                    ("state", "=", "draft"),
+                    ("contract_date_start", "!=", False),
+                    ("contract_date_start", "<=", pp.date_end),
                     "|",
-                    ("date_end", "=", False),
-                    ("date_end", ">=", pp.date_start),
+                    ("contract_date_end", "=", False),
+                    ("contract_date_end", ">=", pp.date_start),
                 ]
             )
         return res
@@ -56,7 +59,7 @@ class ProcessingWizard(models.TransientModel):
     # Contracts in Draft State
     contract_ids = fields.Many2many(
         string="Contracts to Approve",
-        comodel_name="hr.contract",
+        comodel_name="hr.version",
         relation="hr_payroll_processing_contracts_rel",
         column1="wizard_id",
         column2="contract_id",
@@ -170,18 +173,22 @@ class ProcessingWizard(models.TransientModel):
         self.ensure_one()
         if self.payroll_period_id.state in ["payment", "closed"]:
             raise exceptions.UserError(
-                _(
+                self.env._(
                     "You cannot modify a payroll register once it has been "
                     "marked for payment"
                 )
             )
 
         if self.payroll_period_id.state not in ["open", "ended", "locked", "generate"]:
-            raise exceptions.UserError(_("You must lock the payroll period first."))
+            raise exceptions.UserError(
+                self.env._("You must lock the payroll period first.")
+            )
 
         # Create the payroll register
         register_values = {
-            "name": _("%(month)s Payroll Sheet", month=self.payroll_period_id.name),
+            "name": self.env._(
+                "%(month)s Payroll Sheet", month=self.payroll_period_id.name
+            ),
             "period_name": self.payroll_period_id.period_name,
             "date_start": self.payroll_period_id.date_start,
             "date_end": self.payroll_period_id.date_end,
@@ -189,7 +196,9 @@ class ProcessingWizard(models.TransientModel):
         }
 
         # Get list of departments
-        department_ids = self.env["hr.department"].search([])
+        # Every department must be visited to build the payslip batches, so an
+        # unbounded search is intentional here.
+        department_ids = self.env["hr.department"].search([])  # pylint: disable=no-search-all
 
         register = self.create_payslip_runs(register_values, department_ids)
         register.set_denominations()
@@ -207,15 +216,15 @@ class ProcessingWizard(models.TransientModel):
         return period.schedule_id.contract_ids
 
     def _get_employees_from_department(self, dept, contracts, date_start, date_end):
-        c_ids = self.env["hr.contract"].search(
+        c_ids = self.env["hr.version"].search(
             [
                 ("id", "in", contracts.ids),
-                ("date_start", "<=", date_end),
+                ("contract_date_start", "<=", date_end),
                 "|",
-                ("date_end", "=", False),
-                ("date_end", ">=", date_start),
+                ("contract_date_end", "=", False),
+                ("contract_date_end", ">=", date_start),
                 "|",
-                ("department_id.id", "=", dept.id),
+                ("department_id", "=", dept.id),
                 ("employee_id.department_id", "=", dept.id),
             ]
         )

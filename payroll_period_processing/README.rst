@@ -22,11 +22,10 @@ Payroll Period Processing
 
 |badge1| |badge2| |badge3|
 
-This module provides an End-of-Period payroll processing wizard. The wizard can be used to:
-* Check there are no draft contracts
-* Check there are no un-approved leaves
-* Check and adjust the dates of any public holidays
-* Generate pay slips
+This module provides an End-of-Period payroll processing wizard. The
+wizard can be used to: \* Check there are no draft contracts \* Check
+there are no un-approved leaves \* Check and adjust the dates of any
+public holidays \* Generate pay slips
 
 **Table of contents**
 
@@ -36,23 +35,26 @@ This module provides an End-of-Period payroll processing wizard. The wizard can 
 Usage
 =====
 
-To use this module:
-#. Navigate to Payroll -> Payroll Periods and open a payroll period that has ended
-#. Click on the "Process Payroll" button
-#. Click on the "Next" button to progress through the various check screens
-#. Click on the "Back" button to return to any previous check screens
-#. At any time you can click on the "Generate Payslips" button to generate the payroll
+To use this module: #. Navigate to Payroll -> Payroll Periods and open a
+payroll period that has ended #. Click on the "Process Payroll" button
+#. Click on the "Next" button to progress through the various check
+screens #. Click on the "Back" button to return to any previous check
+screens #. At any time you can click on the "Generate Payslips" button
+to generate the payroll
 
 Changelog
 =========
 
 14.0.1.2.1 (2022-08-10)
-~~~~~~~~~~~~~~~~~~~~~~~
-* [FIX] take into account timezone when creating payslip runs
+-----------------------
+
+- [FIX] take into account timezone when creating payslip runs
 
 14.0.1.2.0 (2022-04-13)
-~~~~~~~~~~~~~~~~~~~~~~~
-* This module now depends on hr_holidays_public from OCA and not on trevi_hr_public_holidays
+-----------------------
+
+- This module now depends on hr_holidays_public from OCA and not on
+  trevi_hr_public_holidays
 
 Bug Tracker
 ===========
@@ -68,18 +70,18 @@ Credits
 =======
 
 Authors
-~~~~~~~
+-------
 
 * TREVI Software
 * Clear ICT Solutions
 
 Other credits
-~~~~~~~~~~~~~
+-------------
 
-* Clear ICT Solutions <info@clearict.com>
+- Clear ICT Solutions <info@clearict.com>
 
 Maintainers
-~~~~~~~~~~~
+-----------
 
 This module is part of the `trevi-software/trevi-payroll <https://github.com/trevi-software/trevi-payroll/tree/19.0/payroll_period_processing>`_ project on GitHub.
 
