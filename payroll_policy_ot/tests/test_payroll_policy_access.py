@@ -48,6 +48,14 @@ class TestPolicyAccess(common.TransactionCase):
             email="ric@example.com",
         )
 
+    def _assert_read_succeeds(self, model, rec_id, expected_name, label):
+        """Read a field as the given user; fail loudly if the read is denied."""
+        try:
+            data = model.browse(rec_id).read(["name"])
+            self.assertEqual(data[0]["name"], expected_name)
+        except AccessError:
+            self.fail(f"Caught an unexpected exception reading {label}")
+
     def test_hrm_access(self):
         """HRM only has read access"""
 
@@ -56,27 +64,34 @@ class TestPolicyAccess(common.TransactionCase):
             self.OtPolicy.with_user(self.userHRM).create(
                 {"name": "OT2", "date": date.today()}
             )
+        with self.assertRaises(AccessError):
             self.OtPolicyLine.with_user(self.userHRM).create(
-                {"name": "line2", "type": "daily"}
+                {"name": "line2", "code": "L2", "type": "daily"}
             )
         # Unlink fails
         with self.assertRaises(AccessError):
             self.ot_policy.with_user(self.userHRM).unlink()
+        with self.assertRaises(AccessError):
             self.ot_line.with_user(self.userHRM).unlink()
         # Read succeeds
-        try:
-            self.OtPolicy.with_user(self.userHRM).browse(self.ot_policy.id)
-        except AccessError:
-            self.fail("Caught an unexpected exception reading hr.policy.ot")
-        try:
-            self.OtPolicyLine.with_user(self.userHRM).browse(self.ot_policy.id)
-        except AccessError:
-            self.fail("Caught an unexpected exception reading hr.policy.line.ot")
+        self._assert_read_succeeds(
+            self.OtPolicy.with_user(self.userHRM),
+            self.ot_policy.id,
+            "OT1",
+            "hr.policy.ot",
+        )
+        self._assert_read_succeeds(
+            self.OtPolicyLine.with_user(self.userHRM),
+            self.ot_line.id,
+            "Line1",
+            "hr.policy.line.ot",
+        )
         # Write fails
         with self.assertRaises(AccessError):
             self.OtPolicy.with_user(self.userHRM).browse(self.ot_policy.id).write(
                 {"name": "OT3"}
             )
+        with self.assertRaises(AccessError):
             self.OtPolicyLine.with_user(self.userHRM).browse(self.ot_line.id).write(
                 {"name": "line3"}
             )
@@ -89,27 +104,34 @@ class TestPolicyAccess(common.TransactionCase):
             self.OtPolicy.with_user(self.userPU).create(
                 {"name": "OT2", "date": date.today()}
             )
+        with self.assertRaises(AccessError):
             self.OtPolicyLine.with_user(self.userPU).create(
-                {"name": "line2", "type": "daily"}
+                {"name": "line2", "code": "L2", "type": "daily"}
             )
         # Unlink fails
         with self.assertRaises(AccessError):
             self.ot_policy.with_user(self.userPU).unlink()
+        with self.assertRaises(AccessError):
             self.ot_line.with_user(self.userPU).unlink()
         # Read succeeds
-        try:
-            self.OtPolicy.with_user(self.userPU).browse(self.ot_policy.id)
-        except AccessError:
-            self.fail("Caught an unexpected exception reading hr.policy.ot")
-        try:
-            self.OtPolicyLine.with_user(self.userPU).browse(self.ot_policy.id)
-        except AccessError:
-            self.fail("Caught an unexpected exception reading hr.policy.line.ot")
+        self._assert_read_succeeds(
+            self.OtPolicy.with_user(self.userPU),
+            self.ot_policy.id,
+            "OT1",
+            "hr.policy.ot",
+        )
+        self._assert_read_succeeds(
+            self.OtPolicyLine.with_user(self.userPU),
+            self.ot_line.id,
+            "Line1",
+            "hr.policy.line.ot",
+        )
         # Write fails
         with self.assertRaises(AccessError):
             self.OtPolicy.with_user(self.userPU).browse(self.ot_policy.id).write(
                 {"name": "OT3"}
             )
+        with self.assertRaises(AccessError):
             self.OtPolicyLine.with_user(self.userPU).browse(self.ot_line.id).write(
                 {"name": "line3"}
             )
@@ -118,14 +140,18 @@ class TestPolicyAccess(common.TransactionCase):
         """Payroll Manager has complete access"""
 
         # Read succeeds
-        try:
-            self.OtPolicy.with_user(self.userPM).browse(self.ot_policy.id)
-        except AccessError:
-            self.fail("Caught an unexpected exception reading hr.policy.ot")
-        try:
-            self.OtPolicyLine.with_user(self.userPM).browse(self.ot_line.id)
-        except AccessError:
-            self.fail("Caught an unexpected exception reading hr.policy.line.ot")
+        self._assert_read_succeeds(
+            self.OtPolicy.with_user(self.userPM),
+            self.ot_policy.id,
+            "OT1",
+            "hr.policy.ot",
+        )
+        self._assert_read_succeeds(
+            self.OtPolicyLine.with_user(self.userPM),
+            self.ot_line.id,
+            "Line1",
+            "hr.policy.line.ot",
+        )
         # Write succeeds
         try:
             self.OtPolicy.with_user(self.userPM).browse(self.ot_policy.id).write(
@@ -144,15 +170,21 @@ class TestPolicyAccess(common.TransactionCase):
             ot = self.OtPolicy.with_user(self.userPM).create(
                 {"name": "OT test pm", "date": date.today()}
             )
-            ot.unlink()
         except AccessError:
-            self.fail("Caught unexpected exception creating/unlinking hr.policy.ot")
+            self.fail("Caught unexpected exception creating hr.policy.ot")
+        else:
+            try:
+                ot.unlink()
+            except AccessError:
+                self.fail("Caught unexpected exception unlinking hr.policy.ot")
         try:
             line = self.OtPolicyLine.with_user(self.userPM).create(
                 {"name": "line test pm", "type": "daily", "code": "A"}
             )
-            line.unlink()
         except AccessError:
-            self.fail(
-                "Caught unexpected exception creating/unlinking hr.policy.line.ot"
-            )
+            self.fail("Caught unexpected exception creating hr.policy.line.ot")
+        else:
+            try:
+                line.unlink()
+            except AccessError:
+                self.fail("Caught unexpected exception unlinking hr.policy.line.ot")
