@@ -22,7 +22,8 @@ Payroll Period Lock
 
 |badge1| |badge2| |badge3|
 
-This module allows the Payroll Manager to lock and unlock a payroll period.
+This module allows the Payroll Manager to lock and unlock a payroll
+period.
 
 **Table of contents**
 
@@ -43,18 +44,18 @@ Credits
 =======
 
 Authors
-~~~~~~~
+-------
 
 * TREVI Software
 * Michael Telahun Makonnen
 
 Other credits
-~~~~~~~~~~~~~
+-------------
 
-* Michael Telahun Makonnen <mtm@trevi.et>
+- Michael Telahun Makonnen <mtm@trevi.et>
 
 Maintainers
-~~~~~~~~~~~
+-----------
 
 This module is part of the `trevi-software/trevi-payroll <https://github.com/trevi-software/trevi-payroll/tree/19.0/payroll_period_base_lock>`_ project on GitHub.
 
