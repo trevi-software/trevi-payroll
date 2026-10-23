@@ -14,7 +14,7 @@
                     string="Ended Periods"
                     domain="[('state','in',['ended','locked','generate','payment'])]"
                 />
-                <group expand="0" string="Group By...">
+                <group>
                     <filter
                         name="group_company"
                         string="Company"

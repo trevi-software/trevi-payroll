@@ -2,7 +2,7 @@
 # Copyright (C) 2013 Michael Telahun Makonnen <mmakonnen@gmail.com>.
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl.html).
 
-from odoo import _, exceptions, fields, models
+from odoo import exceptions, fields, models
 from odoo.tools.safe_eval import safe_eval
 
 
@@ -73,15 +73,18 @@ result = categories.GROSS.amount > categories.NET.amount"""
             return True
         else:  # python code
             try:
-                safe_eval(self.condition_python, localdict, mode="exec", nocopy=True)
+                # Odoo 19: safe_eval() no longer takes the `nocopy` argument;
+                # the context dict is always mutated in place.
+                safe_eval(self.condition_python, localdict, mode="exec")
                 return "result" in localdict and localdict["result"] or False
             except Exception as exc:
                 raise exceptions.UserError(
-                    _("Error!")
+                    self.env._("Error!")
                     + "\n"
-                    + _(
+                    + self.env._(
                         "Wrong python condition defined for payroll exception"
-                        " rule %(name)s (%(code)s)."
+                        " rule %(name)s (%(code)s).",
+                        name=self.name,
+                        code=self.code,
                     )
-                    % {"name": self.name, "code": self.code}
                 ) from exc

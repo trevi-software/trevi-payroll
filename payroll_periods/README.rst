@@ -24,7 +24,13 @@ Payroll Period
 
 Easy Payroll Management
 -----------------------
-This module implements a more formal payroll cycle. This cycle is based on payroll period schedules configured by the user. Based on the configured schedule payroll periods are periodicaly created in advance. When a payroll period ends the state is automatically set to 'Ended'. A manual schedule can also be created, in which case the payroll manager must create payroll periods individually.
+
+This module implements a more formal payroll cycle. This cycle is based
+on payroll period schedules configured by the user. Based on the
+configured schedule payroll periods are periodicaly created in advance.
+When a payroll period ends the state is automatically set to 'Ended'. A
+manual schedule can also be created, in which case the payroll manager
+must create payroll periods individually.
 
 **Table of contents**
 
@@ -36,43 +42,52 @@ Configuration
 
 To configure payroll periods, you need to:
 
-#. Go to Payroll -> Configuration -> Payroll Period Schedules
-#. Click on the "Create" button to create a new schedule
+1. Go to Payroll -> Configuration -> Payroll Period Schedules
+2. Click on the "Create" button to create a new schedule
 
 To configure payslip exception rules, you need to:
 
-#. Go to Payroll -> Configuration -> Payslip Exception Rules
-#. Click on the "Create" button to create a new rule
+1. Go to Payroll -> Configuration -> Payslip Exception Rules
+2. Click on the "Create" button to create a new rule
 
 Known issues / Roadmap
 ======================
 
-* Currently only monthly schedules are implemented
-* The option to make payment on a business day is not yet implemented
+- Currently only monthly schedules are implemented
+- The option to make payment on a business day is not yet implemented
 
 Changelog
 =========
 
 14.0.1.1.4 (2022-08-11)
-~~~~~~~~~~~~~~~~~~~~~~~
-* [FIX] A bug when creating pay slips that didn't change the period's start/end times to the local timezone
+-----------------------
+
+- [FIX] A bug when creating pay slips that didn't change the period's
+  start/end times to the local timezone
 
 14.0.1.1.3 (2022-04-10)
-~~~~~~~~~~~~~~~~~~~~~~~
-* [FIX] Fixed a bug that prevented multiple payslips being computed at once
+-----------------------
+
+- [FIX] Fixed a bug that prevented multiple payslips being computed at
+  once
 
 14.0.1.1.2 (2022-01-12)
-~~~~~~~~~~~~~~~~~~~~~~~
-* [ADD] Allow users to view their own (and subordinates) payslips
+-----------------------
+
+- [ADD] Allow users to view their own (and subordinates) payslips
 
 14.0.1.1.1 (2021-10-07)
-~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------
 
-* [ADD] Additional access rules
-* [FIX] Replace broken gtk-icons with font-awesome icons in payslip exception buttons in form view
-* [FIX] Properly spell out Payroll period schedule field name in hr.contract
-* [ADD] Change the severity of the NETZERO payslip exception rule from 'low' to 'critical'
-* [FIX] Payroll Period cron jobs did not complete running because of a programming error
+- [ADD] Additional access rules
+- [FIX] Replace broken gtk-icons with font-awesome icons in payslip
+  exception buttons in form view
+- [FIX] Properly spell out Payroll period schedule field name in
+  hr.contract
+- [ADD] Change the severity of the NETZERO payslip exception rule from
+  'low' to 'critical'
+- [FIX] Payroll Period cron jobs did not complete running because of a
+  programming error
 
 Bug Tracker
 ===========
@@ -88,18 +103,18 @@ Credits
 =======
 
 Authors
-~~~~~~~
+-------
 
 * TREVI Software
 * Michael Telahun Makonnen
 
 Other credits
-~~~~~~~~~~~~~
+-------------
 
-* Michael Telahun Makonnen <mtm@trevi.et>
+- Michael Telahun Makonnen <mtm@trevi.et>
 
 Maintainers
-~~~~~~~~~~~
+-----------
 
 This module is part of the `trevi-software/trevi-payroll <https://github.com/trevi-software/trevi-payroll/tree/19.0/payroll_periods>`_ project on GitHub.
 

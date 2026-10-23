@@ -1,6 +1,7 @@
 # Copyright (C) 2021 Trevi Software (https://trevi.et)
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl.html).
 
+from datetime import date
 
 from odoo.addons.payroll.tests.common import TestPayslipBase
 
@@ -11,12 +12,20 @@ class TestPayslip(TestPayslipBase):
         # Form: payroll_account, when installed alongside, makes journal_id a
         # required field on the payslip form, and it is only ever filled in from
         # the contract.
-        richard_payslip = self.Payslip.create({"employee_id": self.richard_emp.id})
-        richard_payslip.onchange_employee()
-        richard_payslip.compute_sheet()
-        richard_payslip.write({"number": "SLIP/1000"})
+        #
+        # Odoo 19: hr.contract is gone and a contract is now an hr.version
+        # carrying contract dates - there is no draft/approved contract state
+        # any more. The "no approved contract" case is therefore an employee
+        # whose version carries no contract dates at all.
+        emp_no_contract = self.env["hr.employee"].create(
+            {"name": "No Contract", "date_version": date(2000, 1, 1)}
+        )
+        no_contract_payslip = self.Payslip.create({"employee_id": emp_no_contract.id})
+        no_contract_payslip.onchange_employee()
+        no_contract_payslip.compute_sheet()
+        no_contract_payslip.write({"number": "SLIP/1000"})
 
-        categories = richard_payslip.get_categories_dict()
+        categories = no_contract_payslip.get_categories_dict()
         self.assertEqual(
             categories,
             {},

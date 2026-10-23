@@ -5,7 +5,8 @@ from odoo import fields, models
 
 
 class Contract(models.Model):
-    _inherit = "hr.contract"
+    # Odoo 19: hr_contract was merged into hr; a contract is now an hr.version.
+    _inherit = "hr.version"
 
     pps_id = fields.Many2one(
         "hr.payroll.period.schedule", "Payroll Period Schedule", required=False

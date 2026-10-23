@@ -5,7 +5,7 @@
 {
     "name": "Payroll Period",
     "summary": "Configurable payroll schedules.",
-    "version": "18.0.1.0.0",
+    "version": "19.0.1.0.0",
     "category": "Payroll",
     "images": ["static/src/img/main_screenshot.png"],
     "author": "TREVI Software, Michael Telahun Makonnen",
@@ -13,7 +13,6 @@
     "website": "https://github.com/trevi-software/trevi-payroll",
     "depends": [
         "hr",
-        "hr_contract",
         "hr_employee_status",
         "payroll",
     ],

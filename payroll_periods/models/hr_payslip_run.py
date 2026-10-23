@@ -6,7 +6,7 @@ from datetime import datetime
 
 from pytz import timezone, utc
 
-from odoo import _, api, exceptions, fields, models
+from odoo import api, exceptions, fields, models
 from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT as OE_DTFORMAT
 
 
@@ -41,9 +41,9 @@ class HrPayslipRun(models.Model):
 
         if p_data["state"] not in ["open", "ended", "locked", "generate"]:
             raise exceptions.UserError(
-                _("Invalid Action")
+                self.env._("Invalid Action")
                 + "\n"
-                + _("You must lock the payroll period first.")
+                + self.env._("You must lock the payroll period first.")
             )
 
         s_data = (
@@ -92,7 +92,8 @@ class HrPayslipRun(models.Model):
         date_end,
         annual_pay_periods,
     ):
-        Contract = self.env["hr.contract"]
+        # Odoo 19: hr.contract is gone, a contract is an hr.version
+        Contract = self.env["hr.version"]
         Department = self.env["hr.department"]
         Employee = self.env["hr.employee"]
         PayslipRun = self.env["hr.payslip.run"]
@@ -115,26 +116,24 @@ class HrPayslipRun(models.Model):
             c_ids = Contract.search(
                 [
                     ("id", "in", contract_ids),
-                    ("date_start", "<=", date_end),
+                    ("contract_date_start", "<=", date_end),
                     "|",
-                    ("date_end", "=", False),
-                    ("date_end", ">=", date_start),
+                    ("contract_date_end", "=", False),
+                    ("contract_date_end", ">=", date_start),
                     "|",
-                    ("department_id.id", "=", dept.id),
-                    ("employee_id.department_id.id", "=", dept.id),
+                    ("department_id", "=", dept.id),
+                    ("employee_id.department_id", "=", dept.id),
                 ]
             )
             c2_ids = Contract.search(
                 [
                     ("id", "in", contract_ids),
-                    ("date_start", "<=", date_end),
+                    ("contract_date_start", "<=", date_end),
                     "|",
-                    ("date_end", "=", False),
-                    ("date_end", ">=", date_start),
+                    ("contract_date_end", "=", False),
+                    ("contract_date_end", ">=", date_start),
                     ("employee_id.status", "in", ["pending_inactive", "inactive"]),
-                    "|",
-                    ("job_id.department_id.id", "=", dept.id),
-                    ("end_job_id.department_id.id", "=", dept.id),
+                    ("job_id.department_id", "=", dept.id),
                 ]
             )
             for i in c2_ids:

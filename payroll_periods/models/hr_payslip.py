@@ -81,10 +81,15 @@ class HrPayslip(models.Model):
         self.ensure_one()
 
         # Get all the rules for all the payroll structures associated
-        # with all the contracts for this employee for this period
+        # with all the versions (contracts) for this employee for this period
+        # Odoo 19: _get_contracts() returns a dict keyed by employee id, and a
+        # contract is an hr.version.
         #
-        contracts = self.employee_id._get_contracts(
-            date_from=self.date_from, date_to=self.date_to
+        contracts_by_employee = self.employee_id._get_contracts(
+            date_start=self.date_from, date_end=self.date_to
+        )
+        contracts = contracts_by_employee.get(
+            self.employee_id.id, self.env["hr.version"]
         )
         rules = contracts.get_all_structures().get_all_rules().sorted("sequence")
 
@@ -116,14 +121,18 @@ class HrPayslip(models.Model):
     def compute_sheet(self):
         res = super().compute_sheet()
 
-        sorted_rules = (
-            self.env["hr.payslip.exception.rule"].search([]).sorted("sequence")
-        )
+        Rule = self.env["hr.payslip.exception.rule"]
+        # Every exception rule applies to every payslip, so the sweep is
+        # intentionally unbounded.
+        sorted_rules = Rule.search([])  # pylint: disable=no-search-all
+        sorted_rules = sorted_rules.sorted("sequence")
 
         for payslip in self:
             baselocaldict = payslip._get_baselocaldict_hook()
             employee = payslip.employee_id
-            contract = employee.contract_id
+            # Odoo 19: hr.employee has no contract_id; the contract (hr.version)
+            # is carried by the payslip itself.
+            contract = payslip.contract_id
             localdict = dict(baselocaldict, employee=employee, contract=contract)
 
             for rule in sorted_rules:

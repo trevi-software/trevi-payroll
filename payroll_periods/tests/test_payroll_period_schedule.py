@@ -38,9 +38,12 @@ class TestSchedule(common.TransactionCase):
         )
 
     def apply_create_cron(self):
+        # Odoo 19: method_direct_trigger() runs the job through the scheduler
+        # (separate transaction), so its writes are invisible to the test. Run
+        # the underlying server action inside the test transaction instead.
         self.env.ref(
             "payroll_periods.hr_payroll_period_create_cron"
-        ).method_direct_trigger()
+        ).ir_actions_server_id.run()
 
     def test_annual_period_no(self):
         """There are 12 annual periods for monthly schedule"""

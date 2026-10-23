@@ -21,8 +21,14 @@ class TestSchedule(common.TransactionCase):
         cls.Payslip = cls.env["hr.payslip"]
         cls.Exception = cls.env["hr.payslip.exception"]
         cls.exRuleCrit = cls.env.ref("payroll_periods.payslip_exception_third")
-        cls.eeJohn = cls.env["hr.employee"].create({"name": "EE John"})
-        cls.eeSally = cls.env["hr.employee"].create({"name": "EE Sally"})
+        # Odoo 19: every employee owns an hr.version dated today; backdate it so
+        # the versions created by the tests are not capped by a "today" version.
+        cls.eeJohn = cls.env["hr.employee"].create(
+            {"name": "EE John", "date_version": date(2000, 1, 1)}
+        )
+        cls.eeSally = cls.env["hr.employee"].create(
+            {"name": "EE Sally", "date_version": date(2000, 1, 1)}
+        )
         # Payroll Manager user
         cls.userPM = new_test_user(
             cls.env,
@@ -32,11 +38,21 @@ class TestSchedule(common.TransactionCase):
             email="ric@example.com",
         )
 
+        # Odoo 19 does not install demo data, so 'payroll.ALW' and
+        # 'payroll.structure_base' do not exist. Build the salary structure the
+        # contracts need: a NET rule that pays the wage, plus the commission
+        # rule that carries the payslip input line under test.
+        cls.cat_alw = cls.env["hr.salary.rule.category"].create(
+            {"name": "Allowance", "code": "ALW"}
+        )
+        cls.cat_net = cls.env["hr.salary.rule.category"].create(
+            {"name": "Net", "code": "NET"}
+        )
         cls.rule_commision = cls.env["hr.salary.rule"].create(
             {
                 "name": "Commission",
                 "code": "COMM",
-                "category_id": cls.env.ref("payroll.ALW").id,
+                "category_id": cls.cat_alw.id,
                 "sequence": 17,
                 "amount_select": "code",
                 "amount_python_compute": "result = inputs.SALECOM.amount",
@@ -49,9 +65,25 @@ class TestSchedule(common.TransactionCase):
                 "input_id": cls.rule_commision.id,
             }
         )
+        cls.rule_net = cls.env["hr.salary.rule"].create(
+            {
+                "name": "Net Salary",
+                "code": "NET",
+                "category_id": cls.cat_net.id,
+                "sequence": 100,
+                "condition_select": "none",
+                "amount_select": "code",
+                "amount_python_compute": "result = contract.wage",
+            }
+        )
 
-        cls.pay_struct = cls.env.ref("payroll.structure_base")
-        cls.pay_struct.write({"rule_ids": [(4, cls.rule_commision.id)]})
+        cls.pay_struct = cls.env["hr.payroll.structure"].create(
+            {
+                "name": "Test Structure",
+                "code": "TEST",
+                "rule_ids": [(6, 0, [cls.rule_commision.id, cls.rule_net.id])],
+            }
+        )
 
     def create_payroll_schedule(self, stype=False, initial_date=False):
         return self.Schedule.create(
@@ -73,28 +105,31 @@ class TestSchedule(common.TransactionCase):
             }
         )
 
-    def create_contract(
-        self, eid, state, kanban_state, start, end=None, trial_end=None, pps_id=None
-    ):
-        return self.env["hr.contract"].create(
+    def create_contract(self, eid, start, end=None, trial_end=None, pps_id=None):
+        # Odoo 19: hr.contract is gone; a contract is an hr.version with
+        # contract dates. date_version is unique per employee, so it is pinned
+        # to the contract start date.
+        return self.env["hr.version"].create(
             {
                 "name": "Contract",
                 "employee_id": eid,
-                "state": state,
-                "kanban_state": kanban_state,
                 "wage": 1,
-                "date_start": start,
+                "date_version": start,
+                "contract_date_start": start,
+                "contract_date_end": end,
                 "trial_date_end": trial_end,
-                "date_end": end,
                 "struct_id": self.pay_struct.id,
                 "pps_id": pps_id,
             }
         )
 
     def apply_end_cron(self):
+        # Odoo 19: method_direct_trigger() runs the job through the scheduler
+        # (separate transaction), so its writes are invisible to the test. Run
+        # the underlying server action inside the test transaction instead.
         self.env.ref(
             "payroll_periods.hr_payroll_period_ended_cron"
-        ).method_direct_trigger()
+        ).ir_actions_server_id.run()
 
     def test_newly_created_period(self):
         """Newly created period should be in 'open' state"""
@@ -117,9 +152,15 @@ class TestSchedule(common.TransactionCase):
     def test_cron_set_ended(self):
         """Set periods past their end date to state: ended"""
 
-        d = date.today() - relativedelta(year=1)
+        # relativedelta(year=1) sets the year to 1 (absolute), which blew up in
+        # pytz; -years=1 is what the test means.
+        d = date.today() - relativedelta(years=1)
         start = datetime(d.year, 1, 1)
         pps = self.create_payroll_schedule("monthly", start.date())
+        # Creating a schedule does not create its periods; add the (past)
+        # periods so the cron has something to end.
+        pps.button_add_pay_periods()
+        self.assertTrue(pps.pay_period_ids)
 
         self.apply_end_cron()
 
@@ -236,7 +277,7 @@ class TestSchedule(common.TransactionCase):
 
         start = datetime(2021, 1, 1)
         end = datetime(2021, 1, 31, 23, 59, 59)
-        self.create_contract(self.eeJohn.id, "draft", "done", start)
+        self.create_contract(self.eeJohn.id, start)
         pps = self.create_payroll_schedule("manual", start.date())
         tz_local = timezone(pps.tz)
         tz_start = tz_local.localize(start, is_dst=False)
@@ -268,12 +309,8 @@ class TestSchedule(common.TransactionCase):
         start = datetime(2021, 1, 1)
         end = datetime(2021, 1, 31, 23, 59, 59)
         c2End = start + relativedelta(days=20)
-        self.create_contract(
-            self.eeJohn.id, "close", "normal", start, start + relativedelta(days=10)
-        )
-        self.create_contract(
-            self.eeJohn.id, "draft", "done", start + relativedelta(days=11), c2End
-        )
+        self.create_contract(self.eeJohn.id, start, start + relativedelta(days=10))
+        self.create_contract(self.eeJohn.id, start + relativedelta(days=11), c2End)
         pps = self.create_payroll_schedule("manual", start.date())
         pp = self.create_payroll_period(pps.id, start, end)
         run = self.Run.create(
@@ -295,10 +332,7 @@ class TestSchedule(common.TransactionCase):
         start = datetime(2021, 1, 1)
         end = datetime(2021, 1, 31, 23, 59, 59)
         pps = self.create_payroll_schedule("manual", start.date())
-        cc = self.create_contract(
-            self.eeJohn.id, "draft", "done", start.date(), pps_id=pps.id
-        )
-        cc.signal_confirm()
+        cc = self.create_contract(self.eeJohn.id, start.date(), pps_id=pps.id)
         pp = self.create_payroll_period(pps.id, start, end)
         run = self.Run.create(
             {
@@ -308,7 +342,9 @@ class TestSchedule(common.TransactionCase):
                 "period_id": pp.id,
             }
         )
-        self.assertEqual("open", cc.state)
+        # Odoo 19: contracts have no draft/approved state; a version carrying
+        # contract dates is in force and is picked up by the period.
+        self.assertTrue(cc.is_in_contract)
         self.assertIn(self.rule_commision, cc.struct_id.rule_ids)
         slip = pp.create_payslip(self.eeJohn.id, run_id=run.id)
 
@@ -325,10 +361,7 @@ class TestSchedule(common.TransactionCase):
         start = datetime(2021, 1, 1)
         end = datetime(2021, 1, 31, 23, 59, 59)
         pps = self.create_payroll_schedule("manual", start.date())
-        cc = self.create_contract(
-            self.eeJohn.id, "draft", "done", start.date(), pps_id=pps.id
-        )
-        cc.signal_confirm()
+        self.create_contract(self.eeJohn.id, start.date(), pps_id=pps.id)
         pp = self.create_payroll_period(pps.id, start, end)
         run = self.Run.create(
             {
@@ -355,14 +388,8 @@ class TestSchedule(common.TransactionCase):
         start = datetime(2021, 1, 1)
         end = datetime(2021, 1, 31, 23, 59, 59)
         pps = self.create_payroll_schedule("manual", start.date())
-        cc = self.create_contract(
-            self.eeJohn.id, "draft", "done", start.date(), pps_id=pps.id
-        )
-        cc.signal_confirm()
-        cc2 = self.create_contract(
-            self.eeSally.id, "draft", "done", start.date(), pps_id=pps.id
-        )
-        cc2.signal_confirm()
+        self.create_contract(self.eeJohn.id, start.date(), pps_id=pps.id)
+        self.create_contract(self.eeSally.id, start.date(), pps_id=pps.id)
         pp = self.create_payroll_period(pps.id, start, end)
         run = self.Run.create(
             {

@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 from pytz import timezone
 
-from odoo import _, api, exceptions, fields, models
+from odoo import api, exceptions, fields, models
 
 from .hr_payroll_period_schedule import get_period_year
 
@@ -152,13 +152,14 @@ class HrPayrollPeriod(models.Model):
             for ex in period.exception_ids:
                 if ex.severity == "critical" and not ex.ignore:
                     raise exceptions.ValidationError(
-                        _("Validation Error")
+                        self.env._("Validation Error")
                         + "\n"
-                        + _(
-                            "Critical exceptions remain in %(period)s. If you wish to \
-                            proceed you must resolve or ignore them."
+                        + self.env._(
+                            "Critical exceptions remain in %(period)s."
+                            " If you wish to proceed you must resolve or ignore"
+                            " them.",
+                            period=period.name,
                         )
-                        % {"period": period.name}
                     )
         self.write({"state": "payment"})
 
@@ -203,13 +204,16 @@ class HrPayrollPeriod(models.Model):
         dEarliestContractStart = False
         dLastContractEnd = False
         open_contract = False
-        for contract in ee.contract_ids:
+        # Odoo 19: a contract is an hr.version carrying contract dates. The
+        # version fields are restricted to HR users, so read them as sudo to
+        # keep the payroll processing usable by payroll managers.
+        for contract in ee.sudo().version_ids.filtered("contract_date_start"):
             # Does employee have a contract in this pay period?
             #
-            dContractStart = contract.date_start
+            dContractStart = contract.contract_date_start
             dContractEnd = False
-            if contract.date_end:
-                dContractEnd = contract.date_end
+            if contract.contract_date_end:
+                dContractEnd = contract.contract_date_end
             if dContractStart > dPeriodEnd or (
                 dContractEnd and dContractEnd < dPeriodStart
             ):
@@ -287,11 +291,12 @@ class HrPayrollPeriod(models.Model):
         month_name, _month_no, year_no = get_period_year(
             dPeriodStart, annual_pay_periods
         )
-        slip_name = _("Pay Slip for %(employee)s for %(year)s/%(month)s") % {
-            "employee": ee.name,
-            "year": year_no,
-            "month": month_name,
-        }
+        slip_name = self.env._(
+            "Pay Slip for %(employee)s for %(year)s/%(month)s",
+            employee=ee.name,
+            year=year_no,
+            month=month_name,
+        )
         res = {
             "employee_id": ee.id,
             "name": slip_name,
@@ -312,7 +317,10 @@ class HrPayrollPeriod(models.Model):
             .browse(self.ids[0])
             .read(["date_start", "date_end"])
         )
-        register_ids = self.env["hr.contribution.register"].search([]).ids
+        Register = self.env["hr.contribution.register"]
+        # The report covers every contribution register, so the sweep is
+        # intentionally unbounded.
+        register_ids = Register.search([]).ids  # pylint: disable=no-search-all
 
         form = {"date_from": data["date_start"], "date_to": data["date_end"]}
 
@@ -333,7 +341,7 @@ class HrPayrollPeriod(models.Model):
 
         if self.state in ["payment", "closed"]:
             raise exceptions.UserError(
-                _(
+                self.env._(
                     "Invalid Action"
                     "You cannot modify a pay slip once the period it is in has been "
                     "marked for payment."

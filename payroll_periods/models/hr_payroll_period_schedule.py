@@ -9,7 +9,7 @@ from datetime import date, datetime, timedelta
 from dateutil.relativedelta import relativedelta
 from pytz import common_timezones, timezone, utc
 
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT as OE_DTFORMAT
 
 
@@ -168,7 +168,7 @@ class HrPayperiodSchedule(models.Model):
         default="3",
     )
     contract_ids = fields.One2many(
-        string="Contracts", comodel_name="hr.contract", inverse_name="pps_id"
+        string="Contracts", comodel_name="hr.version", inverse_name="pps_id"
     )
     pay_period_ids = fields.One2many(
         string="Pay Periods",
@@ -227,10 +227,18 @@ class HrPayperiodSchedule(models.Model):
                 dtEnd = utcEnd.replace(tzinfo=None)
 
                 data = {
-                    "name": _("%(year)s/%(month)s %(name)s")
-                    % {"year": year_number, "month": month_number, "name": month_name},
-                    "period_name": _("%(year)s/%(month)s %(name)s")
-                    % {"year": year_number, "month": month_number, "name": month_name},
+                    "name": self.env._(
+                        "%(year)s/%(month)s %(name)s",
+                        year=year_number,
+                        month=month_number,
+                        name=month_name,
+                    ),
+                    "period_name": self.env._(
+                        "%(year)s/%(month)s %(name)s",
+                        year=year_number,
+                        month=month_number,
+                        name=month_name,
+                    ),
                     "schedule_id": self.id,
                     "date_start": dtStart,
                     "date_end": dtEnd,
@@ -257,10 +265,18 @@ class HrPayperiodSchedule(models.Model):
                 dtEnd = utcEnd.replace(tzinfo=None)
 
                 data = {
-                    "name": _("%(year)s/%(month)s %(name)s")
-                    % {"year": year_number, "month": month_number, "name": month_name},
-                    "period_name": _("%(year)s/%(month)s %(name)s")
-                    % {"year": year_number, "month": month_number, "name": month_name},
+                    "name": self.env._(
+                        "%(year)s/%(month)s %(name)s",
+                        year=year_number,
+                        month=month_number,
+                        name=month_name,
+                    ),
+                    "period_name": self.env._(
+                        "%(year)s/%(month)s %(name)s",
+                        year=year_number,
+                        month=month_number,
+                        name=month_name,
+                    ),
                     "schedule_id": self.id,
                     "date_start": dtStart,
                     "date_end": dtEnd,
@@ -306,7 +322,10 @@ class HrPayperiodSchedule(models.Model):
 
         dtNow = datetime.now()
         dtNow = datetime.strptime(dtNow.strftime("%Y-%m-1 00:00:00"), OE_DTFORMAT)
-        sched_ids = self.env["hr.payroll.period.schedule"].search([])
+        Schedule = self.env["hr.payroll.period.schedule"]
+        # The cron must visit every schedule, so the sweep is intentionally
+        # unbounded.
+        sched_ids = Schedule.search([])  # pylint: disable=no-search-all
 
         for sched in sched_ids:
             # Add up to three periods from now. If there are not periods in
