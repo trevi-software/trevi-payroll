@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="schedule1" model="hr.payroll.period.schedule">
+        <field name="name">Calendar Month Schedule</field>
+        <field name="tz">GMT</field>
+        <field name="type">monthly</field>
+        <field name="mo_paydate">3</field>
+        <field name="initial_period_date" eval="datetime.now().strftime('%Y-%m-1')" />
+    </record>
+
+    <!--
+        Odoo 19: the demo contracts shipped by hr_contract (hr_contract_admin,
+        hr_contract_al, ...) no longer exist - a contract is an hr.version now
+        and hr.employee demo records own their versions inline, without xmlids.
+        There is therefore no demo contract to attach the schedule to.
+    -->
+</odoo>
