@@ -91,18 +91,25 @@ class PayrollReportView(models.Model):
             )
 
         having_str = ""
+        params = ()
         if inc_rulecateg_ids:
-            having_str = f"HAVING psl.category_id IN {tuple(inc_rulecateg_ids.ids)}"
+            # Bind the category ids as a query parameter instead of formatting
+            # the Python tuple into the SQL: a single selected category used to
+            # render as ``IN (5,)``, which PostgreSQL rejects, so the view (and
+            # therefore every module upgrade) failed to build.
+            having_str = "HAVING psl.category_id = ANY(%s)"
+            params = (inc_rulecateg_ids.ids,)
 
-        return having_str
+        return having_str, params
 
     def init(self):
         tools.drop_view_if_exists(self.env.cr, self._table)
+        having_str, params = self._having()
         query = f"""CREATE or REPLACE VIEW {self._table} as ( SELECT
                    {self._select()}
                    FROM {self._from()}
                    GROUP BY
                    {self._group_by()}
-                   {self._having()}
+                   {having_str}
                    )"""
-        self.env.cr.execute(query)
+        self.env.cr.execute(query, params)
