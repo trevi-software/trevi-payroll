@@ -4,7 +4,7 @@
 
 from datetime import date, timedelta
 
-from odoo import _, fields, models
+from odoo import fields, models
 
 # Selection: day of month
 SELECTION_DOM = [
@@ -155,7 +155,11 @@ class HrPolicyLine(models.Model):
         if dToday is None:
             dToday = date.today()
 
-        hireDate = employee.first_contract_date
+        # Odoo 19 dropped the stored ``hr.employee.first_contract_date`` field;
+        # a contract is an ``hr.version`` record now and the employee's
+        # employment date is derived from the earliest ``contract_date_start``
+        # (``get_employment_date`` comes from hr_employee_seniority_months).
+        hireDate = employee.get_employment_date()
         delta = dToday - hireDate
         if abs(delta.days) > self.minimum_employed_days:
             return True
@@ -180,7 +184,7 @@ class HrPolicyLine(models.Model):
             amount = rec.do_calculation(employee, d_today)
             if amount is False:
                 break
-            name = _("Calendar based accrual (%(name)s)", name=self.name)
+            name = self.env._("Calendar based accrual (%(name)s)", name=self.name)
             lines = self.accrual_id.deposit(employee.id, amount, date.today(), name)
             if job:
                 for line in lines:
@@ -212,7 +216,7 @@ class HrPolicyLine(models.Model):
 
         if dToday is None:
             dToday = date.today()
-        dHire = employee.first_contract_date
+        dHire = employee.get_employment_date()
         srvc_months = employee.get_months_service_to_date(dToday=dToday)
         srvc_months = int(srvc_months)
 

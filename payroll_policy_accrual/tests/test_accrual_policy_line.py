@@ -13,6 +13,7 @@ class TestAccrualPolicy(common.TransactionCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
+        cls.env = cls.env(context=dict(cls.env.context, tracking_disable=True))
 
         cls.PolicyGroup = cls.env["hr.policy.group"]
         cls.Policy = cls.env["hr.policy.accrual"]
@@ -23,26 +24,42 @@ class TestAccrualPolicy(common.TransactionCase):
         cls.LeaveType = cls.env["hr.leave.type"]
         cls.LeaveAlloction = cls.env["hr.leave.allocation"]
 
-    def create_contract(
-        self, eid, state, kanban_state, start, end=None, trial_end=None
-    ):
-        return self.env["hr.contract"].create(
+    def create_employee(self, name):
+        """Create an employee with a back-dated initial version.
+
+        In Odoo 19 an employee always owns an ``hr.version`` dated today and
+        the ``(employee_id, date_version)`` pair is unique, so the employee is
+        created with a back-dated ``date_version``. That leaves the contract
+        start date free for the version created by :meth:`create_contract`.
+        """
+        return self.Employee.create({"name": name, "date_version": "2000-01-01"})
+
+    def create_contract(self, eid, start, end=None, trial_end=None):
+        """Create the ``hr.version`` record that represents a contract.
+
+        Odoo 19 merged ``hr_contract`` into ``hr``: a contract is an
+        ``hr.version`` and its dates live in ``contract_date_start`` /
+        ``contract_date_end``. The ``state``/``kanban_state`` selection is gone.
+        """
+        return self.env["hr.version"].create(
             {
                 "name": "Contract",
                 "employee_id": eid,
-                "state": state,
-                "kanban_state": kanban_state,
+                "date_version": start,
+                "contract_date_start": start,
                 "wage": 1,
-                "date_start": start,
                 "trial_date_end": trial_end,
-                "date_end": end,
+                "contract_date_end": end,
             }
         )
 
     def apply_cron(self):
-        self.env.ref(
-            "payroll_policy_accrual.hr_accrual_policy_cron"
-        ).method_direct_trigger()
+        # Odoo 19's ``ir.cron.method_direct_trigger()`` runs the job in its own
+        # cursor/transaction, so the records created by the test are not
+        # visible to it. Run the cron's server action instead: it executes the
+        # very same code, in the current transaction.
+        cron = self.env.ref("payroll_policy_accrual.hr_accrual_policy_cron")
+        cron.ir_actions_server_id.run()
 
     def test_get_latest_policy(self):
         """Latest policy at given date should be returned"""
@@ -82,14 +99,12 @@ class TestAccrualPolicy(common.TransactionCase):
 
         # Setup Employee past minimum days
         start = date.today() - timedelta(days=100)
-        ee = self.Employee.create({"name": "John"})
-        cc = self.create_contract(ee.id, "draft", "done", start)
-        cc.signal_confirm()
+        ee = self.create_employee("John")
+        self.create_contract(ee.id, start)
         # Setup Employee still in minimum days
         start = date.today()
-        ee2 = self.Employee.create({"name": "Paul"})
-        cc2 = self.create_contract(ee2.id, "draft", "done", start)
-        cc2.signal_confirm()
+        ee2 = self.create_employee("Paul")
+        self.create_contract(ee2.id, start)
 
         # Create policy with minimum employed days = 30
         aa = self.Accrual.create({"name": "ACCR"})
@@ -115,9 +130,8 @@ class TestAccrualPolicy(common.TransactionCase):
         start = date.today() - relativedelta(months=1)
         dLastRun = date.today() - relativedelta(days=4)
         dtLastRun = datetime.combine(dLastRun, datetime.min.time())
-        ee = self.Employee.create({"name": "John"})
-        cc = self.create_contract(ee.id, "draft", "done", start)
-        cc.signal_confirm()
+        ee = self.create_employee("John")
+        cc = self.create_contract(ee.id, start)
 
         # Create policy that accrues 24 days/year
         # hr_leave_type_unique (pulled in via trevi-hr deps in CI) adds a

@@ -49,7 +49,9 @@ class HrPolicy(models.Model):
 
         dToday = fields.Date.to_date(fields.Date.today())
 
-        for pg in PolicyGroup.search([]):
+        # Accruals must be swept for every policy group, so this search is
+        # intentionally unbounded: a limit would silently skip policies.
+        for pg in PolicyGroup.search([]):  # pylint: disable=no-search-all
             accrual_policy = self.get_latest_policy(pg, dToday)
             if accrual_policy is None:
                 continue
@@ -74,6 +76,11 @@ class HrPolicy(models.Model):
             # day (beginning from the last date for which it was run) until
             # today for each contract attached to the policy group.
             #
+            # Odoo 19: a contract is an ``hr.version`` record. The old
+            # ``state``/``kanban_state`` state machine is gone, so a version is
+            # "running" when it is not archived and its contract dates cover
+            # the day being accrued for.
+            #
             for line in accrual_policy.line_ids:
                 if line.type not in ["calendar"]:
                     continue
@@ -89,14 +96,23 @@ class HrPolicy(models.Model):
 
                     employee_list = []
                     for contract in pg.contract_ids:
-                        # employee already done or contract not in running state
+                        # employee already done, or contract archived
                         if (
                             contract.employee_id.id in employee_list
-                            or contract.state in ["draft", "done"]
+                            or not contract.active
+                        ):
+                            continue
+                        # contract has not started yet
+                        if (
+                            contract.contract_date_start
+                            and contract.contract_date_start > dJob
                         ):
                             continue
                         # contract has already ended
-                        if contract.date_end and contract.date_end < dJob:
+                        if (
+                            contract.contract_date_end
+                            and contract.contract_date_end < dJob
+                        ):
                             continue
                         line.calculate_and_deposit(
                             contract.employee_id, job, d_today=dJob
