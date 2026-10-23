@@ -1,0 +1,238 @@
+# Copyright (C) 2022 TREVI Software
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+
+from datetime import date, datetime, timedelta
+
+from pytz import timezone, utc
+
+from odoo.tests import common, new_test_user
+
+
+class TestPolicyCommon(common.TransactionCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.env = cls.env(context=dict(cls.env.context, tracking_disable=True))
+
+        cls.HrAttendance = cls.env["hr.attendance"]
+        # Odoo 19 merged ``hr_contract`` into ``hr``: a contract is now the
+        # employee's ``hr.version`` record.
+        cls.HrVersion = cls.env["hr.version"]
+        cls.HrEmployee = cls.env["hr.employee"]
+        cls.PolicyGroup = cls.env["hr.policy.group"]
+        cls.Policy = cls.env["hr.policy.rounding"]
+        cls.PolicyLine = cls.env["hr.policy.line.rounding"]
+        cls.ResourceCalendar = cls.env["resource.calendar"]
+        cls.CalendarAttendance = cls.env["resource.calendar.attendance"]
+        cls.CalendarAttendanceTemplate = cls.env[
+            "resource.calendar.attendance.template"
+        ]
+
+        cls.tpl_morning = cls.CalendarAttendanceTemplate.create(
+            {
+                "name": "Morning",
+                "day_period": "morning",
+                "hour_from": 8,
+                "hour_to": 12,
+            }
+        )
+        cls.tpl_afternoon = cls.CalendarAttendanceTemplate.create(
+            {
+                "name": "Afternoon",
+                "day_period": "afternoon",
+                "hour_from": 13,
+                "hour_to": 17,
+            }
+        )
+        cls.default_calendar = cls.ResourceCalendar.create(
+            {
+                "name": "56 Hrs a week",
+                "tz": "UTC",
+            }
+        )
+        # Create a full 7-day week sor our tests don't fail on Sat. and Sun.
+        for day in ["0", "1", "2", "3", "4", "5", "6"]:
+            cls.CalendarAttendance.create(
+                {
+                    "calendar_id": cls.default_calendar.id,
+                    "template_id": cls.tpl_morning.id,
+                    "dayofweek": day,
+                    "name": "Morning",
+                    "day_period": "morning",
+                    "hour_from": 8,
+                    "hour_to": 12,
+                }
+            )._onchange_template_id()
+            cls.CalendarAttendance.create(
+                {
+                    "calendar_id": cls.default_calendar.id,
+                    "template_id": cls.tpl_afternoon.id,
+                    "dayofweek": day,
+                    "name": "Afternoon",
+                    "day_period": "afternoon",
+                    "hour_from": 13,
+                    "hour_to": 17,
+                }
+            )._onchange_template_id()
+
+        cls.policy = cls.Policy.create(
+            {"name": "ROUNDING POLICY1", "date": date.today(), "tz": "UTC"}
+        )
+        cls.line = cls.PolicyLine.create(
+            {
+                "attendance_type": "in",
+                "round_type": "avg",
+                "policy_id": cls.policy.id,
+            }
+        )
+        # Payroll Manager user
+        cls.userPM = new_test_user(
+            cls.env,
+            login="pm",
+            groups="base.group_user,payroll.group_payroll_manager",
+            name="Payroll manager",
+            email="pm@example.com",
+        )
+        # Payroll user
+        cls.userPU = new_test_user(
+            cls.env,
+            login="pu",
+            groups="base.group_user,payroll.group_payroll_user",
+            name="Payroll manager",
+            email="pu@example.com",
+        )
+        # HR Manager
+        cls.userHRM = new_test_user(
+            cls.env,
+            login="hrm",
+            groups="base.group_user,hr.group_hr_manager",
+            name="Payroll manager",
+            email="hrm@example.com",
+        )
+
+        # Employee with contract
+        cls.test_employee = cls.create_employee(
+            "Test Employee", resource_calendar_id=cls.default_calendar.id
+        )
+        cls.test_contract = cls.create_contract()
+
+    @classmethod
+    def create_employee(cls, name="John", **vals):
+        """Create an employee whose initial version is backdated.
+
+        Every ``hr.employee`` in Odoo 19 owns an ``hr.version`` dated today and
+        ``hr.version`` enforces a unique ``(employee_id, date_version)`` index.
+        Backdating the initial version leaves room for the contract version
+        created by :meth:`create_contract`, which is dated today so that it is
+        the employee's *current* version.
+        """
+        vals.setdefault("date_version", "2000-01-01")
+        return cls.HrEmployee.create(dict({"name": name}, **vals))
+
+    @classmethod
+    def create_contract(cls, eid=None, start=None, end=None):
+        """Create the employee's contract as an ``hr.version`` record.
+
+        In Odoo 19 the contract is an ``hr.version``: the former
+        ``date_start`` / ``date_end`` are ``contract_date_start`` /
+        ``contract_date_end`` here. The ``state`` / ``kanban_state`` fields do
+        not exist any more; whether the contract is running is expressed by
+        the computed ``is_current`` / ``is_past`` / ``is_future`` flags.
+        """
+        if eid is None:
+            eid = cls.test_employee.id
+        if start is None:
+            start = date.today()
+        return cls.HrVersion.create(
+            {
+                "name": "Contract",
+                "employee_id": eid,
+                "date_version": date.today(),
+                "wage": 1,
+                "contract_date_start": start,
+                "contract_date_end": end,
+                "resource_calendar_id": cls.default_calendar.id,
+            }
+        )
+
+    def make_datetime(self, d: date, sTime: str) -> datetime:
+        return datetime.combine(d, datetime.strptime(sTime, "%H:%M").time())
+
+    def get_start_end_dates(self, weeks=1):
+        total_days = (weeks * 7) - 1
+        dStart = date.today()
+        while dStart.weekday() != 0:
+            dStart -= timedelta(days=1)
+        dEnd = dStart + timedelta(days=total_days)
+        return dStart, dEnd
+
+    def localize_dt(self, dt, tz, reverse=False):
+        """
+        Localize naive dt from database (UTC) to timzezone tz. If reverse is True
+        a naive dt that is in timezone tz is converted to naive dt for storage in db.
+        """
+
+        local_tz = timezone(tz)
+        if reverse:
+            res = (
+                local_tz.localize(dt, is_dst=False).astimezone(utc).replace(tzinfo=None)
+            )
+        else:
+            res = utc.localize(dt, is_dst=False).astimezone(local_tz)
+        return res
+
+    def setup_pg(self, line_ids, tz="UTC"):
+        p = self.Policy.create(
+            {
+                "name": "P1",
+                "date": date.today(),
+                "tz": tz,
+                "line_ids": line_ids,
+            }
+        )
+        pg = self.PolicyGroup.create(
+            {
+                "name": "PGroup",
+                "rounding_policy_ids": [(6, 0, [p.id])],
+            }
+        )
+        self.test_contract.policy_group_id = pg
+
+        self.assertGreater(
+            len(self.test_employee.resource_id.scheduled_shift_ids),
+            0,
+            "Shifts have been created on contract creation",
+        )
+
+        return (p, pg)
+
+    def set_in_times(self, strClock, strCheck):
+        clock_in = self.localize_dt(
+            self.make_datetime(date.today(), strClock),
+            self.test_employee.resource_id.tz,
+            reverse=True,
+        )
+        check_in = self.localize_dt(
+            self.make_datetime(date.today(), strCheck),
+            self.test_employee.resource_id.tz,
+            reverse=True,
+        )
+        return (clock_in, check_in)
+
+    def set_out_times(self, strIn, strClock, strCheck):
+        check_in = self.localize_dt(
+            self.make_datetime(date.today(), strIn),
+            self.test_employee.resource_id.tz,
+            reverse=True,
+        )
+        clock_out = self.localize_dt(
+            self.make_datetime(date.today(), strClock),
+            self.test_employee.resource_id.tz,
+            reverse=True,
+        )
+        check_out = self.localize_dt(
+            self.make_datetime(date.today(), strCheck),
+            self.test_employee.resource_id.tz,
+            reverse=True,
+        )
+        return (check_in, clock_out, check_out)

@@ -1,0 +1,149 @@
+# Copyright (C) 2022 TREVI Software
+# Copyright (C) 2013 Michael Telahun Makonnen <mmakonnen@gmail.com>.
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+
+
+from odoo import api, fields, models
+
+
+class HrAttendance(models.Model):
+    _inherit = "hr.attendance"
+
+    clock_in = fields.Datetime()
+    clock_out = fields.Datetime()
+
+    @api.model
+    def _get_schedule(self, ee_id, d, contract):
+        sched_hours = []
+        if contract:
+            ResourceShift = self.env["resource.schedule.shift"]
+            shifts = ResourceShift.search(
+                [
+                    ("employee_id", "=", ee_id),
+                    ("day", "=", d),
+                ]
+            )
+            sched_hours = shifts.datetimes_naive_utc()
+        return sched_hours
+
+    @api.model
+    def _get_schedule_by_approximation(self, ee_id, action, utcdt, contract):
+        shift_records = self._get_schedule(ee_id, utcdt.date(), contract)
+        dtBestIn = dtBestOut = shiftBest = previousDelta = False
+        for utcIn, utcOut, shift in shift_records:
+            if action == "sign_in":
+                delta = abs((utcdt - utcIn).total_seconds())
+                if utcIn == utcdt:
+                    return (utcIn, utcOut, shift)
+                elif delta <= (8 * 60 * 60):
+                    if previousDelta is False or (delta < previousDelta):
+                        previousDelta = delta
+                        dtBestIn = utcIn
+                        dtBestOut = utcOut
+                        shiftBest = shift
+            elif action == "sign_out":
+                delta = abs((utcdt - utcOut).total_seconds())
+                if utcOut == utcdt:
+                    return (utcIn, utcOut, shift)
+                elif delta <= (8 * 60 * 60):
+                    if previousDelta is False or (delta < previousDelta):
+                        previousDelta = delta
+                        dtBestIn = utcIn
+                        dtBestOut = utcOut
+                        shiftBest = shift
+        return (dtBestIn, dtBestOut, shiftBest)
+
+    @api.model
+    def get_contract_by_date(self, ee_id, d):
+        # Odoo 19 merged hr_contract into hr: the contract is now the
+        # employee's ``hr.version`` and its validity dates are the
+        # ``contract_date_start`` / ``contract_date_end`` fields.
+        con_ids = self.env["hr.version"].search(
+            [
+                ("employee_id", "=", ee_id),
+                ("contract_date_start", "<=", d),
+                "|",
+                ("contract_date_end", "=", False),
+                ("contract_date_end", ">=", d),
+                # Only versions that have already taken effect on the punch
+                # date: a later version of an ongoing contract (dated after the
+                # punch) must not supply the policy group for an earlier punch.
+                ("date_version", "<=", d),
+            ],
+            order="date_version desc",
+        )
+
+        if len(con_ids) > 0:
+            return con_ids[0]
+        else:
+            return False
+
+    @api.model
+    def _process_policy(self, employee_id, vals):
+        PolicyRounding = self.env["hr.policy.rounding"]
+        res = vals.copy()
+        contract = False
+        if res.get("clock_in", False) and not res.get("check_in", False):
+            rp = None
+            dt = fields.Datetime.to_datetime(res["clock_in"])
+            res.update({"check_in": res["clock_in"]})
+            contract = self.get_contract_by_date(employee_id, dt.date())
+            if contract:
+                rp = PolicyRounding.get_latest_policy(
+                    contract.policy_group_id, dt.date()
+                )
+            if rp is not None:
+                shift_record = tuple(
+                    self._get_schedule_by_approximation(
+                        employee_id, "sign_in", dt, contract
+                    )
+                )
+                if shift_record and shift_record[2]:
+                    res.update({"schedule_shift_id": shift_record[2].id})
+                    new_time = rp.process_rounding_policy(dt, "sign_in", shift_record)
+                    if new_time:
+                        res.update({"check_in": new_time})
+
+        if res.get("clock_out", False) and not res.get("check_out", False):
+            rp = None
+            dt = fields.Datetime.to_datetime(res["clock_out"])
+            res.update({"check_out": res["clock_out"]})
+            contract = self.get_contract_by_date(employee_id, dt.date())
+            if contract:
+                rp = PolicyRounding.get_latest_policy(
+                    contract.policy_group_id, dt.date()
+                )
+            if rp is not None:
+                shift_record = self._get_schedule_by_approximation(
+                    employee_id, "sign_out", dt, contract
+                )
+                if shift_record and shift_record[2]:
+                    res.update({"schedule_shift_id": shift_record[2].id})
+                    new_time = rp.process_rounding_policy(dt, "sign_out", shift_record)
+                    if new_time:
+                        res.update({"check_out": new_time})
+
+        return res
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        cooked_list = []
+        for vals in vals_list:
+            vals2 = self._process_policy(vals["employee_id"], vals)
+            cooked_list.append(vals2)
+
+        return super().create(cooked_list)
+
+    def write(self, vals):
+        # ``_process_policy`` returns a copy of ``vals`` with the rounded
+        # ``check_in`` / ``check_out`` added. Process the *original* values
+        # separately for every record and write only that record, otherwise a
+        # bulk update would skip rounding (the added key is already present)
+        # and copy the first employee's times and schedule onto the rest.
+        if not self:
+            return super().write(vals)
+        res = True
+        for rec in self:
+            rec_vals = self._process_policy(rec.employee_id.id, vals)
+            res = super(HrAttendance, rec).write(rec_vals)
+        return res
