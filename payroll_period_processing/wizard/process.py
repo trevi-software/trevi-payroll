@@ -1,0 +1,360 @@
+# Copyright (C) 2021 Trevi Software (https://trevi.et)
+# Copyright (C) 2015 Michael Telahun Makonnen <mmakonnen@gmail.com>.
+# License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl.html).
+
+from pytz import timezone, utc
+
+from odoo import api, exceptions, fields, models
+
+DEFAULT_BATCHBY = "department"
+
+
+class ProcessingWizard(models.TransientModel):
+    _name = "hr.payroll.processing"
+    _description = "HR Payroll Processing Wizard"
+
+    @api.model
+    def _get_pp(self):
+        res = False
+        if self.env.context is not None:
+            res = self.env.context.get("active_id", False)
+        return res
+
+    @api.model
+    def _get_contracts(self):
+        # Odoo 19: hr_contract was merged into hr and hr.contract was renamed
+        # hr.version. There is no draft/confirmed state any more, so list every
+        # contract version that overlaps the payroll period.
+        res = []
+        Contract = self.env["hr.version"]
+        pp_id = self._get_pp()
+        if pp_id:
+            pp = self.env["hr.payroll.period"].browse(pp_id)
+            res = Contract.search(
+                [
+                    ("contract_date_start", "!=", False),
+                    ("contract_date_start", "<=", pp.date_end),
+                    "|",
+                    ("contract_date_end", "=", False),
+                    ("contract_date_end", ">=", pp.date_start),
+                ]
+            )
+        return res
+
+    state = fields.Selection(
+        selection=[
+            ("apprvcn", "Contracts"),
+            ("apprvlv", "Leaves"),
+            ("holidays", "Holidays"),
+        ],
+        default="apprvcn",
+        readonly=True,
+    )
+    payroll_period_id = fields.Many2one(
+        comodel_name="hr.payroll.period",
+        default=lambda self: self._get_pp(),
+        readonly=True,
+    )
+
+    # Contracts in Draft State
+    contract_ids = fields.Many2many(
+        string="Contracts to Approve",
+        comodel_name="hr.version",
+        relation="hr_payroll_processing_contracts_rel",
+        column1="wizard_id",
+        column2="contract_id",
+        default=lambda self: self._get_contracts(),
+        readonly=True,
+    )
+
+    # Leaves in Draft State
+    leave_ids = fields.Many2many(
+        string="Leaves to Approve",
+        comodel_name="hr.leave",
+        relation="hr_payroll_processing_leaves_rel",
+        column1="wizard_id",
+        column2="leave_id",
+        readonly=True,
+    )
+
+    # Public Holidays
+    public_holiday_ids = fields.Many2many(
+        string="Public Holidays",
+        comodel_name="calendar.public.holiday.line",
+        relation="hr_payroll_processing_hol_rel",
+        readonly=True,
+    )
+
+    def _populate_leaves(self):
+        self.ensure_one()
+        Leaves = self.env["hr.leave"]
+        res = Leaves.search(
+            [
+                ("date_from", "<=", self.payroll_period_id.date_end),
+                ("date_to", ">=", self.payroll_period_id.date_start),
+                ("state", "not in", ["cancel", "refuse", "validate"]),
+            ]
+        )
+        self.write({"leave_ids": [(6, 0, res.ids)]})
+        return
+
+    def _populate_holidays(self):
+        self.ensure_one()
+        holiday_ids = []
+        pp = self.payroll_period_id
+
+        # XXX - Someone interested in DST should fix this.
+        #
+        local_tz = timezone(pp.schedule_id.tz)
+        utcdtStart = utc.localize(pp.date_start, is_dst=False)
+        dtStart = utcdtStart.astimezone(local_tz)
+        utcdtEnd = utc.localize(pp.date_end, is_dst=False)
+        dtEnd = utcdtEnd.astimezone(local_tz)
+        holiday_ids = self.env["calendar.public.holiday.line"].search(
+            ["&", ("date", ">=", dtStart.date()), ("date", "<=", dtEnd.date())]
+        )
+        if len(holiday_ids) > 0:
+            self.write({"public_holiday_ids": [(6, 0, holiday_ids.ids)]})
+        else:
+            self.write({"public_holiday_ids": [(5,)]})
+
+        return
+
+    def state_back(self):
+        wizard = self
+        if wizard.state == "holidays":
+            self.state_leaves()
+        elif wizard.state == "apprvlv":
+            self.state_contracts()
+
+        return {
+            "view_mode": "form",
+            "res_model": "hr.payroll.processing",
+            "res_id": self.ids[0],
+            "type": "ir.actions.act_window",
+            "target": "new",
+            "nodestroy": True,
+            "context": self.env.context,
+        }
+
+    def state_next(self):
+        wizard = self
+        if wizard.state == "apprvcn":
+            self.state_leaves()
+        elif wizard.state == "apprvlv":
+            self.state_holidays()
+
+        return {
+            "view_mode": "form",
+            "res_model": "hr.payroll.processing",
+            "res_id": self.ids[0],
+            "type": "ir.actions.act_window",
+            "target": "new",
+            "nodestroy": True,
+            "context": self.env.context,
+        }
+
+    def generate_payslips(self):
+        self.create_payroll_register()
+        return {"type": "ir.actions.act_window_close"}
+
+    def state_contracts(self):
+        self.write({"state": "apprvcn"})
+
+    def state_leaves(self):
+        self._populate_leaves()
+        self.write({"state": "apprvlv"})
+
+    def state_holidays(self):
+        self._populate_holidays()
+        self.write({"state": "holidays"})
+
+    def create_payroll_register(self):
+        self.ensure_one()
+        if self.payroll_period_id.state in ["payment", "closed"]:
+            raise exceptions.UserError(
+                self.env._(
+                    "You cannot modify a payroll register once it has been "
+                    "marked for payment"
+                )
+            )
+
+        if self.payroll_period_id.state not in ["open", "ended", "locked", "generate"]:
+            raise exceptions.UserError(
+                self.env._("You must lock the payroll period first.")
+            )
+
+        # Create the payroll register
+        register_values = {
+            "name": self.env._(
+                "%(month)s Payroll Sheet", month=self.payroll_period_id.name
+            ),
+            "period_name": self.payroll_period_id.period_name,
+            "date_start": self.payroll_period_id.date_start,
+            "date_end": self.payroll_period_id.date_end,
+            "period_id": self.payroll_period_id.id,
+        }
+
+        # Get list of departments
+        # Every department must be visited to build the payslip batches, so an
+        # unbounded search is intentional here.
+        department_ids = self.env["hr.department"].search([])  # pylint: disable=no-search-all
+
+        register = self.create_payslip_runs(register_values, department_ids)
+        register.set_denominations()
+
+    @api.model
+    def _remove_register(self, register):
+        for run in register.run_ids:
+            run.slip_ids.unlink()
+        register.run_ids.unlink()
+        register.unlink()
+
+    def get_period_schedule_contracts(self, period):
+        """Get contracts attached to payroll schedule of 'period'."""
+
+        return period.schedule_id.contract_ids
+
+    def _get_employees_from_department(self, dept, contracts, date_start, date_end):
+        c_ids = self.env["hr.version"].search(
+            [
+                ("id", "in", contracts.ids),
+                ("contract_date_start", "<=", date_end),
+                "|",
+                ("contract_date_end", "=", False),
+                ("contract_date_end", ">=", date_start),
+                "|",
+                ("department_id", "=", dept.id),
+                ("employee_id.department_id", "=", dept.id),
+            ]
+        )
+        return c_ids.mapped("employee_id")
+
+    def _get_employees_without_department(self, contracts, date_start, date_end):
+        """Employees with a contract in the period but no department.
+
+        ``_create_batches`` groups payslips into one batch per department, so
+        an employee whose contract version and employee record both have no
+        department is never visited by that loop and would be silently left
+        out of the payroll register.
+        """
+        c_ids = self.env["hr.version"].search(
+            [
+                ("id", "in", contracts.ids),
+                ("contract_date_start", "<=", date_end),
+                "|",
+                ("contract_date_end", "=", False),
+                ("contract_date_end", ">=", date_start),
+                ("department_id", "=", False),
+                ("employee_id.department_id", "=", False),
+            ]
+        )
+        return c_ids.mapped("employee_id")
+
+    def _create_batch(self, register, name, ee_ids, date_start, date_end, dept_ids):
+        run_res = {
+            "name": name,
+            "date_start": date_start,
+            "date_end": date_end,
+            "register_id": register.id,
+            "period_id": register.period_id.id,
+            "department_ids": [(6, 0, dept_ids)],
+        }
+        batch = self.env["hr.payslip.run"].create(run_res)
+
+        # Create a pay slip for each employee in each department that has
+        # a contract in the pay period schedule of this pay period
+        payslips = self.env["hr.payslip"]
+        for ee in ee_ids.sorted(key=lambda e: e.name):
+            if not self.payroll_period_id.process_employee(ee.id):
+                continue
+
+            payslips |= self.payroll_period_id.create_payslip(ee.id, batch.id)
+
+        # Calculate payroll for all the pay slips in this batch (run)
+        payslips.compute_sheet()
+        return batch
+
+    def _create_batches(
+        self,
+        register,
+        contracts,
+        departments,
+        date_start,
+        date_end,
+        batch_by=DEFAULT_BATCHBY,
+    ):
+        batches = self.env["hr.payslip.run"]
+        if batch_by != DEFAULT_BATCHBY:
+            return batches
+
+        # Create payslip batch (run) for each department
+        #
+        for dept in departments:
+            ee_ids = self._get_employees_from_department(
+                dept, contracts, date_start, date_end
+            )
+            if len(ee_ids) == 0:
+                continue
+
+            batches |= self._create_batch(
+                register, dept.complete_name, ee_ids, date_start, date_end, [dept.id]
+            )
+
+        # Employees with no department are not visited by the loop above, so
+        # they would be silently dropped from the register. Group them into a
+        # single unassigned batch so they still get payslips.
+        ee_ids = self._get_employees_without_department(contracts, date_start, date_end)
+        if len(ee_ids) > 0:
+            batches |= self._create_batch(
+                register,
+                self.env._("No Department"),
+                ee_ids,
+                date_start,
+                date_end,
+                [],
+            )
+
+        return batches
+
+    def create_payslip_runs(self, register_values, dept_ids):
+        """
+        Create payslips for employees, in all departments, that have a contract in
+        this pay period's schedule.
+        """
+
+        # DateTime in db is stored as naive UTC. Convert it to explicit UTC
+        # and then convert that into the time zone of the pay period schedule.
+        #
+        period = self.payroll_period_id
+        local_tz = timezone(period.schedule_id.tz)
+        utcdt_start = utc.localize(period.date_start)
+        tzdt_start = utcdt_start.astimezone(local_tz)
+        utcdt_end = utc.localize(period.date_end)
+        tzdt_end = utcdt_end.astimezone(local_tz)
+
+        date_start = tzdt_start.date()
+        date_end = tzdt_end.date()
+        previous_register = period.register_id
+        contract_ids = self.get_period_schedule_contracts(period)
+        batch_by = self.get_batch_criteria()
+
+        # Remove any pre-existing payroll registers
+        if previous_register:
+            self._remove_register(previous_register)
+
+        # Create Payroll Register
+        register = self.env["hr.payroll.register"].create(register_values)
+
+        # Create payslip batches
+        self._create_batches(
+            register, contract_ids, dept_ids, date_start, date_end, batch_by
+        )
+
+        # Attach payroll register to this pay period
+        period.register_id = register
+
+        return register
+
+    def get_batch_criteria(self):
+        return DEFAULT_BATCHBY
