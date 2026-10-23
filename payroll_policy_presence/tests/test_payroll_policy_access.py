@@ -50,119 +50,135 @@ class TestPolicyAccess(common.TransactionCase):
             email="hrm@example.com",
         )
 
+    def _line_vals(self, name="line2", code="L2"):
+        """Return a complete, valid set of values for a policy line.
+
+        The values are valid on purpose: the create permission check must be
+        the reason the call fails (or succeeds), not a missing required field.
+        """
+        return {
+            "name": name,
+            "code": code,
+            "type": "normal",
+            "active_after": 8.0,
+            "duration": 1.0,
+            "policy_id": self.policy.id,
+        }
+
     def test_hrm_access(self):
         """HRM only has read access"""
 
-        # Create fails
+        # Create policy fails
         with self.assertRaises(AccessError):
             self.Policy.with_user(self.userHRM).create(
                 {"name": "POLICY2", "date": date.today()}
             )
-            self.OtPolicyLine.with_user(self.userHRM).create(
-                {"name": "line2", "type": "daily"}
-            )
-        # Unlink fails
+        # Create line fails
+        with self.assertRaises(AccessError):
+            self.PolicyLine.with_user(self.userHRM).create(self._line_vals())
+        # Unlink policy fails
         with self.assertRaises(AccessError):
             self.policy.with_user(self.userHRM).unlink()
-            self.line.with_user(self.userHRM).unlink()
-        # Read succeeds
-        try:
-            self.Policy.with_user(self.userHRM).browse(self.policy.id)
-        except AccessError:
-            self.fail("Caught an unexpected exception reading hr.policy.presence")
-        try:
-            self.PolicyLine.with_user(self.userHRM).browse(self.policy.id)
-        except AccessError:
-            self.fail("Caught an unexpected exception reading hr.policy.line.presence")
-        # Write fails
+        # Unlink line fails
         with self.assertRaises(AccessError):
-            self.Policy.with_user(self.userHRM).browse(self.policy.id).write(
-                {"name": "POLICY3"}
-            )
-            self.PolicyLine.with_user(self.userHRM).browse(self.line.id).write(
-                {"name": "line3"}
-            )
+            self.line.with_user(self.userHRM).unlink()
+        # Read policy succeeds
+        self.assertEqual(
+            self.Policy.with_user(self.userHRM)
+            .browse(self.policy.id)
+            .read(["name"])[0]["name"],
+            "POLICY1",
+        )
+        # Read line succeeds
+        self.assertEqual(
+            self.PolicyLine.with_user(self.userHRM)
+            .browse(self.line.id)
+            .read(["name"])[0]["name"],
+            "Line1",
+        )
+        # Write policy fails
+        with self.assertRaises(AccessError):
+            self.policy.with_user(self.userHRM).write({"name": "POLICY3"})
+        # Write line fails
+        with self.assertRaises(AccessError):
+            self.line.with_user(self.userHRM).write({"name": "line3"})
 
     def test_payroll_user_access(self):
         """Payroll User only has read access"""
 
-        # Create fails
+        # Create policy fails
         with self.assertRaises(AccessError):
             self.Policy.with_user(self.userPU).create(
                 {"name": "POL2", "date": date.today()}
             )
-            self.PolicyLine.with_user(self.userPU).create(
-                {"name": "line2", "type": "daily"}
-            )
-        # Unlink fails
+        # Create line fails
+        with self.assertRaises(AccessError):
+            self.PolicyLine.with_user(self.userPU).create(self._line_vals())
+        # Unlink policy fails
         with self.assertRaises(AccessError):
             self.policy.with_user(self.userPU).unlink()
-            self.line.with_user(self.userPU).unlink()
-        # Read succeeds
-        try:
-            self.Policy.with_user(self.userPU).browse(self.policy.id)
-        except AccessError:
-            self.fail("Caught an unexpected exception reading hr.policy.presence")
-        try:
-            self.PolicyLine.with_user(self.userPU).browse(self.policy.id)
-        except AccessError:
-            self.fail("Caught an unexpected exception reading hr.policy.line.presence")
-        # Write fails
+        # Unlink line fails
         with self.assertRaises(AccessError):
-            self.Policy.with_user(self.userPU).browse(self.policy.id).write(
-                {"name": "POL3"}
-            )
-            self.PolicyLine.with_user(self.userPU).browse(self.line.id).write(
-                {"name": "line3"}
-            )
+            self.line.with_user(self.userPU).unlink()
+        # Read policy succeeds
+        self.assertEqual(
+            self.Policy.with_user(self.userPU)
+            .browse(self.policy.id)
+            .read(["name"])[0]["name"],
+            "POLICY1",
+        )
+        # Read line succeeds
+        self.assertEqual(
+            self.PolicyLine.with_user(self.userPU)
+            .browse(self.line.id)
+            .read(["name"])[0]["name"],
+            "Line1",
+        )
+        # Write policy fails
+        with self.assertRaises(AccessError):
+            self.policy.with_user(self.userPU).write({"name": "POL3"})
+        # Write line fails
+        with self.assertRaises(AccessError):
+            self.line.with_user(self.userPU).write({"name": "line3"})
 
     def test_payroll_manager_access(self):
         """Payroll Manager has complete access"""
 
-        # Read succeeds
-        try:
-            self.Policy.with_user(self.userPM).browse(self.policy.id)
-        except AccessError:
-            self.fail("Caught an unexpected exception reading hr.policy.presence")
-        try:
-            self.PolicyLine.with_user(self.userPM).browse(self.line.id)
-        except AccessError:
-            self.fail("Caught an unexpected exception reading hr.policy.line.presence")
-        # Write succeeds
-        try:
-            self.Policy.with_user(self.userPM).browse(self.policy.id).write(
-                {"name": "XX"}
-            )
-        except AccessError:
-            self.fail("Caught an unexpected exception writing hr.policy.presence")
-        try:
-            self.PolicyLine.with_user(self.userPM).browse(self.line.id).write(
-                {"name": "XX"}
-            )
-        except AccessError:
-            self.fail("Caught an unexpected exception writing hr.policy.line.presence")
-        # Create/Unlink succeeds
-        try:
-            pol = self.Policy.with_user(self.userPM).create(
-                {"name": "Policy test pm", "date": date.today()}
-            )
-            pol.unlink()
-        except AccessError:
-            self.fail(
-                "Caught unexpected exception creating/unlinking hr.policy.presence"
-            )
-        try:
-            line = self.PolicyLine.with_user(self.userPM).create(
-                {
-                    "name": "line test pm",
-                    "type": "normal",
-                    "active_after": 8.0,
-                    "duration": 1.0,
-                    "code": "A",
-                }
-            )
-            line.unlink()
-        except AccessError:
-            self.fail(
-                "Caught unexpected exception creating/unlinking hr.policy.line.presence"
-            )
+        # Read policy succeeds
+        self.assertEqual(
+            self.Policy.with_user(self.userPM)
+            .browse(self.policy.id)
+            .read(["name"])[0]["name"],
+            "POLICY1",
+        )
+        # Read line succeeds
+        self.assertEqual(
+            self.PolicyLine.with_user(self.userPM)
+            .browse(self.line.id)
+            .read(["name"])[0]["name"],
+            "Line1",
+        )
+        # Write policy succeeds
+        self.policy.with_user(self.userPM).write({"name": "XX"})
+        self.assertEqual(
+            self.Policy.with_user(self.userPM).browse(self.policy.id).name, "XX"
+        )
+        # Write line succeeds
+        self.line.with_user(self.userPM).write({"name": "XX"})
+        self.assertEqual(
+            self.PolicyLine.with_user(self.userPM).browse(self.line.id).name, "XX"
+        )
+        # Create/Unlink policy succeeds
+        pol = self.Policy.with_user(self.userPM).create(
+            {"name": "Policy test pm", "date": date.today()}
+        )
+        self.assertTrue(pol.exists())
+        pol.unlink()
+        self.assertFalse(pol.exists())
+        # Create/Unlink line succeeds
+        line = self.PolicyLine.with_user(self.userPM).create(
+            self._line_vals(name="line test pm", code="A")
+        )
+        self.assertTrue(line.exists())
+        line.unlink()
+        self.assertFalse(line.exists())
