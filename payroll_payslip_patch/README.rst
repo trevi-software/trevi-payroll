@@ -22,10 +22,12 @@ Payslip Patch
 
 |badge1| |badge2| |badge3|
 
-**THIS MODULE'S FUNCTIONALITY HAS BEEN MERGED INTO OCA/Payroll. DO NOT USE**
+**THIS MODULE'S FUNCTIONALITY HAS BEEN MERGED INTO OCA/Payroll. DO NOT
+USE**
 
-This module patches the payslip processing source code in the Payroll module to enable additional functionality
-during payslip processing. It is a technical module that is used by other modules.
+This module patches the payslip processing source code in the Payroll
+module to enable additional functionality during payslip processing. It
+is a technical module that is used by other modules.
 
 **Table of contents**
 
@@ -36,9 +38,10 @@ Changelog
 =========
 
 14.0.2.0.0 (2022-08-17)
-~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------
 
-* The functionality in this module has been merged into OCA/Payroll. This module is no longer necessary.
+- The functionality in this module has been merged into OCA/Payroll.
+  This module is no longer necessary.
 
 Bug Tracker
 ===========
@@ -54,18 +57,18 @@ Credits
 =======
 
 Authors
-~~~~~~~
+-------
 
 * TREVI Software
 * Michael Telahun Makonnen
 
 Other credits
-~~~~~~~~~~~~~
+-------------
 
-* Michael Telahun Makonnen <mtm@trevi.et>
+- Michael Telahun Makonnen <mtm@trevi.et>
 
 Maintainers
-~~~~~~~~~~~
+-----------
 
 This module is part of the `trevi-software/trevi-payroll <https://github.com/trevi-software/trevi-payroll/tree/19.0/payroll_payslip_patch>`_ project on GitHub.
 

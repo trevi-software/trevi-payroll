@@ -4,11 +4,11 @@
 from odoo.addons.payroll.tests.common import TestPayslipBase
 
 
-def get_localdict_mock(*args, **kwargs):
+def get_payroll_dict_mock(*args, **kwargs):
     return {"mock": True}
 
 
-def get_contractdict_mock(*args, **kwargs):
+def get_current_contract_dict_mock(*args, **kwargs):
     return {"my_mock_value": True}
 
 
@@ -16,7 +16,7 @@ class TestPayslip(TestPayslipBase):
     def setUp(self):
         super().setUp()
 
-        self.Contract = self.env["hr.contract"]
+        self.Contract = self.env["hr.version"]
         self.HrPayslip = self.env["hr.payslip"]
         self.Rule = self.env["hr.salary.rule"]
 
@@ -25,36 +25,25 @@ class TestPayslip(TestPayslipBase):
                 "name": "Mock Salary Rule",
                 "code": "MOCK",
                 "sequence": 5,
-                "category_id": self.ref("payroll.ALW"),
+                "category_id": self.categ_alw.id,
                 "amount_select": "code",
                 "amount_python_compute": (
-                    "result = (dictionaries.mock is True) and 1.0 or 0.0"
+                    "result = (payroll.mock is True) and 1.0 or 0.0"
                 ),
             }
         )
-        self.developer_pay_structure.write(
-            {"parent_id": self.ref("payroll.structure_base")}
-        )
         self.developer_pay_structure.write({"rule_ids": [(4, self.mock_rule.id)]})
 
-        contracts = self.Contract.search([("employee_id", "=", self.richard_emp.id)])
-        contracts[0].kanban_state = "done"
-
-    def apply_contract_cron(self):
-        self.env.ref(
-            "hr_contract.ir_cron_data_contract_update_state"
-        ).method_direct_trigger()
-
-    def test_localdict(self):
         self.apply_contract_cron()
 
+    def test_payroll_dict(self):
         # I create an employee Payslip
         richard_payslip = self.env["hr.payslip"].create(
             {"name": "Payslip of Richard", "employee_id": self.richard_emp.id}
         )
 
-        # I patch the get_localdict() method to return my own dictionary
-        richard_payslip._patch_method("get_localdict", get_localdict_mock)
+        # I patch the get_payroll_dict() method to return my own dictionary
+        self.patch(type(richard_payslip), "get_payroll_dict", get_payroll_dict_mock)
         richard_payslip.compute_sheet()
 
         mock_payslip_line = False
@@ -66,10 +55,7 @@ class TestPayslip(TestPayslipBase):
             mock_payslip_line.amount, 1.0, "The mock payslip rule was evaluated"
         )
 
-        richard_payslip._revert_method("get_localdict")
-
     def test_contractdict(self):
-        self.apply_contract_cron()
         self.mock_rule.amount_python_compute = (
             "result = (current_contract.my_mock_value is True) and 1.0 or 0.0"
         )
@@ -79,8 +65,13 @@ class TestPayslip(TestPayslipBase):
             {"name": "Payslip of Richard", "employee_id": self.richard_emp.id}
         )
 
-        # I patch the get_localdict() method to return my own dictionary
-        richard_payslip._patch_method("get_contractdict", get_contractdict_mock)
+        # I patch the get_current_contract_dict() method to return my own
+        # dictionary
+        self.patch(
+            type(richard_payslip),
+            "get_current_contract_dict",
+            get_current_contract_dict_mock,
+        )
         richard_payslip.compute_sheet()
 
         mock_payslip_line = False
@@ -95,5 +86,3 @@ class TestPayslip(TestPayslipBase):
             1.0,
             "The mock payslip contract rule was evaluated",
         )
-
-        richard_payslip._revert_method("get_contractdict")
