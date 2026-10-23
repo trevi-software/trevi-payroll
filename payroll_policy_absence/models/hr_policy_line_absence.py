@@ -32,4 +32,7 @@ class PolicyLineAbsence(models.Model):
     def onchange_holiday(self):
         if self.holiday_status_id:
             self.name = self.holiday_status_id.name
-            self.code = self.holiday_status_id.code
+            # hr.leave.type no longer carries a short `code` (removed in 19.0),
+            # so derive a default policy code from the leave type name.
+            if not self.code:
+                self.code = self.holiday_status_id.name.strip().upper()[:8]

@@ -23,10 +23,12 @@ Payroll Absence Policy
 |badge1| |badge2| |badge3|
 
 Define Absence Policies
-========================
+-----------------------
+
 Define properties of an absence policy, such as:
-    * Type (paid, unpaid)
-    * Rate (multiplier of base wage)
+
+- Type (paid, unpaid)
+- Rate (multiplier of base wage)
 
 **Table of contents**
 
@@ -47,18 +49,18 @@ Credits
 =======
 
 Authors
-~~~~~~~
+-------
 
 * TREVI Software
 * Michael Telahun Makonnen
 
 Other credits
-~~~~~~~~~~~~~
+-------------
 
-* Michael Telahun Makonnen <mtm@trevi.et>
+- Michael Telahun Makonnen <mtm@trevi.et>
 
 Maintainers
-~~~~~~~~~~~
+-----------
 
 This module is part of the `trevi-software/trevi-payroll <https://github.com/trevi-software/trevi-payroll/tree/19.0/payroll_policy_absence>`_ project on GitHub.
 

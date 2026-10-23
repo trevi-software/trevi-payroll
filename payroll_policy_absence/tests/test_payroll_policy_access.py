@@ -14,7 +14,7 @@ class TestPolicyAccess(common.TransactionCase):
 
         cls.Policy = cls.env["hr.policy.absence"]
         cls.PolicyLine = cls.env["hr.policy.line.absence"]
-        cls.leave_type = cls.env.ref("hr_holidays.holiday_status_cl")
+        cls.leave_type = cls.env.ref("hr_holidays.leave_type_paid_time_off")
         cls.policy = cls.Policy.create({"name": "POLICY1", "date": date.today()})
         cls.line = cls.PolicyLine.create(
             {
