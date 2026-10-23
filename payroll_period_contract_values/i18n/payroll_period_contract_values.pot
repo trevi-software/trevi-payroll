@@ -4,8 +4,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 14.0\n"
+"Project-Id-Version: Odoo Server 19.0\n"
 "Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-23 13:31+0000\n"
+"PO-Revision-Date: 2026-10-23 13:31+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -14,19 +16,19 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. module: payroll_period_contract_values
-#: model:ir.model.fields,field_description:payroll_period_contract_values.field_hr_contract__display_name
 #: model:ir.model.fields,field_description:payroll_period_contract_values.field_hr_contract_init__display_name
+#: model:ir.model.fields,field_description:payroll_period_contract_values.field_hr_version__display_name
 msgid "Display Name"
 msgstr ""
 
 #. module: payroll_period_contract_values
-#: model:ir.model,name:payroll_period_contract_values.model_hr_contract
-msgid "Employee Contract"
+#: model:ir.model,name:payroll_period_contract_values.model_hr_version
+msgid "Employee Contract / Version"
 msgstr ""
 
 #. module: payroll_period_contract_values
-#: model:ir.model.fields,field_description:payroll_period_contract_values.field_hr_contract__id
 #: model:ir.model.fields,field_description:payroll_period_contract_values.field_hr_contract_init__id
+#: model:ir.model.fields,field_description:payroll_period_contract_values.field_hr_version__id
 msgid "ID"
 msgstr ""
 
@@ -36,13 +38,8 @@ msgid "Initial Contract Settings"
 msgstr ""
 
 #. module: payroll_period_contract_values
-#: model:ir.model.fields,field_description:payroll_period_contract_values.field_hr_contract____last_update
-#: model:ir.model.fields,field_description:payroll_period_contract_values.field_hr_contract_init____last_update
-msgid "Last Modified on"
-msgstr ""
-
-#. module: payroll_period_contract_values
-#: model:ir.model.fields,field_description:payroll_period_contract_values.field_hr_contract__pps_id
 #: model:ir.model.fields,field_description:payroll_period_contract_values.field_hr_contract_init__pay_sched_id
+#: model:ir.model.fields,field_description:payroll_period_contract_values.field_hr_employee__pps_id
+#: model:ir.model.fields,field_description:payroll_period_contract_values.field_hr_version__pps_id
 msgid "Payroll Period Schedule"
 msgstr ""
