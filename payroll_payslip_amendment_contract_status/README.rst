@@ -22,7 +22,9 @@ Payslip Amendment with Contract State
 
 |badge1| |badge2| |badge3|
 
-This module links Payslip Amendments and Employee contract states to take into account multiple consecutive contracts within the payslip start and end dates.
+This module links Payslip Amendments and Employee contract states to
+take into account multiple consecutive contracts within the payslip
+start and end dates.
 
 **Table of contents**
 
@@ -43,12 +45,12 @@ Credits
 =======
 
 Authors
-~~~~~~~
+-------
 
 * TREVI Software
 
 Maintainers
-~~~~~~~~~~~
+-----------
 
 This module is part of the `trevi-software/trevi-payroll <https://github.com/trevi-software/trevi-payroll/tree/19.0/payroll_payslip_amendment_contract_status>`_ project on GitHub.
 
