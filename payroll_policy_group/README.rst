@@ -22,7 +22,9 @@ Payroll Policy Groups
 
 |badge1| |badge2| |badge3|
 
-Define a collection of policies, such as Overtime, Absence, and Accruals that are attached to an employee contract. These policies are applied during payroll processing.
+Define a collection of policies, such as Overtime, Absence, and Accruals
+that are attached to an employee contract. These policies are applied
+during payroll processing.
 
 **Table of contents**
 
@@ -33,8 +35,10 @@ Changelog
 =========
 
 14.0.1.0.1 (2022-04-10)
-~~~~~~~~~~~~~~~~~~~~~~~
-* [FIX] Fixed a visual artifact in contract form view of the Payroll Policy Group field
+-----------------------
+
+- [FIX] Fixed a visual artifact in contract form view of the Payroll
+  Policy Group field
 
 Bug Tracker
 ===========
@@ -50,18 +54,18 @@ Credits
 =======
 
 Authors
-~~~~~~~
+-------
 
 * TREVI Software
 * Michael Telahun Makonnen
 
 Other credits
-~~~~~~~~~~~~~
+-------------
 
-* Michael Telahun Makonnen <mtm@trevi.et>
+- Michael Telahun Makonnen <mtm@trevi.et>
 
 Maintainers
-~~~~~~~~~~~
+-----------
 
 This module is part of the `trevi-software/trevi-payroll <https://github.com/trevi-software/trevi-payroll/tree/19.0/payroll_policy_group>`_ project on GitHub.
 

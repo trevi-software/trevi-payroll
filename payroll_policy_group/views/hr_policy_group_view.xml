@@ -53,12 +53,14 @@
     <!-- Contract -->
 
     <record id="hr_contract_view_form" model="ir.ui.view">
-        <field name="name">hr.contract.form.inherit</field>
-        <field name="model">hr.contract</field>
-        <field name="inherit_id" ref="hr_contract.hr_contract_view_form" />
+        <field name="name">hr.version.form.inherit</field>
+        <field name="model">hr.version</field>
+        <field name="inherit_id" ref="hr.hr_contract_template_form_view" />
         <field name="arch" type="xml">
-            <xpath expr="//group[@name='yearly_benefits']" position="inside">
-                <field name="policy_group_id" required="1" />
+            <xpath expr="//group[@name='salary_info']" position="inside">
+                <group name="yearly_benefits">
+                    <field name="policy_group_id" required="1" />
+                </group>
             </xpath>
         </field>
     </record>

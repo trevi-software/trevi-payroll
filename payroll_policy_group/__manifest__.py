@@ -5,14 +5,14 @@
 {
     "name": "Payroll Policy Groups",
     "summary": "Group payroll policies and assign them to contracts",
-    "version": "18.0.1.0.0",
+    "version": "19.0.1.0.0",
     "category": "Payroll",
     "author": "TREVI Software, Michael Telahun Makonnen",
     "license": "AGPL-3",
     "images": ["static/src/img/main_screenshot.png"],
     "website": "https://github.com/trevi-software/trevi-payroll",
     "depends": [
-        "hr_contract",
+        "hr",
         "hr_contract_values_payroll",
         "payroll",
     ],

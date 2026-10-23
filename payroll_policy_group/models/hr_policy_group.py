@@ -11,7 +11,7 @@ class PolicyGroup(models.Model):
 
     name = fields.Char(required=True)
     contract_ids = fields.One2many(
-        string="Contracts", comodel_name="hr.contract", inverse_name="policy_group_id"
+        string="Contracts", comodel_name="hr.version", inverse_name="policy_group_id"
     )
 
 
@@ -23,8 +23,10 @@ class ContractInit(models.Model):
     )
 
 
-class HrContract(models.Model):
-    _inherit = "hr.contract"
+class HrVersion(models.Model):
+    # In Odoo 19 ``hr_contract`` was merged into ``hr`` and ``hr.contract``
+    # was renamed ``hr.version``, so the policy group lives there now.
+    _inherit = "hr.version"
 
     @api.model
     def _get_policy_group(self):
