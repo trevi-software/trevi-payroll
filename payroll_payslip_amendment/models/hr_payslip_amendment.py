@@ -4,7 +4,7 @@
 
 from datetime import date
 
-from odoo import _, api, exceptions, fields, models
+from odoo import api, exceptions, fields, models
 
 
 class HrPayslipAmendment(models.Model):
@@ -51,14 +51,19 @@ class HrPayslipAmendment(models.Model):
         for rec in self:
             rec.display_name = f"{rec.employee_id.name} ({rec.input_id.code})"
 
-    def unlink(self):
+    @api.ondelete(at_uninstall=False)
+    def _unlink_except_confirmed(self):
+        # A confirmed or applied amendment must not be deleted; the ORM calls
+        # this hook from unlink(), so the constraint also holds for batch and
+        # cascading deletes without overriding unlink() itself.
         for psa in self:
             if psa.state in ["validate", "done"]:
                 raise exceptions.UserError(
-                    _("A Pay Slip Amendment that has been confirmed cannot be deleted!")
+                    self.env._(
+                        "A Pay Slip Amendment that has been confirmed "
+                        "cannot be deleted!"
+                    )
                 )
-
-        return super().unlink()
 
     def do_validate(self):
         rset = self.filtered(lambda rec: rec.state == "draft")
