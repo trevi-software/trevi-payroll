@@ -51,15 +51,26 @@ class HrPolicy(models.Model):
 
         # Accruals must be swept for every policy group, so this search is
         # intentionally unbounded: a limit would silently skip policies.
+        #
+        # Jobs are tracked per accrual line, not per policy group. Several
+        # groups may share the same accrual policy, so a policy has to be
+        # processed once, with the employees of every group that uses it.
+        # Otherwise the second group would find the job created for the first
+        # group through ``get_last_job_date()`` and skip all of its employees.
+        #
+        policies = {}
         for pg in PolicyGroup.search([]):  # pylint: disable=no-search-all
             accrual_policy = self.get_latest_policy(pg, dToday)
             if accrual_policy is None:
                 continue
+            policies.setdefault(accrual_policy.id, [accrual_policy, []])[1].append(pg)
 
-            # Get the last time that an accrual job was run for each accrual line in
-            # the accrual policy. If there was no 'last time' assume this is the first
-            # time the job is being run and start it running from today. Otherwise,
-            # we must also run jobs for all the skipped dates.
+        for accrual_policy, groups in policies.values():
+            # Get the last time that an accrual job was run for each accrual
+            # line in the accrual policy. If there was no 'last time' assume
+            # this is the first time the job is being run and start it running
+            # from today. Otherwise, we must also run jobs for all the skipped
+            # dates.
             #
             line_jobs = {}
             for line in accrual_policy.line_ids:
@@ -74,7 +85,8 @@ class HrPolicy(models.Model):
 
             # For each accrual line in this accrual policy do a run for each
             # day (beginning from the last date for which it was run) until
-            # today for each contract attached to the policy group.
+            # today for each contract attached to any of the policy groups
+            # using this policy.
             #
             # Odoo 19: a contract is an ``hr.version`` record. The old
             # ``state``/``kanban_state`` state machine is gone, so a version is
@@ -95,32 +107,33 @@ class HrPolicy(models.Model):
                     job = AccrualJob.create(job_vals)
 
                     employee_list = []
-                    for contract in pg.contract_ids:
-                        # employee already done, or contract archived
-                        if (
-                            contract.employee_id.id in employee_list
-                            or not contract.active
-                        ):
-                            continue
-                        # contract has not started yet
-                        if (
-                            contract.contract_date_start
-                            and contract.contract_date_start > dJob
-                        ):
-                            continue
-                        # contract has already ended
-                        if (
-                            contract.contract_date_end
-                            and contract.contract_date_end < dJob
-                        ):
-                            continue
-                        line.calculate_and_deposit(
-                            contract.employee_id, job, d_today=dJob
-                        )
+                    for pg in groups:
+                        for contract in pg.contract_ids:
+                            # employee already done, or contract archived
+                            if (
+                                contract.employee_id.id in employee_list
+                                or not contract.active
+                            ):
+                                continue
+                            # contract has not started yet
+                            if (
+                                contract.contract_date_start
+                                and contract.contract_date_start > dJob
+                            ):
+                                continue
+                            # contract has already ended
+                            if (
+                                contract.contract_date_end
+                                and contract.contract_date_end < dJob
+                            ):
+                                continue
+                            line.calculate_and_deposit(
+                                contract.employee_id, job, d_today=dJob
+                            )
 
-                        # An employee may have multiple valid contracts.
-                        # Don't double-count.
-                        employee_list.append(contract.employee_id.id)
+                            # An employee may have multiple valid contracts.
+                            # Don't double-count.
+                            employee_list.append(contract.employee_id.id)
                     job.end_time = datetime.now()
 
     @api.model

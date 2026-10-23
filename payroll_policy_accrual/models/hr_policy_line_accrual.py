@@ -2,9 +2,11 @@
 # Copyright (C) 2013 Michael Telahun Makonnen <mmakonnen@gmail.com>.
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from datetime import date, timedelta
+import calendar
+from datetime import date
 
-from odoo import fields, models
+from odoo import api, fields, models
+from odoo.exceptions import ValidationError
 
 # Selection: day of month
 SELECTION_DOM = [
@@ -165,6 +167,24 @@ class HrPolicyLine(models.Model):
             return True
         return False
 
+    @api.constrains("accrual_rate_premium", "accrual_rate_premium_milestone")
+    def _check_premium_milestone(self):
+        """A premium cannot be computed without a positive milestone.
+
+        The premium rate is divided by ``accrual_rate_premium_milestone``, so a
+        milestone of zero (the field default) would make the accrual job crash
+        once an employee reaches ``accrual_rate_premium_minimum`` months.
+        """
+
+        for line in self:
+            if line.accrual_rate_premium and line.accrual_rate_premium_milestone <= 0:
+                raise ValidationError(
+                    self.env._(
+                        "A positive 'Accrual Premium Milestone' is required when"
+                        " a premium rate is configured."
+                    )
+                )
+
     def get_last_job_date(self):
         """
         @return: a datetime.date object representing the time the last job ran.
@@ -185,7 +205,12 @@ class HrPolicyLine(models.Model):
             if amount is False:
                 break
             name = self.env._("Calendar based accrual (%(name)s)", name=self.name)
-            lines = self.accrual_id.deposit(employee.id, amount, date.today(), name)
+            lines = self.accrual_id.deposit(
+                employee.id,
+                amount,
+                d_today if d_today is not None else date.today(),
+                name,
+            )
             if job:
                 for line in lines:
                     job.write(
@@ -198,10 +223,16 @@ class HrPolicyLine(models.Model):
     def do_calculation(self, employee, dToday=None):
         self.ensure_one()
 
-        # The last day of the month for each month
+        if dToday is None:
+            dToday = date.today()
+
+        # The last day of each month for the year ``dToday`` falls in.
+        # February depends on the year (a leap year has a 29th day), so it
+        # cannot be hard-coded: an employee hired on the 30th or 31st must
+        # still receive the February accrual in a leap year.
         month_last_day = {
             1: 31,
-            2: 28,
+            2: calendar.monthrange(dToday.year, 2)[1],
             3: 31,
             4: 30,
             5: 31,
@@ -214,8 +245,6 @@ class HrPolicyLine(models.Model):
             12: 31,
         }
 
-        if dToday is None:
-            dToday = date.today()
         dHire = employee.get_employment_date()
         srvc_months = employee.get_months_service_to_date(dToday=dToday)
         srvc_months = int(srvc_months)
@@ -229,10 +258,16 @@ class HrPolicyLine(models.Model):
             freq_annual_month = dHire.month
             freq_annual_day = dHire.day
         else:
-            freq_week_day = self.frequency_week_day
-            freq_month_day = self.frequency_month_day
-            freq_annual_month = self.frequency_annual_month
-            freq_annual_day = self.frequency_annual_day
+            # The selection fields are stored (and returned) as strings while
+            # the date parts they are compared with are integers: convert them
+            # or the comparisons never match (and the ``>``/``!=`` checks raise
+            # TypeError on a string). An unset value must not match any date,
+            # so it becomes -1 instead of 0 (0 is Monday and day 0 never
+            # exists).
+            freq_week_day = int(self.frequency_week_day or -1)
+            freq_month_day = int(self.frequency_month_day or -1)
+            freq_annual_month = int(self.frequency_annual_month or -1)
+            freq_annual_day = int(self.frequency_annual_day or -1)
 
         premium_amount = 0
         if self.calculation_frequency == "weekly":
@@ -241,23 +276,17 @@ class HrPolicyLine(models.Model):
             freq_amount = float(self.accrual_rate) / 52.0
             premium_amount = self._calculate_premium_weekly(srvc_months)
         elif self.calculation_frequency == "monthly":
-            # When deciding to skip an employee account for actual month lengths if
-            # the frequency date is 31 and this month only has 30 days, go ahead and
-            # do the accrual on the last day of the month (i.e. the 30th). For
-            # February, on non-leap years execute accruals for the 29th on the 28th.
+            # When deciding to skip an employee account for actual month
+            # lengths if the frequency date is 31 and this month only has 30
+            # days, go ahead and do the accrual on the last day of the month
+            # (i.e. the 30th). February uses its actual last day (28, or 29 in
+            # a leap year) so employees hired on the 30th/31st are not skipped.
             #
             if (
                 dToday.day == month_last_day[dToday.month]
                 and freq_month_day > dToday.day
             ):
-                if dToday.month != 2:
-                    freq_month_day = dToday.day
-                elif (
-                    dToday.month == 2
-                    and dToday.day == 28
-                    and (dToday + timedelta(days=+1)).day != 29
-                ):
-                    freq_month_day = dToday.day
+                freq_month_day = dToday.day
 
             if dToday.day != freq_month_day:
                 return False
@@ -265,17 +294,21 @@ class HrPolicyLine(models.Model):
             freq_amount = float(self.accrual_rate) / 12.0
             premium_amount = self._calculate_premium_monthly(srvc_months)
         else:  # annual frequency
-            # On non-leap years execute Feb. 29 accruals on the 28th
+            # Execute a February accrual dated the 29th (or the 30th/31st) on
+            # the last day the month actually has.
             #
             if (
-                dToday.month == 2
-                and dToday.day == 28
-                and (dToday + timedelta(days=+1)).day != 29
+                freq_annual_month == 2
+                and dToday.month == 2
+                and dToday.day == month_last_day[2]
                 and freq_annual_day > dToday.day
             ):
                 freq_annual_day = dToday.day
 
-            if dToday.month != freq_annual_month and dToday.day != freq_annual_day:
+            # Both the month and the day must match, otherwise an annual rule
+            # would pay the full yearly amount every day of the matching month
+            # (and on the matching day of every other month).
+            if dToday.month != freq_annual_month or dToday.day != freq_annual_day:
                 return False
 
             freq_amount = self.accrual_rate
@@ -291,7 +324,11 @@ class HrPolicyLine(models.Model):
     def _calculate_premium_weekly(self, srvc_months):
         self.ensure_one()
         premium_amount = 0.0
-        if self.accrual_rate_premium_minimum <= srvc_months:
+        if (
+            self.accrual_rate_premium
+            and self.accrual_rate_premium_milestone > 0
+            and self.accrual_rate_premium_minimum <= srvc_months
+        ):
             premium_amount = (
                 (
                     max(
@@ -310,7 +347,11 @@ class HrPolicyLine(models.Model):
     def _calculate_premium_monthly(self, srvc_months):
         self.ensure_one()
         premium_amount = 0.0
-        if self.accrual_rate_premium_minimum <= srvc_months:
+        if (
+            self.accrual_rate_premium
+            and self.accrual_rate_premium_milestone > 0
+            and self.accrual_rate_premium_minimum <= srvc_months
+        ):
             premium_amount = (
                 (
                     max(
@@ -329,7 +370,11 @@ class HrPolicyLine(models.Model):
     def _calculate_premium_annual(self, srvc_months):
         self.ensure_one()
         premium_amount = 0.0
-        if self.accrual_rate_premium_minimum <= srvc_months:
+        if (
+            self.accrual_rate_premium
+            and self.accrual_rate_premium_milestone > 0
+            and self.accrual_rate_premium_minimum <= srvc_months
+        ):
             premium_amount = (
                 (
                     max(
