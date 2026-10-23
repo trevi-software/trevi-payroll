@@ -3,6 +3,8 @@
 
 from datetime import date, datetime, timedelta
 
+from odoo import fields
+
 from . import common
 
 
@@ -901,4 +903,121 @@ class TestHrAttendance(common.TestPolicyCommon):
         )
         self.assertEqual(
             att.clock_in, clock_in, "The clock-in time contains the original time"
+        )
+
+    def _make_policy_group(self, name, attendance_type, round_type, interval):
+        p = self.Policy.create(
+            {
+                "name": name,
+                "date": date.today(),
+                "tz": "UTC",
+                "line_ids": [
+                    (
+                        0,
+                        0,
+                        {
+                            "attendance_type": attendance_type,
+                            "round_type": round_type,
+                            "round_interval": interval,
+                        },
+                    )
+                ],
+            }
+        )
+        return self.PolicyGroup.create(
+            {"name": name, "rounding_policy_ids": [(6, 0, [p.id])]}
+        )
+
+    def test_get_contract_by_date_ignores_future_version(self):
+        """The version effective on the punch date is returned, not a future one.
+
+        A later version of an ongoing contract must not supply the policy group
+        for an earlier punch.
+        """
+
+        ee = self.create_employee("Future version")
+        contract = self.create_contract(ee.id)
+        self.HrVersion.create(
+            {
+                "name": "Future contract",
+                "employee_id": ee.id,
+                "date_version": date.today() + timedelta(days=30),
+                "wage": 1,
+                "contract_date_start": date.today(),
+                "contract_date_end": False,
+                "resource_calendar_id": self.default_calendar.id,
+            }
+        )
+
+        res = self.HrAttendance.get_contract_by_date(ee.id, date.today())
+
+        self.assertEqual(
+            res,
+            contract,
+            "The version effective on the punch date supplies the contract",
+        )
+
+    def test_write_empty_recordset(self):
+        """Writing on an empty recordset is a no-op, not an UnboundLocalError."""
+
+        empty = self.HrAttendance.search([("id", "=", 0)])
+        self.assertFalse(empty, "The recordset is empty")
+        res = empty.write({"clock_out": fields.Datetime.now()})
+        self.assertTrue(res, "An empty write succeeds")
+
+    def test_write_bulk_does_not_mix_employees(self):
+        """A bulk write rounds every record with its own policy.
+
+        ``write()`` must not reuse the first record's processed values (or copy
+        its rounded times and schedule) onto the rest of the recordset.
+        """
+
+        ee_a = self.create_employee("Bulk A")
+        ee_b = self.create_employee("Bulk B")
+        cc_a = self.create_contract(ee_a.id)
+        cc_b = self.create_contract(ee_b.id)
+        cc_a.policy_group_id = self._make_policy_group("PG down", "out", "down", 5)
+        cc_b.policy_group_id = self._make_policy_group("PG up", "out", "up", 5)
+
+        check_in_a = self.localize_dt(
+            self.make_datetime(date.today(), "12:00"),
+            ee_a.resource_id.tz,
+            reverse=True,
+        )
+        check_in_b = self.localize_dt(
+            self.make_datetime(date.today(), "12:00"),
+            ee_b.resource_id.tz,
+            reverse=True,
+        )
+        att_a = self.HrAttendance.create(
+            {"employee_id": ee_a.id, "check_in": check_in_a}
+        )
+        att_b = self.HrAttendance.create(
+            {"employee_id": ee_b.id, "check_in": check_in_b}
+        )
+
+        clock_out = self.localize_dt(
+            self.make_datetime(date.today(), "17:33"),
+            ee_a.resource_id.tz,
+            reverse=True,
+        )
+        (att_a + att_b).write({"clock_out": clock_out})
+
+        self.assertEqual(
+            att_a.check_out,
+            self.localize_dt(
+                self.make_datetime(date.today(), "17:30"),
+                ee_a.resource_id.tz,
+                reverse=True,
+            ),
+            "Employee A's check-out is rounded DOWN by 5 minutes",
+        )
+        self.assertEqual(
+            att_b.check_out,
+            self.localize_dt(
+                self.make_datetime(date.today(), "17:35"),
+                ee_b.resource_id.tz,
+                reverse=True,
+            ),
+            "Employee B's check-out is rounded UP by 5 minutes",
         )

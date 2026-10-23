@@ -65,6 +65,10 @@ class HrAttendance(models.Model):
                 "|",
                 ("contract_date_end", "=", False),
                 ("contract_date_end", ">=", d),
+                # Only versions that have already taken effect on the punch
+                # date: a later version of an ongoing contract (dated after the
+                # punch) must not supply the policy group for an earlier punch.
+                ("date_version", "<=", d),
             ],
             order="date_version desc",
         )
@@ -131,8 +135,15 @@ class HrAttendance(models.Model):
         return super().create(cooked_list)
 
     def write(self, vals):
+        # ``_process_policy`` returns a copy of ``vals`` with the rounded
+        # ``check_in`` / ``check_out`` added. Process the *original* values
+        # separately for every record and write only that record, otherwise a
+        # bulk update would skip rounding (the added key is already present)
+        # and copy the first employee's times and schedule onto the rest.
+        if not self:
+            return super().write(vals)
+        res = True
         for rec in self:
-            vals = self._process_policy(rec.employee_id.id, vals)
-            res = super().write(vals)
-
+            rec_vals = self._process_policy(rec.employee_id.id, vals)
+            res = super(HrAttendance, rec).write(rec_vals)
         return res

@@ -78,7 +78,7 @@ class PolicyLine(models.Model):
     # deprecation warning, which the repo's CI escalates to an error); the
     # replacement is a class-level ``models.Constraint`` named after it.
     _uniq_id_att_type = models.Constraint(
-        "UNIQUE(id,attendance_type)",
+        "UNIQUE(policy_id,attendance_type)",
         "Attendance types must be unique per rounding policy line",
     )
 
@@ -195,7 +195,7 @@ class PolicyLine(models.Model):
 
         # Sign-out: punch time is less than scheduled time
         if utcdt <= utcdtOut:
-            if self.round_type in ["down", "avg"] and not self.preauth_ot:
+            if self.round_type in ["down", "avg"]:
                 utcdtBottom = utcdtOut
                 while utcdtBottom > utcdt:
                     utcdtBottom += timedelta(minutes=-(self.round_interval))
@@ -210,14 +210,14 @@ class PolicyLine(models.Model):
         # Sign-out: punch time is greater than scheduled time
         if utcdt > utcdtOut:
             if self.round_type in ["down", "avg"]:
-                utcdtPrevBottom = utcdtIn
-                utcdtBottom = utcdtIn
+                utcdtPrevBottom = utcdtOut
+                utcdtBottom = utcdtOut
                 while utcdtBottom <= utcdt:
                     utcdtPrevBottom = utcdtBottom
                     utcdtBottom += timedelta(minutes=+(self.round_interval))
                 utcdtBottom = utcdtPrevBottom
             if self.round_type in ["up", "avg"]:
-                utcdtTop = utcdtIn
+                utcdtTop = utcdtOut
                 while utcdtTop < utcdt:
                     utcdtTop += timedelta(minutes=+(self.round_interval))
 

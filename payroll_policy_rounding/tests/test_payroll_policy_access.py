@@ -15,31 +15,36 @@ class TestPolicyAccess(common.TestPolicyCommon):
         # Create fails
         with self.assertRaises(AccessError):
             self.Policy.with_user(self.userHRM).create(
-                {"name": "POLICY2", "date": date.today()}
+                {"name": "POLICY2", "date": date.today(), "tz": "UTC"}
             )
-            self.OtPolicyLine.with_user(self.userHRM).create(
-                {"name": "line2", "type": "daily"}
+        with self.assertRaises(AccessError):
+            self.PolicyLine.with_user(self.userHRM).create(
+                {"attendance_type": "in", "round_type": "down"}
             )
         # Unlink fails
         with self.assertRaises(AccessError):
             self.policy.with_user(self.userHRM).unlink()
+        with self.assertRaises(AccessError):
             self.line.with_user(self.userHRM).unlink()
-        # Read succeeds
+        # Read succeeds (read a field to actually exercise read access)
         try:
-            self.Policy.with_user(self.userHRM).browse(self.policy.id)
+            self.Policy.with_user(self.userHRM).browse(self.policy.id).read(["name"])
         except AccessError:
-            self.fail("Caught an unexpected exception reading hr.policy.presence")
+            self.fail("Caught an unexpected exception reading hr.policy.rounding")
         try:
-            self.PolicyLine.with_user(self.userHRM).browse(self.policy.id)
+            self.PolicyLine.with_user(self.userHRM).browse(self.line.id).read(
+                ["attendance_type"]
+            )
         except AccessError:
-            self.fail("Caught an unexpected exception reading hr.policy.line.presence")
+            self.fail("Caught an unexpected exception reading hr.policy.line.rounding")
         # Write fails
         with self.assertRaises(AccessError):
             self.Policy.with_user(self.userHRM).browse(self.policy.id).write(
                 {"name": "POLICY3"}
             )
+        with self.assertRaises(AccessError):
             self.PolicyLine.with_user(self.userHRM).browse(self.line.id).write(
-                {"name": "line3"}
+                {"round_type": "down"}
             )
 
     def test_payroll_user_access(self):
@@ -48,31 +53,36 @@ class TestPolicyAccess(common.TestPolicyCommon):
         # Create fails
         with self.assertRaises(AccessError):
             self.Policy.with_user(self.userPU).create(
-                {"name": "POL2", "date": date.today()}
+                {"name": "POL2", "date": date.today(), "tz": "UTC"}
             )
+        with self.assertRaises(AccessError):
             self.PolicyLine.with_user(self.userPU).create(
-                {"name": "line2", "type": "daily"}
+                {"attendance_type": "in", "round_type": "down"}
             )
         # Unlink fails
         with self.assertRaises(AccessError):
             self.policy.with_user(self.userPU).unlink()
+        with self.assertRaises(AccessError):
             self.line.with_user(self.userPU).unlink()
-        # Read succeeds
+        # Read succeeds (read a field to actually exercise read access)
         try:
-            self.Policy.with_user(self.userPU).browse(self.policy.id)
+            self.Policy.with_user(self.userPU).browse(self.policy.id).read(["name"])
         except AccessError:
-            self.fail("Caught an unexpected exception reading hr.policy.presence")
+            self.fail("Caught an unexpected exception reading hr.policy.rounding")
         try:
-            self.PolicyLine.with_user(self.userPU).browse(self.policy.id)
+            self.PolicyLine.with_user(self.userPU).browse(self.line.id).read(
+                ["attendance_type"]
+            )
         except AccessError:
-            self.fail("Caught an unexpected exception reading hr.policy.line.presence")
+            self.fail("Caught an unexpected exception reading hr.policy.line.rounding")
         # Write fails
         with self.assertRaises(AccessError):
             self.Policy.with_user(self.userPU).browse(self.policy.id).write(
                 {"name": "POL3"}
             )
+        with self.assertRaises(AccessError):
             self.PolicyLine.with_user(self.userPU).browse(self.line.id).write(
-                {"name": "line3"}
+                {"round_type": "down"}
             )
 
     def test_payroll_manager_access(self):
@@ -80,26 +90,28 @@ class TestPolicyAccess(common.TestPolicyCommon):
 
         # Read succeeds
         try:
-            self.Policy.with_user(self.userPM).browse(self.policy.id)
+            self.Policy.with_user(self.userPM).browse(self.policy.id).read(["name"])
         except AccessError:
-            self.fail("Caught an unexpected exception reading hr.policy.presence")
+            self.fail("Caught an unexpected exception reading hr.policy.rounding")
         try:
-            self.PolicyLine.with_user(self.userPM).browse(self.line.id)
+            self.PolicyLine.with_user(self.userPM).browse(self.line.id).read(
+                ["attendance_type"]
+            )
         except AccessError:
-            self.fail("Caught an unexpected exception reading hr.policy.line.presence")
+            self.fail("Caught an unexpected exception reading hr.policy.line.rounding")
         # Write succeeds
         try:
             self.Policy.with_user(self.userPM).browse(self.policy.id).write(
                 {"name": "XXX"}
             )
         except AccessError:
-            self.fail("Caught an unexpected exception writing hr.policy.presence")
+            self.fail("Caught an unexpected exception writing hr.policy.rounding")
         try:
             self.PolicyLine.with_user(self.userPM).browse(self.line.id).write(
                 {"round_type": "down"}
             )
         except AccessError:
-            self.fail("Caught an unexpected exception writing hr.policy.line.presence")
+            self.fail("Caught an unexpected exception writing hr.policy.line.rounding")
         # Create/Unlink succeeds
         try:
             pol = self.Policy.with_user(self.userPM).create(
@@ -108,7 +120,7 @@ class TestPolicyAccess(common.TestPolicyCommon):
             pol.unlink()
         except AccessError:
             self.fail(
-                "Caught unexpected exception creating/unlinking hr.policy.presence"
+                "Caught unexpected exception creating/unlinking hr.policy.rounding"
             )
         try:
             line = self.PolicyLine.with_user(self.userPM).create(
@@ -120,5 +132,5 @@ class TestPolicyAccess(common.TestPolicyCommon):
             line.unlink()
         except AccessError:
             self.fail(
-                "Caught unexpected exception creating/unlinking hr.policy.line.presence"
+                "Caught unexpected exception creating/unlinking hr.policy.line.rounding"
             )
