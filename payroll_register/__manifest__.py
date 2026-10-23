@@ -16,6 +16,7 @@
     ],
     "data": [
         "security/ir.model.access.csv",
+        "security/hr_payroll_register_security.xml",
         "wizard/hr_payroll_register_run_view.xml",
         "views/hr_payroll_register_view.xml",
     ],

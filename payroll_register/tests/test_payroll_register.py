@@ -121,8 +121,10 @@ class TestPayrollRegister(common.TransactionCase):
                 "date_end": self.end,
             }
         )
-        wiz = self.Wizard.with_context(active_id=reg.id).create(
-            {"department_ids": [(6, 0, [self.dept1.id])]}
+        wiz = (
+            self.Wizard.with_user(self.userPM)
+            .with_context(active_id=reg.id)
+            .create({"department_ids": [(6, 0, [self.dept1.id])]})
         )
         wiz.create_payslip_runs()
 
@@ -160,3 +162,100 @@ class TestPayrollRegister(common.TransactionCase):
         }
         self.assertGreater(len(reg.denomination_ids), 0)
         self.check_denominations(reg, res)
+
+    def test_exact_change_multiple_registers(self):
+        """
+        ``exact_change`` is computed per register, never accumulated across
+        records. Reading two registers in a single compute pass must return
+        each register's own total, not a running sum: a shared accumulator
+        would leak one register's amount into the next one.
+        """
+
+        self.setUpCommon()
+        reg1 = self.Register.create(
+            {
+                "name": "Register A",
+                "date_start": self.start,
+                "date_end": self.end,
+                "currency_id": self.env.ref("base.USD").id,
+            }
+        )
+        reg2 = self.Register.create(
+            {
+                "name": "Register B",
+                "date_start": self.start,
+                "date_end": self.end,
+                "currency_id": self.env.ref("base.USD").id,
+            }
+        )
+        self.env["hr.payroll.register.denominations"].create(
+            [
+                {"register_id": reg1.id, "denomination": 100, "denomination_qty": 2},
+                {"register_id": reg1.id, "denomination": 5, "denomination_qty": 3},
+                {"register_id": reg2.id, "denomination": 50, "denomination_qty": 1},
+            ]
+        )
+
+        regs = reg1 | reg2
+        regs.invalidate_recordset(["exact_change"])
+        # mapped() triggers a single multi-record compute pass.
+        self.assertEqual(regs.mapped("exact_change"), [215.0, 50.0])
+
+    def test_set_denominations_clears_empty_register(self):
+        """
+        Re-calculating a register that no longer has any batches must clear
+        the stale denomination rows and the net amount, not keep showing them.
+        """
+
+        reg = self.Register.create(
+            {
+                "name": "Empty Register",
+                "date_start": self.start,
+                "date_end": self.end,
+                "currency_id": self.env.ref("base.USD").id,
+            }
+        )
+        self.env["hr.payroll.register.denominations"].create(
+            {"register_id": reg.id, "denomination": 100, "denomination_qty": 9}
+        )
+        self.assertTrue(reg.denomination_ids)
+
+        reg.set_denominations()
+
+        self.assertFalse(reg.denomination_ids)
+        self.assertEqual(reg.exact_change, 0)
+
+    def test_delete_runs_clears_denominations(self):
+        """
+        Removing every batch of a register must also drop its denomination
+        rows, so the old cash totals are no longer displayed.
+        """
+
+        self.setUpCommon()
+        reg = self.Register.create(
+            {
+                "name": "Register To Delete",
+                "date_start": self.start,
+                "date_end": self.end,
+                "currency_id": self.env.ref("base.USD").id,
+            }
+        )
+        self.env["hr.payslip.run"].create(
+            {
+                "name": "Batch A",
+                "date_start": self.start.date(),
+                "date_end": self.end.date(),
+                "register_id": reg.id,
+            }
+        )
+        self.env["hr.payroll.register.denominations"].create(
+            {"register_id": reg.id, "denomination": 100, "denomination_qty": 9}
+        )
+        self.assertTrue(reg.run_ids)
+        self.assertTrue(reg.denomination_ids)
+
+        reg.action_delete_runs()
+
+        self.assertFalse(reg.run_ids)
+        self.assertFalse(reg.denomination_ids)
+        self.assertEqual(reg.exact_change, 0)

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright (C) 2021 Trevi Software (https://trevi.et)
+     License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl.html). -->
+<odoo noupdate="1">
+    <record id="hr_payroll_register_rule_company" model="ir.rule">
+        <field name="name">Payroll Register: multi-company</field>
+        <field name="model_id" ref="model_hr_payroll_register" />
+        <field name="global" eval="True" />
+        <field name="domain_force">
+            ['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]
+        </field>
+    </record>
+
+    <record id="hr_payroll_register_denomination_rule_company" model="ir.rule">
+        <field name="name">Payroll Register Denomination: multi-company</field>
+        <field name="model_id" ref="model_hr_payroll_register_denominations" />
+        <field name="global" eval="True" />
+        <field name="domain_force">
+            ['|', ('register_id.company_id', '=', False),
+            ('register_id.company_id', 'in', company_ids)]
+        </field>
+    </record>
+</odoo>

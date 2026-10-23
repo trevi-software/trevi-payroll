@@ -25,7 +25,7 @@ class HrPayrollRegister(models.Model):
     _description = "Payroll Register"
 
     _unique_name = models.Constraint(
-        "CHECK(1=1)",
+        "UNIQUE(name, company_id)",
         "Payroll Register description must be unique per company.",
     )
 
@@ -101,6 +101,9 @@ class HrPayrollRegister(models.Model):
         PayslipRun = self.env["hr.payslip.run"]
         payslip_run_ids = PayslipRun.search([("register_id", "in", self.ids)])
         payslip_run_ids.unlink()
+        # Drop the denomination rows as well, otherwise the register keeps
+        # showing the cash quantities and net amount of the deleted batches.
+        self.denomination_ids.unlink()
         return True
 
     @api.model
@@ -123,20 +126,23 @@ class HrPayrollRegister(models.Model):
     def set_denominations(self):
         Denominations = self.env["hr.payroll.register.denominations"]
         for register in self:
-            if len(register.run_ids) == 0:
-                return
-
-            # Remove current denomination count
+            # Remove current denomination count. This must happen before the
+            # empty-register check below, so that removing all the batches
+            # clears the stale cash quantities and net amount instead of
+            # leaving them visible.
             den_ids = Denominations.search([("register_id", "=", register.id)])
             den_ids.unlink()
+
+            if len(register.run_ids) == 0:
+                continue
 
             # Get list of all 'NET' payslip lines
             #
             net_lines = self.get_net_payslip_lines(register.run_ids)
             if len(net_lines) == 0:
-                return
+                continue
 
-            currency = self.currency_id
+            currency = register.currency_id
             denominations, smallest_note = currency.get_denomination_list()
             denom_qty_list = dict.fromkeys(denominations, 0)
             for net in net_lines:
