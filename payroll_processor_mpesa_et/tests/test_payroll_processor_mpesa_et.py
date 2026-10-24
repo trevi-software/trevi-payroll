@@ -8,6 +8,7 @@ from unittest.mock import MagicMock, PropertyMock, patch
 from requests.exceptions import HTTPError
 
 from odoo import tests
+
 from odoo.addons.payroll_processor_mpesa_et.controllers.result import MyResultController
 from odoo.addons.payroll_processor_mpesa_et.controllers.timeout import TimeoutController
 from odoo.addons.payroll_processor_mpesa_et.models.payroll_processor_mpesa_et import (
@@ -19,8 +20,7 @@ from odoo.addons.payroll_processor_mpesa_et.models.payroll_processor_mpesa_et im
 )
 
 REQUEST_PATH = (
-    "odoo.addons.payroll_processor_mpesa_et.models."
-    "payroll_processor_mpesa_et.request"
+    "odoo.addons.payroll_processor_mpesa_et.models.payroll_processor_mpesa_et.request"
 )
 BASE_URL = "https://payroll.example.com"
 

@@ -5,6 +5,7 @@
 from unittest.mock import patch
 
 from odoo.exceptions import ValidationError
+
 from odoo.addons.payroll.tests.common import TestPayslipBase
 
 MPESA_PHONE = "+251911223344"
@@ -96,9 +97,7 @@ class TestMpesaEtPayslip(TestPayslipBase):
         slip = self._create_payslip()
         slip.action_payslip_payment()
         self.assertFalse(slip.mpesa_et_payment_response)
-        self.assertEqual(
-            0, self.Response.search_count([("payslip_id", "=", slip.id)])
-        )
+        self.assertEqual(0, self.Response.search_count([("payslip_id", "=", slip.id)]))
 
     def test_payment_sends_the_net_amount_to_the_employee_phone(self):
         processor = self._create_processor()
@@ -114,13 +113,11 @@ class TestMpesaEtPayslip(TestPayslipBase):
             "ResponseDescription": "Accepted",
         }
         model = type(processor)
-        with patch.object(
-            model, "authenticate", return_value={"access_token": "tok"}
-        ), patch.object(
-            model, "get_authorization", return_value="Bearer tok"
-        ), patch.object(
-            model, "payout", return_value=api_response
-        ) as payout_mock:
+        with (
+            patch.object(model, "authenticate", return_value={"access_token": "tok"}),
+            patch.object(model, "get_authorization", return_value="Bearer tok"),
+            patch.object(model, "payout", return_value=api_response) as payout_mock,
+        ):
             slip.action_payslip_payment()
 
         self.assertTrue(payout_mock.called, "The payout API was called")
@@ -147,13 +144,11 @@ class TestMpesaEtPayslip(TestPayslipBase):
         slip.paid_mpesa = True
         slip.paid = True
         model = type(processor)
-        with patch.object(
-            model, "authenticate", return_value={"access_token": "tok"}
-        ), patch.object(
-            model, "get_authorization", return_value="Bearer tok"
-        ), patch.object(
-            model, "payout"
-        ) as payout_mock:
+        with (
+            patch.object(model, "authenticate", return_value={"access_token": "tok"}),
+            patch.object(model, "get_authorization", return_value="Bearer tok"),
+            patch.object(model, "payout") as payout_mock,
+        ):
             slip.action_payslip_payment()
         self.assertFalse(payout_mock.called, "A paid payslip is not paid again")
 
@@ -161,18 +156,14 @@ class TestMpesaEtPayslip(TestPayslipBase):
         processor = self._create_processor()
         slip = self._create_payslip()
         model = type(processor)
-        with patch.object(
-            model, "authenticate", return_value={"access_token": "tok"}
-        ), patch.object(
-            model, "get_authorization", return_value="Bearer tok"
-        ), patch.object(
-            model, "payout", side_effect=Exception("connection reset")
+        with (
+            patch.object(model, "authenticate", return_value={"access_token": "tok"}),
+            patch.object(model, "get_authorization", return_value="Bearer tok"),
+            patch.object(model, "payout", side_effect=Exception("connection reset")),
         ):
             slip.action_payslip_payment()
         self.assertFalse(
             slip.mpesa_et_payment_response,
             "No response is stored when the request failed",
         )
-        self.assertEqual(
-            0, self.Response.search_count([("payslip_id", "=", slip.id)])
-        )
+        self.assertEqual(0, self.Response.search_count([("payslip_id", "=", slip.id)]))
