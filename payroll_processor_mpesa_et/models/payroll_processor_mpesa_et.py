@@ -122,13 +122,15 @@ class PayrollProcessorMpesaEt(models.Model):
             "ResultURL": result_url,
         }
 
+        # Never log the credential: it is the base64-encoded payout password.
+        logged_payload = dict(payload, SecurityCredential="***")
         _logger.info(
             "Initiating M-PESA payment request to %s for amount %s to endpoint: %s"
             " with payload: %s",
             party_b,
             amount,
             endpoint,
-            payload,
+            logged_payload,
         )
         response = request("POST", endpoint, headers=headers, data=payload, timeout=30)
 

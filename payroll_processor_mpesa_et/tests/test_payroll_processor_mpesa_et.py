@@ -120,6 +120,23 @@ class TestMpesaEtApiClient(tests.TransactionCase):
             b64encode(b"pass").decode("utf-8"), payload["SecurityCredential"]
         )
 
+    def test_payout_does_not_log_the_payment_password(self):
+        """The payout credential is the base64-encoded password: never log it."""
+        logger_name = (
+            "odoo.addons.payroll_processor_mpesa_et.models.payroll_processor_mpesa_et"
+        )
+        with patch(REQUEST_PATH) as request_mock:
+            request_mock.return_value = fake_response({"ConversationId": "conv-1"})
+            with self.assertLogs(logger_name, level="INFO") as logs:
+                self.processor.payout(
+                    "Bearer tok", "+251911223344", 1234.5, "Payslip P1"
+                )
+        logged = "\n".join(logs.output)
+        self.assertNotIn(
+            b64encode(b"pass").decode("utf-8"), logged, "the password is not logged"
+        )
+        self.assertIn("SecurityCredential': '***'", logged)
+
     def test_payout_raises_for_an_http_error(self):
         with patch(REQUEST_PATH) as request_mock:
             response = fake_response(status_code=500)
