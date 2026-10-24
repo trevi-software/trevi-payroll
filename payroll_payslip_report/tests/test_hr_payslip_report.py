@@ -1,8 +1,9 @@
 # Copyright (C) 2022 Trevi Software (https://trevi.et)
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl.html).
 
-from odoo.addons.payroll.tests.common import TestPayslipBase
 from odoo.tests import new_test_user
+
+from odoo.addons.payroll.tests.common import TestPayslipBase
 
 
 class TestHrPayslipReportView(TestPayslipBase):
@@ -24,9 +25,7 @@ class TestHrPayslipReportView(TestPayslipBase):
         rows = self.env["hr.payslip.report.view"].search([])
         self.assertTrue(rows, "the analysis view must return the payslip lines")
         self.assertEqual(set(rows.mapped("name")), {self.richard_emp})
-        self.assertEqual(
-            set(rows.mapped("company_id")), {self.richard_emp.company_id}
-        )
+        self.assertEqual(set(rows.mapped("company_id")), {self.richard_emp.company_id})
         self.assertEqual(set(rows.mapped("state")), {"draft"})
 
     def test_include_category_codes_single_category(self):
@@ -46,9 +45,7 @@ class TestHrPayslipReportView(TestPayslipBase):
 
         # Exactly one category matches this code: rebuilding the view must
         # succeed and must really filter on it.
-        param.set_param(
-            "payroll_payslip_report.include_category_codes", category.code
-        )
+        param.set_param("payroll_payslip_report.include_category_codes", category.code)
         view.init()
         self.assertFalse(
             view.search([]),
