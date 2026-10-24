@@ -44,4 +44,4 @@ class MyResultController(Controller):
             }
         )
 
-        return (MyResultController, self).handler(**kwargs)
+        return {}

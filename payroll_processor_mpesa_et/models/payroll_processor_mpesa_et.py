@@ -1,6 +1,5 @@
 import logging
 from base64 import b64encode
-from json import loads
 
 from requests import codes, request
 
@@ -9,8 +8,8 @@ from odoo import fields, models
 API_SERVER = "apisandbox.safaricom.et"
 API_ENDPOINT_AUTH = "/v1/token/generate"
 API_ENDPOINT_PAYOUT = "/mpesa/b2c/v2/paymentrequest"
-MY_TIMEOUT_ENDPOINT = "payroll_processor_mpesa_et/timeout"
-MY_RESULT_ENDPOINT = "payroll_processor_mpesa_et/result"
+MY_TIMEOUT_ENDPOINT = "payroll_processor_mpesa_et/v1/timeout"
+MY_RESULT_ENDPOINT = "payroll_processor_mpesa_et/v1/result"
 
 _logger = logging.getLogger(__name__)
 
@@ -53,24 +52,16 @@ class PayrollProcessorMpesaEt(models.Model):
         api_server = API_SERVER
         api_endpoint = API_ENDPOINT_AUTH
         api_auth_query = "grant_type=client_credentials"
-        endpoint = (
-            "".join("https://")
-            .join(api_server)
-            .join(api_endpoint)
-            .join("?")
-            .join(api_auth_query)
-        )
-        authorization = "".join(
-            "Basic ",
-            b64encode(
-                "".join(self.consumer_key, ":", self.consumer_secret).encode("utf-8")
-            ),
+        endpoint = f"https://{api_server}{api_endpoint}?{api_auth_query}"
+        credentials = f"{self.consumer_key}:{self.consumer_secret}"
+        authorization = "Basic " + b64encode(credentials.encode("utf-8")).decode(
+            "utf-8"
         )
         headers = {"Authorization": authorization}
         response = request("GET", endpoint, headers=headers, timeout=30)
 
         if response.status_code == codes.ok:
-            return loads(response.json())
+            return response.json()
         else:
             response.raise_for_status()
 
@@ -86,13 +77,7 @@ class PayrollProcessorMpesaEt(models.Model):
             str: The bearer authorization token.
         """
 
-        bearer_auth = (
-            "".join(auth_response["token_type"])
-            .join(" ")
-            .join(auth_response["access_token"])
-        )
-
-        return bearer_auth
+        return f"{auth_response['token_type']} {auth_response['access_token']}"
 
     def payout(
         self, bearer_auth: str, party_b: str, amount: float, remarks: str
@@ -115,23 +100,18 @@ class PayrollProcessorMpesaEt(models.Model):
 
         api_server = API_SERVER
         api_endpoint = API_ENDPOINT_PAYOUT
-        endpoint = "".join("https://").join(api_server).join(api_endpoint)
-        timeout_url = (
-            "".join(self.env["ir.config_parameter"].sudo().get_param("web.base.url"))
-            .join("/")
-            .join(MY_TIMEOUT_ENDPOINT)
-        )
-        result_url = (
-            "".join(self.env["ir.config_parameter"].sudo().get_param("web.base.url"))
-            .join("/")
-            .join(MY_RESULT_ENDPOINT)
-        )
+        endpoint = f"https://{api_server}{api_endpoint}"
+        base_url = self.env["ir.config_parameter"].sudo().get_param("web.base.url")
+        timeout_url = f"{base_url}/{MY_TIMEOUT_ENDPOINT}"
+        result_url = f"{base_url}/{MY_RESULT_ENDPOINT}"
         command = "SalaryPayment"
         occasion = "Disbursement"
         headers = {"Authorization": bearer_auth}
         payload = {
             "InitiatorName": self.api_user,
-            "SecurityCredential": b64encode(self.api_password.encode("utf-8")),
+            "SecurityCredential": b64encode(self.api_password.encode("utf-8")).decode(
+                "utf-8"
+            ),
             "Occassion": occasion,
             "CommandID": command,
             "PartyA": self.party_a,
@@ -158,7 +138,7 @@ class PayrollProcessorMpesaEt(models.Model):
                 party_b,
                 response.text,
             )
-            return loads(response.json())
+            return response.json()
         else:
             response.raise_for_status()
 
@@ -168,7 +148,7 @@ class PayrollProcessorMpesaEt(models.Model):
             "ok_originator_conversation": response["OriginatorConversationID"],
             "ok_response_code": response["ResponseCode"],
             "ok_response_desc": response["ResponseDescription"],
-            "raw": response.__str__,
+            "raw": str(response),
         }
 
     def translate_payment_result(self, response: dict[str, str]) -> dict[str, str]:
@@ -177,5 +157,5 @@ class PayrollProcessorMpesaEt(models.Model):
             "ok_originator_conversation": response["OriginatorConversationID"],
             "ok_response_code": response["ResponseCode"],
             "ok_response_desc": response["ResponseDescription"],
-            "raw": response.__str__,
+            "raw": str(response),
         }

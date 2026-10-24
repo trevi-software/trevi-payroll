@@ -38,7 +38,7 @@ class HrPayslip(models.Model):
     def refund_sheet(self):
         return super().refund_sheet()
 
-    def payslip_cancel(self):
+    def action_payslip_cancel(self):
         if self.filtered(lambda slip: slip.paid_mpesa):
             raise ValidationError(
                 self.env._(
@@ -46,7 +46,7 @@ class HrPayslip(models.Model):
                 )
             )
 
-        return super().payslip_cancel()
+        return super().action_payslip_cancel()
 
     def unlink(self):
         if self.filtered(lambda slip: slip.paid_mpesa):
@@ -60,13 +60,27 @@ class HrPayslip(models.Model):
 
         return super().unlink()
 
+    def _mpesa_et_net_amount(self):
+        """Return the amount to disburse for this payslip.
+
+        payroll carries no net-pay field, so the net is the total of the lines
+        computed from the structure's ``NET`` salary rule - the same convention
+        ``payroll_register`` uses to read a payslip's net.
+        """
+        self.ensure_one()
+        net_lines = self.line_ids.filtered(
+            lambda line: line.salary_rule_id.code == "NET"
+        )
+        return sum(net_lines.mapped("total"))
+
     def action_payslip_payment(self):
         for slip in self:
+            if slip.paid:
+                # Already paid: never send a second payout for the same payslip.
+                continue
             if slip.payroll_payment_processor == "mpesa_et":
-                gw = (
-                    self.env["payroll.processor.mpesa_et"]
-                    .search([("enabled", "=", True)])
-                    .browse()
+                gw = self.env["payroll.processor.mpesa_et"].search(
+                    [("enabled", "=", True)]
                 )
                 if len(gw) == 0:
                     _logger.warning(
@@ -81,7 +95,7 @@ class HrPayslip(models.Model):
                     res = gw[0].payout(
                         authorization,
                         slip.employee_id.mpesa_phone,
-                        slip.net_amount,
+                        slip._mpesa_et_net_amount(),
                         slip.name,
                     )
                 except Exception as e:
